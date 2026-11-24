@@ -21,6 +21,8 @@ header{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var
 .hd{max-width:760px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
 .logo{font:700 22px "Noto Serif KR",serif;letter-spacing:.02em}
 .hd nav{display:flex;align-items:center;gap:18px;font-size:15px}
+.hbt{display:inline-flex;align-items:center;gap:8px}
+.hbt .btn{padding:7px 14px;font-size:14px}
 main{max-width:760px;margin:0 auto;padding:28px 20px 48px}
 h1,h2,h3{font-family:"Noto Serif KR",serif;line-height:1.35;margin:0}
 .hero{padding:20px 0 12px}
@@ -288,11 +290,11 @@ footer{max-width:760px;margin:0 auto;padding:0 20px 36px;font-size:13px;color:va
 .lk{font:inherit;font-size:13px;color:var(--ac);background:none;border:0;padding:0;text-decoration:underline;cursor:pointer}
 #toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:6px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s}
 #toast.on{opacity:1}
-@media (max-width:480px){.logo{font-size:19px;white-space:nowrap}.hd{gap:8px}.hd nav{font-size:14px;gap:4px 11px}.sh{flex-direction:column}.two{grid-template-columns:1fr}.hd nav{gap:12px}}
+@media (max-width:480px){.logo{font-size:19px;white-space:nowrap}.hd{gap:8px}.hd nav{font-size:14px;gap:4px 11px}.hbt{gap:6px}.hbt .btn{padding:6px 10px;font-size:13px}.sh{flex-direction:column}.two{grid-template-columns:1fr}.hd nav{gap:12px}}
 </style>
 </head>
 <body>
-<header><div class="hd"><a class="logo" href="#home">콜라주 노블</a><button type="button" class="onl" id="onl" hidden onclick="pvToggle()"></button><nav><a href="#home">작품</a><a href="#mine">내 작품</a><a href="#chars">캐릭터</a><a href="#music">음원</a><a href="#notices">공지</a><a href="#settings">설정</a><a class="bell" href="#alerts" id="bl" aria-label="알림"></a><a class="btn" href="#write">글쓰기</a></nav></div></header>
+<header><div class="hd"><a class="logo" href="#home">콜라주 노블</a><button type="button" class="onl" id="onl" hidden onclick="pvToggle()"></button><nav><a href="#home">작품</a><a href="#mine">내 작품</a><a href="#chars">캐릭터</a><a href="#music">음원</a><a href="#notices">공지</a><a href="#settings">설정</a><a class="bell" href="#alerts" id="bl" aria-label="알림"></a><span class="hbt"><a class="btn ghost" href="#new">작품 만들기</a><a class="btn" href="#write">글쓰기</a></span></nav></div></header>
 <main id="app"></main>
 <aside class="side" id="side" hidden><div class="sdh"><b id="sdc">온라인</b><button type="button" class="sdx" onclick="sideSet(0)" aria-label="접기">✕</button></div><div id="sdl"></div></aside>
 <footer></footer>
