@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>콜라주 노블</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%96%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="fonts/fonts.css">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@400;600;700&family=Nanum+Myeongjo&family=Nanum+Gothic&family=Gowun+Batang&family=Gowun+Dodum&family=Nanum+Pen+Script&family=Black+Han+Sans&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box}
@@ -67,9 +68,13 @@ img.sp{display:block;padding:0;object-fit:cover}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .bd2.cs{color:#e0b64a}}
 :root[data-theme="dark"] .bd2.cs{color:#e0b64a}
 .cm.pri{background:color-mix(in srgb,var(--ac) 7%,transparent);border-radius:8px;padding:12px 10px}
+.pvx{margin-top:14px;padding:12px 14px;border:1px dashed var(--line);border-radius:8px}
+.pvx p{margin:6px 0 0;font-size:16px}
+.pvx p.mu{font-size:13px}
 .cpk{display:flex;align-items:center;gap:10px;margin-top:6px}
 .cpk input[type=color]{width:42px;height:30px;margin:0;padding:0;border:1px solid var(--line);border-radius:6px;background:none;cursor:pointer}
 .tb{position:sticky;top:var(--hh,54px);z-index:6;background:var(--bg);padding:8px 0;margin:0 0 8px;border-bottom:1px solid var(--line)}
+#sp{max-height:46vh;overflow:auto;align-items:stretch}
 #lb,#qp,#sp{position:sticky;top:calc(var(--hh,54px) + 46px);z-index:6}
 .zo{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;touch-action:none;overflow:hidden}
 .zo img{max-width:92vw;max-height:88vh;transform-origin:center center;will-change:transform;user-select:none;-webkit-user-drag:none}
@@ -77,6 +82,18 @@ img.sp{display:block;padding:0;object-fit:cover}
 .zc button{font:inherit;font-size:15px;min-width:42px;height:42px;border-radius:8px;border:1px solid rgba(255,255,255,.35);background:rgba(0,0,0,.45);color:#fff;cursor:pointer}
 .zh{position:absolute;bottom:calc(14px + env(safe-area-inset-bottom,0px));left:0;right:0;text-align:center;color:rgba(255,255,255,.75);font-size:13px}
 .zoomable{cursor:zoom-in}
+.nc{display:block;padding:14px 0;border-bottom:1px solid var(--line)}
+.nc h3{font-size:17px;font-weight:600;margin:4px 0 0}
+.cat{display:inline-block;padding:1px 10px;border-radius:999px;font-size:12px;font-weight:600;border:1px solid currentColor}
+.cat.c0{color:#c0392b}.cat.c1{color:#2471a3}.cat.c2{color:var(--mute)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .cat.c0{color:#e58a7a}:root:not([data-theme="light"]) .cat.c1{color:#7fb3d9}}
+:root[data-theme="dark"] .cat.c0{color:#e58a7a}:root[data-theme="dark"] .cat.c1{color:#7fb3d9}
+.pin{font-size:12px;color:var(--ac);margin-left:8px}
+.ntx{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.8}
+.pv{position:fixed;inset:0;z-index:55;overflow:auto;background:var(--bg);padding:0 0 60px}
+.pvb{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 18px;background:var(--card);border-bottom:1px solid var(--line)}
+.pvb b{font-size:15px}
+.pv .reader{margin-top:18px}
 .cr{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.9);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:18px;touch-action:none}
 .cr h3{color:#fff;font:600 17px/1.3 "Noto Serif KR",serif;margin:0}
 .cr .fr{position:relative;overflow:hidden;background:#fff;border-radius:10px;box-shadow:0 0 0 2px rgba(255,255,255,.5);cursor:grab;flex:none}
@@ -199,7 +216,7 @@ footer{max-width:760px;margin:0 auto;padding:0 20px 36px;font-size:13px;color:va
 </style>
 </head>
 <body>
-<header><div class="hd"><a class="logo" href="#home">콜라주 노블</a><nav><a href="#home">작품</a><a href="#mine">내 작품</a><a href="#chars">캐릭터</a><a href="#music">음원</a><a href="#settings">설정</a><a class="bell" href="#alerts" id="bl" aria-label="알림"></a><a class="btn" href="#write">글쓰기</a></nav></div></header>
+<header><div class="hd"><a class="logo" href="#home">콜라주 노블</a><nav><a href="#home">작품</a><a href="#mine">내 작품</a><a href="#chars">캐릭터</a><a href="#music">음원</a><a href="#notices">공지</a><a href="#settings">설정</a><a class="bell" href="#alerts" id="bl" aria-label="알림"></a><a class="btn" href="#write">글쓰기</a></nav></div></header>
 <main id="app"></main>
 <footer></footer>
 <div id="toast" role="status"></div>
@@ -229,13 +246,13 @@ const pthA=u=>u&&u.startsWith(PUB+'audio/')?u.slice((PUB+'audio/').length):u;
 const J=JSON.stringify;
 let PN={},isAdm=false,snap=null,syncQ=Promise.resolve(),syncT=0,pend=0,lastLoad=0,authMode='in';
 const pn=id=>PN[id]||'작가';
-const emptyDb=()=>({prefs:{size:18,lh:1.9,th:'white',vol:70,alias:{}},set:{alias:true,bgm:true,noRp:false,block:[],nt:{eps:true,cm:'all',seen:''}},subs:[],drafts:[],colors:[],tracks:[],chars:[],core:[],series:[]});
+const emptyDb=()=>({prefs:{size:18,lh:1.9,th:'white',vol:70,alias:{}},set:{alias:true,bgm:true,noRp:false,block:[],nt:{eps:true,cm:'all',seen:''}},subs:[],drafts:[],colors:[],tracks:[],chars:[],core:[],notices:[],series:[]});
 db=emptyDb();
 
 // ----- 표 한 줄로 바꾸는 함수들 (서버에 보낼 모양) -----
 const rowS=s=>({id:s.id,owner:s.author===ME?UID:s.author,title:s.title,kind:s.kind||'long',status:s.status||'연재중',description:s.desc||'',tags:s.tags||[],core_tags:s.core||[],warns:s.warns||[],cover_path:s.cover?pthI(s.cover):null,theme_track:s.theme||null});
 const rowE=(e,i,sid)=>({id:e.id,series_id:sid,position:i,title:e.title,html:e.html||'',status:e.st||'공개',thumb_path:e.img?pthI(e.img):null,cast_ids:e.cast||[],bgm:e.bgm||'',scenes:e.sc||{},edit_count:e.rev||0});
-const rowC=c=>({id:c.id,owner:c.owner===ME?UID:c.owner,name:c.name,wiki_link:c.link||'',avatar_path:c.img?pthI(c.img):null,shared_with:c.share||[],font:c.font||'',color:c.color||'',text_color:c.tcolor||''});
+const rowC=c=>({id:c.id,owner:c.owner===ME?UID:c.owner,name:c.name,wiki_link:c.link||'',avatar_path:c.img?pthI(c.img):null,shared_with:c.share||[],font:c.font||'',color:c.color||'',text_color:c.tcolor||'',split_name:c.split!==false});
 const rowD=d=>({id:d.id,owner:UID,target:d.sid||'',title:d.title||'',html:d.html||'',cast_ids:d.cast||[],thumb_path:d.img||null,bgm:d.bgm||'',scenes:d.sc||{}});
 const rowU=()=>({user_id:UID,alias_on:db.set.alias!==false,hide_rp:!!db.set.noRp,block_warns:db.set.block||[],bgm_on:db.set.bgm!==false,volume:db.prefs.vol==null?70:db.prefs.vol,reader:{size:db.prefs.size,lh:db.prefs.lh,th:db.prefs.th,font:db.prefs.font||null,colors:db.colors||[]},aliases:db.prefs.alias||{},notif:db.set.nt||{}});
 const mineS=()=>db.series.filter(s=>s.author===ME);
@@ -252,17 +269,18 @@ function mkSnap(){const s={s:{},e:{},c:{},t:{},d:{},m:{},sub:db.subs.slice(),u:J
 // ----- 서버에서 불러오기 -----
 async function loadAll(){
  const q=t=>sb.from(t).select('*');
- const R=await Promise.all([q('profiles'),sb.from('series').select('*').order('created_at',{ascending:false}),sb.from('episodes').select('*').order('position'),q('characters'),q('tracks'),sb.from('comments').select('*').order('created_at'),sb.from('subscriptions').select('series_id').eq('user_id',UID),sb.from('drafts').select('*').eq('owner',UID).order('updated_at',{ascending:false}),sb.from('user_settings').select('*').eq('user_id',UID).maybeSingle(),sb.from('core_tags').select('*').order('position')]);
+ const R=await Promise.all([q('profiles'),sb.from('series').select('*').order('created_at',{ascending:false}),sb.from('episodes').select('*').order('position'),q('characters'),q('tracks'),sb.from('comments').select('*').order('created_at'),sb.from('subscriptions').select('series_id').eq('user_id',UID),sb.from('drafts').select('*').eq('owner',UID).order('updated_at',{ascending:false}),sb.from('user_settings').select('*').eq('user_id',UID).maybeSingle(),sb.from('core_tags').select('*').order('position'),sb.from('notices').select('*').order('created_at',{ascending:false})]);
  R.forEach(r=>{if(r.error)throw r.error});
- const [pr,se,ep,ch,tr,cm,sub,dr,us,ct]=R.map(r=>r.data);
+ const [pr,se,ep,ch,tr,cm,sub,dr,us,ct,nc]=R.map(r=>r.data);
  PN={};pr.forEach(p=>{PN[nid(p.id)]=p.nickname;if(nid(p.id)===ME)isAdm=!!p.is_admin});
  const D=emptyDb(),u=us||{},rd=u.reader||{};
  D.set={alias:u.alias_on!==false,bgm:u.bgm_on!==false,noRp:!!u.hide_rp,block:u.block_warns||[],nt:Object.assign({eps:true,cm:'all',seen:''},u.notif||{})};
  D.core=(ct||[]).map(x=>({id:nid(x.id),name:x.name,pos:x.position}));
+ D.notices=(nc||[]).map(x=>({id:nid(x.id),cat:x.category,title:x.title,body:x.body||'',pin:!!x.pinned,author:x.author?nid(x.author):'',ts:Date.parse(x.created_at),up:Date.parse(x.updated_at)})).sort((a,b)=>(b.pin-a.pin)||(b.ts-a.ts));
  D.prefs={size:rd.size||18,lh:rd.lh||1.9,th:rd.th||'white',font:rd.font||undefined,vol:u.volume==null?70:u.volume,alias:u.aliases||{}};
  D.colors=rd.colors||[];
  D.subs=sub.map(x=>nid(x.series_id));
- D.chars=ch.map(c=>({id:nid(c.id),owner:nid(c.owner),name:c.name,link:c.wiki_link||'',img:urlI(c.avatar_path),share:(c.shared_with||[]).map(nid),font:c.font||'',color:c.color||'',tcolor:c.text_color||''}));
+ D.chars=ch.map(c=>({id:nid(c.id),owner:nid(c.owner),name:c.name,link:c.wiki_link||'',img:urlI(c.avatar_path),share:(c.shared_with||[]).map(nid),font:c.font||'',color:c.color||'',tcolor:c.text_color||'',split:c.split_name!==false}));
  D.tracks=tr.map(t=>({id:nid(t.id),owner:nid(t.owner),name:t.name,path:t.path,src:urlA(t.path)}));
  const cmBy={};cm.forEach(c=>{const k=nid(c.episode_id);(cmBy[k]=cmBy[k]||[]).push({id:nid(c.id),kind:c.kind,name:c.display_name,img:urlI(c.avatar_path),text:c.body,d:c.created_at.slice(0,10),ts:Date.parse(c.created_at),mine:nid(c.author)===ME?1:0,cid:c.character_id?nid(c.character_id):null})});
  const epBy={};ep.forEach(e=>{const k=nid(e.series_id);(epBy[k]=epBy[k]||[]).push({id:nid(e.id),title:e.title,st:e.status,d:e.created_at.slice(0,10),html:e.html,img:urlI(e.thumb_path),cast:(e.cast_ids||[]).map(nid),bgm:nid(e.bgm)||'',sc:e.scenes||{},rev:e.edit_count||0,ts:Date.parse(e.created_at),cm:cmBy[nid(e.id)]||[]})});
@@ -357,7 +375,7 @@ const admPanel=()=>!isAdm?'':`<h2 class="h2" style="margin-top:36px">중요 태�
 <div style="margin-top:10px">${db.core.map(c=>`<div class="dr"><span><b>${esc(c.name)}</b> <span class="mu">${db.series.filter(s=>(s.core||[]).includes(c.name)).length}개 작품</span></span><span><button class="lk" onclick="ctRen('${c.id}')">이름 바꾸기</button> <button class="lk" onclick="ctDel('${c.id}')">삭제</button></span></div>`).join('')||'<p class="mu">아직 중요 태그가 없어요.</p>'}</div>
 <h2 class="h2" style="margin-top:36px">모든 작품 관리</h2><p class="mu">다른 사람의 작품도 고치거나 지울 수 있고, 주인을 바꿀 수 있어요.</p>
 <div>${db.series.map(s=>`<div class="dr" style="flex-wrap:wrap"><span><b>${esc(s.title)}</b> <span class="mu">${esc(pn(s.author))} · ${s.eps.length}화</span></span><span style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><a class="lk" href="#series-${s.id}">열기</a><a class="lk" href="#edit-${s.id}">정보 수정</a><select id="xo-${s.id}" class="fs">${Object.keys(PN).map(u=>`<option value="${u}"${u===s.author?' selected':''}>${esc(pn(u))}</option>`).join('')}</select><button class="lk" onclick="admXfer('${s.id}')">양도</button><button class="lk" onclick="admDelS('${s.id}')">삭제</button></span></div>`).join('')||'<p class="mu">아직 작품이 없어요.</p>'}</div>
-<h2 class="h2" style="margin-top:36px">모든 캐릭터 관리</h2><div>${db.chars.map(c=>`<div class="dr"><span><b style="${chStyle(c.id)}">${esc(c.name)}</b> <span class="mu">${esc(pn(c.owner))}</span></span><span>${c.owner===ME?'<span class="mu">내 캐릭터</span>':`<button class="lk" onclick="admDelC('${c.id}')">삭제</button>`}</span></div>`).join('')||'<p class="mu">아직 캐릭터가 없어요.</p>'}</div>`;
+<h2 class="h2" style="margin-top:36px">모든 캐릭터 관리</h2><div>${db.chars.map(c=>`<div class="dr" style="flex-wrap:wrap"><span><b style="${chStyle(c.id)}">${esc(c.name)}</b> <span class="mu">${esc(pn(c.owner))}</span></span><span style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><a class="lk" href="#char-${c.id}">열기</a><select id="xc-${c.id}" class="fs">${Object.keys(PN).map(u=>`<option value="${u}"${u===c.owner?' selected':''}>${esc(pn(u))}</option>`).join('')}</select><button class="lk" onclick="admXferC('${c.id}')">양도</button>${c.owner===ME?'':`<button class="lk" onclick="admDelC('${c.id}')">삭제</button>`}</span></div>`).join('')||'<p class="mu">아직 캐릭터가 없어요.</p>'}</div>`;
 async function nkSave(){const v=$('#nk').value.trim().slice(0,20);if(!v){toast('닉네임을 입력해 주세요');return}const r=await sb.from('profiles').update({nickname:v}).eq('id',UID);if(r.error){toast('저장하지 못했어요');return}PN[ME]=v;toast('닉네임을 바꿨어요')}
 async function icLoad(){const l=$('#icl');if(!l)return;const r=await sb.from('invite_codes').select('*').order('created_at',{ascending:false});if(r.error){l.innerHTML='<p class="mu">불러오지 못했어요</p>';return}
  l.innerHTML=r.data.map(c=>`<div class="dr"><span><b>${esc(c.code)}</b> <span class="mu">${c.used_count}/${c.max_uses}회 사용${c.note?' / '+esc(c.note):''}</span></span><button class="lk" onclick="icDel('${esc(c.code)}')">삭제</button></div>`).join('')||'<p class="mu">만든 코드가 없어요.</p>'}
@@ -412,7 +430,7 @@ ${nsp2(s,e)}${wnote(s)}<div class="rc">${casts(castE(e),1,1)}</div><article clas
 
 function nwT(){const v=$('#ws').value;$('#nw').hidden=v!=='new'&&v!=='short';document.querySelectorAll('.lt,.ls').forEach(e=>e.hidden=v==='short')}
 function cnt(){const t=$('#ed').textContent,n=t.replace(/\s/g,'').length;$('#cnt').textContent=`공백 제외 ${n.toLocaleString()}자, 원고지 약 ${Math.ceil(t.length/200)}매`}
-function dr(){if(!$('#ed'))return;cnt();bsr();if(rev)return;$('#sv').textContent='저장 중';clearTimeout(tm);tm=setTimeout(()=>{if(!$('#ed'))return;if(!$('#wt').value.trim()&&!$('#ed').textContent.trim())return;if(!cd)cd=uid('d');const x={id:cd,sid:$('#ws').value,title:$('#wt').value,cast:gc(),img:eiData,bgm:bgm0,sc:bsc,html:clean($('#ed').innerHTML),ts:Date.now()},i=db.drafts.findIndex(y=>y.id===cd);i<0?db.drafts.unshift(x):db.drafts[i]=x;$('#sv').textContent=save()?'임시 저장됨':'저장 실패';dl()},600)}
+function dr(){if(!$('#ed'))return;cnt();bsr();syncCast();if(rev)return;$('#sv').textContent='저장 중';clearTimeout(tm);tm=setTimeout(()=>{if(!$('#ed'))return;if(!$('#wt').value.trim()&&!$('#ed').textContent.trim())return;if(!cd)cd=uid('d');const x={id:cd,sid:$('#ws').value,title:$('#wt').value,cast:gc(),img:eiData,bgm:bgm0,sc:bsc,html:clean($('#ed').innerHTML),ts:Date.now()},i=db.drafts.findIndex(y=>y.id===cd);i<0?db.drafts.unshift(x):db.drafts[i]=x;$('#sv').textContent=save()?'임시 저장됨':'저장 실패';dl()},600)}
 function fmt(c,v){document.execCommand(c,false,c==='formatBlock'?'<'+v+'>':v||null);$('#ed').focus();dr()}
 function vWrite(sid,did){rev=null;const mine=db.series.filter(s=>s.author===ME&&s.kind!=='short'),d=(db.drafts||[]).find(x=>x.id===did)||{};cd=d.id||null;bgm0=d.bgm||'';bsc=Object.assign({},d.sc);
 const sel=sid&&mine.some(s=>s.id===sid)?sid:(d.sid&&(d.sid==='new'||d.sid==='short'||mine.some(s=>s.id===d.sid))?d.sid:(mine[0]?mine[0].id:'new'));
@@ -420,19 +438,19 @@ app.innerHTML=`<div class="wrap"><h1>글쓰기</h1><div id="dl"></div>
 <label>올릴 곳<select id="ws" onchange="nwT()">${mine.map(s=>`<option value="${s.id}"${s.id===sel?' selected':''}>${esc(s.title)}</option>`).join('')}<option value="new"${sel==='new'?' selected':''}>장편: 새 시리즈 만들기</option><option value="short"${sel==='short'?' selected':''}>단편: 시리즈 없이 올리기</option></select></label>
 <div id="nw" class="box" hidden>${sfields({})}</div>
 ${edBody(d)}
-<div class="acts"><select id="wst" aria-label="공개 설정"><option>공개</option><option>비공개</option></select><button class="btn" onclick="publish()">발행하기</button></div></div>`;
+<div class="acts"><select id="wst" aria-label="공개 설정"><option>공개</option><option>비공개</option></select><button class="btn ghost" onclick="pvOpen()">미리보기</button><button class="btn" onclick="publish()">발행하기</button></div></div>`;
 edInit(d);nwT();dl();$('#ws').addEventListener('change',dr)}
 const edBody=d=>`<label>회차 제목<input id="wt" maxlength="80" value="${esc(d.title||'')}"></label>${efs(d.cast||[])}${eis()}${bgf()}
 <div class="tb" onmousedown="if(!/INPUT|SELECT|OPTION/.test(event.target.tagName))event.preventDefault()">${tbar()}</div><div id="lb" class="pn2" hidden><input id="lu" placeholder="https://로 시작하는 링크 주소" aria-label="링크 주소"><button type="button" class="btn" onclick="lka()">링크 적용</button><button type="button" class="btn ghost" onclick="$('#lb').hidden=true">닫기</button></div><div id="qp" class="pn2" hidden onmousedown="event.preventDefault()">${[1,2,3,4,5,6].map(n=>`<button type="button" class="qb" onclick="qt(${n})"><blockquote class="q${n}">인용</blockquote></button>`).join('')}<button type="button" class="qb" onclick="qt(0)">인용 해제</button></div><div id="sp" class="pn2" hidden></div>
 <p class="mu" style="margin:0 0 6px">본문에서 @를 입력하면 내 캐릭터를 불러올 수 있어요. 태그로 넣은 이름만 독자의 별명으로 바뀝니다.</p><div id="ed" class="ed" contenteditable="true" spellcheck="true" lang="ko" data-ph="여기에 이야기를 써 보세요"></div>
 <div id="mn" class="mn" hidden></div><div id="ip" class="pn2" hidden><span>삽화 크기</span><input type="range" id="iw" min="10" max="100" step="5" value="100" oninput="isz(this.value)" aria-label="삽화 크기"><b id="ivl">100%</b><button type="button" class="btn ghost" onclick="idl()">삽화 삭제</button></div><div class="meta"><span id="cnt"></span><span id="sv"></span></div>`;
-function edInit(d){$('#ed').innerHTML=clean(d.html||'');styleDlg($('#ed'));coverData='';showC();eiData=d.img||'';cx=null;showE();bsn=-1;bsr();cnt();rsw();ntfix();$('#ed').addEventListener('click',ie);$('#ed').addEventListener('input',mnChk);$('#ed').addEventListener('keydown',mnK);$('#ed').addEventListener('blur',()=>setTimeout(mnX,150));
+function edInit(d){$('#ed').innerHTML=clean(d.html||'');styleDlg($('#ed'));autoC=new Set(tids($('#ed').innerHTML));coverData='';showC();eiData=d.img||'';cx=null;showE();bsn=-1;bsr();cnt();rsw();ntfix();$('#ed').addEventListener('click',ie);$('#ed').addEventListener('input',mnChk);$('#ed').addEventListener('keydown',mnK);$('#ed').addEventListener('blur',()=>setTimeout(mnX,150));
 $('#ed').addEventListener('input',dr);$('#wt').addEventListener('input',dr)}
 function vRev(sid,eid){const s=find(sid),e=s&&(s.author===ME||isAdm)&&s.eps.find(x=>x.id===eid);if(!e)return vHome();
 rev={s:sid,e:eid};cd=null;bgm0=e.bgm||'';bsc=Object.assign({},e.sc||{});
 app.innerHTML=`<div class="wrap"><h1>글 수정</h1><p class="mu">${esc(s.title)}${s.kind==='short'?'':' / '+esc(e.title)} · ${esc(e.d)} 발행${e.rev?` · 수정 ${e.rev}회`:''}</p>
 ${edBody(e)}
-<div class="acts"><select id="wst" aria-label="공개 설정"><option${e.st==='비공개'?'':' selected'}>공개</option><option${e.st==='비공개'?' selected':''}>비공개</option></select><button class="btn" onclick="saveRev()">수정 완료</button><a class="btn ghost" href="#series-${sid}">취소</a></div></div>`;
+<div class="acts"><select id="wst" aria-label="공개 설정"><option${e.st==='비공개'?'':' selected'}>공개</option><option${e.st==='비공개'?' selected':''}>비공개</option></select><button class="btn ghost" onclick="pvOpen()">미리보기</button><button class="btn" onclick="saveRev()">수정 완료</button><a class="btn ghost" href="#series-${sid}">취소</a></div></div>`;
 edInit(e)}
 function saveRev(){if(!rev)return;const s=find(rev.s),e=s&&s.eps.find(x=>x.id===rev.e);if(!e){rev=null;return vHome()}
 const t=$('#wt').value.trim(),html=clean(dlgify($('#ed').innerHTML)),st=$('#wst').value;
@@ -506,8 +524,8 @@ function saveS(id){const s=find(id),t=$('#nt').value.trim();if(!t){toast('시리
 if(s.author!==ME){location.hash='series-'+id;adm(()=>pushS(s),'저장했습니다');return}
 if(save()){toast('저장했습니다');location.hash='series-'+id}}
 document.addEventListener('selectionchange',()=>{const e=$('#ed'),s=getSelection();if(e&&s.rangeCount&&e.contains(s.anchorNode))sr=s.getRangeAt(0).cloneRange()});
-const FONTS=[['명조 (기본)','Noto Serif KR'],['고딕','Noto Sans KR'],['나눔명조','Nanum Myeongjo'],['나눔고딕','Nanum Gothic'],['고운바탕','Gowun Batang'],['고운돋움','Gowun Dodum'],['나눔손글씨 펜','Nanum Pen Script'],['블랙한산스','Black Han Sans']];
-const WN=['R18','유혈','폭력','선정적 표현','자살·자해','약물'];
+const FONTS=[['명조 (기본)','Noto Serif KR'],['고딕','Noto Sans KR'],['나눔명조','Nanum Myeongjo'],['나눔고딕','Nanum Gothic'],['고운바탕','Gowun Batang'],['고운돋움','Gowun Dodum'],['나눔손글씨 펜','Nanum Pen Script'],['블랙한산스','Black Han Sans'],['온글잎 박다현체','Ownglyph PDH'],['히피체','Hippie'],['부크크 명조','Bookk Myungjo'],['DNF 비트비트','DNF Bit Bit'],['DNF 단조된 칼날','DNF Forged Blade'],['학교안심 밤하늘','Hakgyoansim Bamhaneul'],['KOTRA 도약','KOTRA LEAP'],['마비노기 클래식','Mabinogi Classic'],['메이플스토리','Maplestory'],['메모멘트 꾹꾹체','Memoment Kkukkukk']];
+const WN=['R18','유혈','폭력','선정적 표현','자살·자해','약물','피폐(우울)','스포일러'];
 const wn=s=>(s.warns||[]).length?`<p class="warns">${s.warns.map(w=>`<span>${esc(w)}</span>`).join('')}</p>`:'';
 const wnote=s=>(s.warns||[]).length?`<div class="wnote"><b>주의</b> 이 작품에는 ${s.warns.map(w=>esc(w)).join(', ')} 요소가 포함되어 있습니다.</div>`:'';
 const wfs=s=>`<fieldset class="wf"><legend>주의 요소 <span class="mu">표시한 항목은 독자에게 먼저 안내됩니다</span></legend>${WN.map(w=>`<label class="ck"><input type="checkbox" name="wn" value="${w}"${(s.warns||[]).includes(w)?' checked':''}>${w}</label>`).join('')}<label>직접 입력 <span class="mu">쉼표로 구분</span><input id="wx" maxlength="60" value="${esc((s.warns||[]).filter(w=>!WN.includes(w)).join(', '))}"></label></fieldset>`;
@@ -576,21 +594,30 @@ app.innerHTML=`<div class="wrap"><h1>캐릭터</h1><p class="mu">내 캐릭터�
 ${sh.length?`<h2 class="h2" style="margin-top:28px">나에게 공유된 캐릭터</h2><div>${sh.map(c=>crow(c,0)).join('')}</div>`:''}
 <h2 class="h2" style="margin-top:28px">모두의 캐릭터 ${ot.length}명</h2><div>${ot.map(c=>crow(c,0)).join('')||'<p class="mu" style="margin:14px 0">아직 없습니다.</p>'}</div>
 <h2 class="h2" style="margin-top:32px">${ed?'캐릭터 수정':'새 캐릭터'}</h2><div class="box">
-<label>이름<input id="cn" maxlength="20"></label>
+<label>이름<input id="cn" maxlength="20" oninput="cpv()"></label>
 <label>콜라주 위키 링크 <span class="mu">캐릭터 소개가 적혀 있는 콜라주 위키 주소 (선택)</span><input id="ci" maxlength="300" placeholder="https://"></label>
-<div class="two"><label>퍼스널 색상 <span class="mu">이름에 쓰여요</span><span class="cpk"><input type="color" id="ccl" value="${esc((ed&&ed.color)||'#7f8c8d')}"><button type="button" class="lk" onclick="$('#ccl').value='#7f8c8d'">기본으로</button></span></label>
-<label>대사 글자색<span class="cpk"><input type="color" id="ctc" value="${esc((ed&&ed.tcolor)||'#7f8c8d')}"><button type="button" class="lk" onclick="$('#ctc').value='#7f8c8d'">기본으로</button></span></label></div>
-<label>대사 글꼴<select id="cft"><option value="">기본</option>${FONTS.map(f=>`<option value="${f[1]}"${ed&&ed.font===f[1]?' selected':''}>${f[0]}</option>`).join('')}</select></label>
+<div class="two"><label>퍼스널 색상 <span class="mu">이름에 쓰여요</span><span class="cpk"><input type="color" id="ccl" value="${esc((ed&&ed.color)||'#7f8c8d')}" oninput="cpv()"><button type="button" class="lk" onclick="$('#ccl').value='#7f8c8d';cpv()">기본으로</button></span></label>
+<label>대사 글자색<span class="cpk"><input type="color" id="ctc" value="${esc((ed&&ed.tcolor)||'#7f8c8d')}" oninput="cpv()"><button type="button" class="lk" onclick="$('#ctc').value='#7f8c8d';cpv()">기본으로</button></span></label></div>
+<label>대사 글꼴<select id="cft" onchange="cpv()"><option value="">기본</option>${FONTS.map(f=>`<option value="${f[1]}"${ed&&ed.font===f[1]?' selected':''}>${f[0]}</option>`).join('')}</select></label>
+<div class="pvx"><span class="mu">미리보기</span><p id="cpv1"></p><p id="cpv2" class="mu"></p></div>
+<label class="ck"><input type="checkbox" id="csp"${ed&&ed.split===false?'':' checked'} onchange="cpv()">이름을 성과 이름으로 구분하기</label>
+<p class="mu" id="cspn" style="margin:2px 0 0"></p>
 <label>프로필 사진<input type="file" id="caf" accept="image/*" onchange="pickA(this)"></label><div id="avp"></div>
 <fieldset class="wf"><legend>RP 함께 쓰기 <span class="mu">고른 사람도 이 캐릭터로 RP 댓글을 쓸 수 있어요</span></legend>${uOpts.length?uOpts.map(u=>`<label class="ck"><input type="checkbox" name="csh" value="${u}"${ed&&(ed.share||[]).includes(u)?' checked':''}>${esc(pn(u))}</label>`).join(''):'<p class="mu">아직 다른 회원이 없어요.</p>'}</fieldset>
-<div class="acts"><button class="btn" onclick="csv()">${ed?'수정 저장':'캐릭터 추가'}</button>${ed?`<button class="btn ghost" onclick="ceid=null;avData='';vChars()">취소</button>`:''}</div></div></div>`;showA()}
-function ced(id){const c=db.chars.find(x=>x.id===id&&x.owner===ME);if(!c)return;ceid=id;avData=c.img||'';vChars();$('#cn').value=c.name;$('#ci').value=c.link||'';showA();window.scrollTo(0,document.body.scrollHeight)}
+<div class="acts" style="margin-top:18px"><button class="btn" onclick="csv()">${ed?'수정 저장':'캐릭터 추가'}</button>${ed?`<button class="btn ghost" onclick="ceid=null;avData='';vChars()">취소</button>`:''}</div></div></div>`;showA();if(ed){$('#cn').value=ed.name;$('#ci').value=ed.link||''}cpv()}
+const PVS='털을 다 뽑아주마!!!';
+function cpv(){const n=($('#cn')&&$('#cn').value.trim())||'이름',f=$('#cft')?$('#cft').value:'',tc=$('#ctc')?$('#ctc').value:'',nc=$('#ccl')?$('#ccl').value:'',sp=$('#csp')?$('#csp').checked:true;
+ const a=$('#cpv1'),b=$('#cpv2'),g=$('#cspn');
+ if(a){a.innerHTML=`<b style="color:${esc(nc)}">${esc(n)}</b> <span style="${f?`font-family:'${esc(f)}',serif;`:''}color:${esc(tc)}">“${PVS}”</span>`}
+ if(b)b.textContent='작품에서 이 캐릭터의 대사는 이렇게 보여요.';
+ if(g){const p=sp?parts(n):{last:'',first:n};g.textContent=sp&&p.last?`@로 부를 때: ${n} / ${p.first} / ${p.last} 중에서 고를 수 있어요`:'@로 부를 때: '+n+' 전체로만 넣을 수 있어요'}}
+function ced(id){const c=db.chars.find(x=>x.id===id&&x.owner===ME);if(!c)return;ceid=id;avData=c.img||'';vChars();window.scrollTo(0,document.body.scrollHeight)}
 const gshare=()=>[...document.querySelectorAll('[name=csh]:checked')].map(e=>e.value);
-function csv(){const n=$('#cn').value.trim(),my=db.chars.filter(c=>c.owner===ME);if(!n){toast('캐릭터 이름을 입력해 주세요');return}const lk=$('#ci').value.trim();if(lk&&!/^https?:\/\//i.test(lk)){toast('링크는 http:// 또는 https:// 로 시작해야 해요');return}let c=ceid&&db.chars.find(x=>x.id===ceid&&x.owner===ME);if(!c){if(my.length>=10){toast('캐릭터는 최대 10명까지 만들 수 있어요');return}c={id:uid('c'),owner:ME};db.chars.push(c)}Object.assign(c,{name:n,link:lk,img:avData,share:gshare(),font:$('#cft').value,color:$('#ccl').value,tcolor:$('#ctc').value});if(save()){ceid=null;avData='';toast('저장했습니다');vChars()}}
+function csv(){const n=$('#cn').value.trim(),my=db.chars.filter(c=>c.owner===ME);if(!n){toast('캐릭터 이름을 입력해 주세요');return}const lk=$('#ci').value.trim();if(lk&&!/^https?:\/\//i.test(lk)){toast('링크는 http:// 또는 https:// 로 시작해야 해요');return}let c=ceid&&db.chars.find(x=>x.id===ceid&&x.owner===ME);if(!c){if(my.length>=10){toast('캐릭터는 최대 10명까지 만들 수 있어요');return}c={id:uid('c'),owner:ME};db.chars.push(c)}Object.assign(c,{name:n,link:lk,img:avData,share:gshare(),font:$('#cft').value,color:$('#ccl').value,tcolor:$('#ctc').value,split:$('#csp').checked});if(save()){ceid=null;avData='';toast('저장했습니다');vChars()}}
 function cdl(id){const c=db.chars.find(x=>x.id===id&&x.owner===ME);if(!c)return;
 if(!confirm('캐릭터 ‘'+c.name+'’을(를) 삭제할까요?\n\n작품의 등장인물 목록에서도 빠지고 되돌릴 수 없어요.\n이 캐릭터로 쓴 RP 댓글은 그대로 남아요.'))return;
 db.chars=db.chars.filter(x=>x.id!==id);db.series.forEach(s=>s.eps.forEach(e=>{e.cast=(e.cast||[]).filter(x=>x!==id)}));save();toast('캐릭터를 삭제했어요');ceid=null;avData='';vChars()}
-function vChar(id){const c=db.chars.find(x=>x.id===id);if(!c)return vHome();const L=db.series.filter(s=>castL(s).some(c=>c.id===id)&&!blk(s));app.innerHTML=`<div class="wrap"><div class="sh">${av(c.img,c.name).replace('class="av"','class="av lgav"')}<div><h1 style="${chStyle(c.id)}">${esc(c.name)}</h1><p class="mu">${esc(pn(c.owner))}의 캐릭터${(c.share||[]).length?' · RP 공유: '+(c.share||[]).map(u=>esc(pn(u))).join(', '):''}</p>${c.font||c.tcolor?`<p style="margin:8px 0 0;${c.font?`font-family:'${esc(c.font)}',serif;`:''}${c.tcolor?`color:${esc(c.tcolor)}`:''}">“대사는 이렇게 보여요.”</p>`:''}${lnk(c)?`<div class="acts">${lnk(c)}</div>`:''}</div></div><div class="box" style="margin:0 0 24px"><label>이 캐릭터의 내 별명 <span class="mu">내 화면의 소설에서만 이 이름으로 보여요</span><input id="al" maxlength="20" value="${esc((db.prefs.alias||{})[c.id]||'')}"></label><div class="acts"><button class="btn" onclick="asv('${c.id}')">별명 저장</button></div></div><h2 class="h2">등장하는 작품 ${L.length}개</h2><div>${L.map(row).join('')||'<p class="mu">아직 이 캐릭터가 등장하는 작품이 없습니다.</p>'}</div></div>`}
+function vChar(id){const c=db.chars.find(x=>x.id===id);if(!c)return vHome();const L=db.series.filter(s=>castL(s).some(c=>c.id===id)&&!blk(s));app.innerHTML=`<div class="wrap"><div class="sh">${av(c.img,c.name).replace('class="av"','class="av lgav"')}<div><h1 style="${chStyle(c.id)}">${esc(c.name)}</h1><p class="mu">${esc(pn(c.owner))}의 캐릭터${(c.share||[]).length?' · RP 공유: '+(c.share||[]).map(u=>esc(pn(u))).join(', '):''}</p>${c.font||c.tcolor?`<p style="margin:8px 0 0;${c.font?`font-family:'${esc(c.font)}',serif;`:''}${c.tcolor?`color:${esc(c.tcolor)}`:''}">“${PVS}”</p>`:''}${lnk(c)?`<div class="acts">${lnk(c)}</div>`:''}</div></div><div class="box" style="margin:0 0 24px"><label>이 캐릭터의 내 별명 <span class="mu">내 화면의 소설에서만 이 이름으로 보여요</span><input id="al" maxlength="20" value="${esc((db.prefs.alias||{})[c.id]||'')}"></label><div class="acts"><button class="btn" onclick="asv('${c.id}')">별명 저장</button></div></div><h2 class="h2">등장하는 작품 ${L.length}개</h2><div>${L.map(row).join('')||'<p class="mu">아직 이 캐릭터가 등장하는 작품이 없습니다.</p>'}</div></div>`}
 function vSet0(){const st=db.set;app.innerHTML=`<div class="wrap"><h1>보기 설정</h1><label class="ck" style="margin-top:20px"><input type="checkbox" id="sal"${st.alias===false?'':' checked'} onchange="sset()">별명으로 보기</label><p class="mu">내가 정한 캐릭터 별명으로 소설 속 이름이 보여요. 끄면 원래 이름으로 돌아가요.</p><label class="ck" style="margin-top:20px"><input type="checkbox" id="sbg"${st.bgm===false?'':' checked'} onchange="sset()">배경음악(BGM) 재생</label><p class="mu">끄면 읽기 화면에서 BGM 재생 버튼이 사라져요. 켜 두어도 자동으로 재생되지는 않아요.</p><label>기본 음량<input type="range" id="svol" min="0" max="100" value="${db.prefs.vol==null?70:db.prefs.vol}" oninput="bgV(this.value)" onchange="bgSv()"></label><label class="ck" style="margin-top:20px"><input type="checkbox" id="snr"${st.noRp?' checked':''} onchange="sset()">RP 댓글 숨기기</label><p class="mu">캐릭터로 쓴 RP 댓글이 댓글 목록에 보이지 않아요.</p><h2 class="h2" style="margin-top:28px">이런 작품은 보지 않을래요</h2><p class="mu">선택한 주의 요소가 있는 작품은 목록에서 숨겨져요.</p><div>${WN.map(w=>`<label class="ck"><input type="checkbox" name="bl" value="${w}"${st.block.includes(w)?' checked':''} onchange="sset()">${w}</label>`).join('')}</div><label>직접 입력 <span class="mu">쉼표로 구분</span><input id="blx" maxlength="80" value="${esc(st.block.filter(w=>!WN.includes(w)).join(', '))}" onchange="sset()"></label>
 <h2 class="h2" style="margin-top:32px">알림</h2><p class="mu">알림은 머리말의 종 모양에 쌓여요.</p>
 <label class="ck"><input type="checkbox" id="nte"${ntP().eps!==false?' checked':''} onchange="sset()">구독한 작품에 새 회차가 올라오면 알림</label>
@@ -607,8 +634,10 @@ function ntfix(){document.querySelectorAll('#ed .nt').forEach(x=>x.contentEditab
 function curNm(){const v=$('#ws').value;if(v==='new'||v==='short')return{last:$('#nl').value.trim(),first:$('#nf').value.trim()};const s=find(v);return Object.assign({last:'',first:''},s&&s.nm)}
 function ntg(t){const n=curNm(),v=t==='full'?n.last+n.first:n[t];if(!v){toast('먼저 작품 정보에 변환할 이름(성·이름)을 입력해 주세요');return}rs();document.execCommand('insertHTML',false,`<span class="nt" data-t="${t}" contenteditable="false">${esc(v)}</span>`);ntfix();dr()}
 function ntb(){const n=curNm(),ed=$('#ed'),map={full:n.last+n.first,first:n.first,last:n.last};let c=0;['full','first','last'].forEach(t=>{const w=map[t];if(!w||!document.querySelector('[name=nb][value='+t+']').checked)return;const L=[],tw=document.createTreeWalker(ed,NodeFilter.SHOW_TEXT);while(tw.nextNode())if(!tw.currentNode.parentElement.closest('.nt'))L.push(tw.currentNode);L.forEach(nd=>{const parts=nd.nodeValue.split(w);if(parts.length<2)return;const f=document.createDocumentFragment();parts.forEach((p,i)=>{if(i){const s=document.createElement('span');s.className='nt';s.dataset.t=t;s.contentEditable='false';s.textContent=w;f.append(s);c++}if(p)f.append(p)});nd.replaceWith(f)})});toast(c?c+'곳을 태그로 바꿨습니다':'바꿀 이름을 찾지 못했습니다. 작품 정보의 성·이름을 확인해 주세요');dr()}
-const SPR=[[/몇 ?일/g,'며칠','“며칠”이 맞는 표기예요'],[/금새/g,'금세','“금세”(금시에)가 바른 표기예요'],[/어떻해/g,'어떡해','“어떡해”(어떻게 해)가 맞아요'],[/웬지/g,'왠지','“왠지”(왜인지)가 맞아요'],[/왠일/g,'웬일','“웬일”이 맞아요'],[/([할갈볼줄올쓸될])께(요?)/g,'$1게$2','어미는 “-ㄹ게”로 써요'],[/되요/g,'돼요','“되어요”의 준말은 “돼요”예요'],[/안 ?돼/g,'안 돼','“안 돼”처럼 띄어 써요'],[/안되/g,'안 되','“안 되다”로 띄어 쓰는 경우가 많아요. 뜻에 따라 확인해 주세요'],[/않되/g,'안 되','“않”이 아니라 “안 되”예요'],[/바램/g,'바람','“바람”(바라는 일)이 맞는 표기예요'],[/역활/g,'역할','“역할”이 맞아요'],[/설레임/g,'설렘','“설렘”이 맞아요'],[/희안/g,'희한','“희한”이 맞아요'],[/오랫만/g,'오랜만','“오랜만”이 맞아요'],[/일부로/g,'일부러','“일부러”가 맞아요'],[/어의없/g,'어이없','“어이없다”가 맞아요'],[/눈쌀/g,'눈살','“눈살”이 맞아요'],[/곰곰히/g,'곰곰이','“곰곰이”가 맞아요'],[/깨끗히/g,'깨끗이','“깨끗이”가 맞아요'],[/열심이/g,'열심히','“열심히”가 맞아요'],[/(할|갈|볼)려고/g,m=>({'할려고':'하려고','갈려고':'가려고','볼려고':'보려고'})[m],'“-려고”가 맞아요']];
-function sph(){const t=$('#ed').textContent;return SPR.map((r,i)=>{const m=t.match(new RegExp(r[0].source,'g'));return m?{i,n:m.length,a:m[0],b:m[0].replace(new RegExp(r[0].source),r[1]),d:r[2]}:null}).filter(Boolean)}
+const SPR=[[/몇 ?일/,'며칠','‘며칠’이 바른 표기예요'],[/금새/,'금세','‘금세’(금시에)가 바릅니다'],[/어떻해/,'어떡해','‘어떡해’(어떻게 해)가 바릅니다'],[/어떡게/,'어떻게','‘어떻게’가 바릅니다'],[/웬지/,'왠지','‘왠지’(왜인지)가 바릅니다'],[/왠일/,'웬일','‘웬일’이 바릅니다'],[/왠만/,'웬만','‘웬만하다’가 바릅니다'],[/왠 /,'웬 ','‘웬’(어떠한)이 바릅니다'],[/역활/,'역할','‘역할’이 바릅니다'],[/설레임/,'설렘','‘설렘’이 바릅니다'],[/설레이/,'설레','‘설레다’여서 ‘설레’가 바릅니다'],[/헤매이/,'헤매','‘헤매다’여서 ‘헤매’가 바릅니다'],[/목메이/,'목메','‘목메다’여서 ‘목메’가 바릅니다'],[/되뇌이/,'되뇌','‘되뇌다’가 바릅니다'],[/희안/,'희한','‘희한하다’가 바릅니다'],[/오랫만/,'오랜만','‘오랜만’이 바릅니다'],[/일부로/,'일부러','‘일부러’가 바릅니다'],[/어의없/,'어이없','‘어이없다’가 바릅니다'],[/눈쌀/,'눈살','‘눈살’이 바릅니다'],[/구렛나루/,'구레나룻','‘구레나룻’이 바릅니다'],[/돌맹이/,'돌멩이','‘돌멩이’가 바릅니다'],[/통채로/,'통째로','‘통째로’가 바릅니다'],[/널부러/,'널브러','‘널브러지다’가 바릅니다'],[/움추리/,'움츠리','‘움츠리다’가 바릅니다'],[/부시시/,'부스스','‘부스스하다’가 바릅니다'],[/뒤쳐지/,'뒤처지','뒤떨어진다는 뜻은 ‘뒤처지다’예요'],[/핼쓱/,'핼쑥','‘핼쑥하다’가 바릅니다'],[/폭팔/,'폭발','‘폭발’이 바릅니다'],[/승락/,'승낙','‘승낙’이 바릅니다'],[/발자욱/,'발자국','‘발자국’이 바릅니다'],[/어줍잖/,'어쭙잖','‘어쭙잖다’가 바릅니다'],[/쉽상/,'십상','‘십상’이 바릅니다'],[/닥달/,'닦달','‘닦달’이 바릅니다'],[/설겆이/,'설거지','‘설거지’가 바릅니다'],[/덤테기/,'덤터기','‘덤터기’가 바릅니다'],[/뒤치닥거리/,'뒤치다꺼리','‘뒤치다꺼리’가 바릅니다'],[/구지/,'굳이','‘굳이’가 바릅니다'],[/깡총깡총/,'깡충깡충','‘깡충깡충’이 바릅니다'],[/넓직/,'널찍','‘널찍하다’가 바릅니다'],[/넓다랗/,'널따랗','‘널따랗다’가 바릅니다'],[/낯설은/,'낯선','‘낯선’이 바릅니다'],[/거칠은/,'거친','‘거친’이 바릅니다'],[/녹슬은/,'녹슨','‘녹슨’이 바릅니다'],[/찌들은/,'찌든','‘찌든’이 바릅니다'],[/서슴치/,'서슴지','‘서슴지’가 바릅니다'],[/넉넉치/,'넉넉지','‘넉넉지’가 바릅니다'],[/익숙치/,'익숙지','‘익숙지’가 바릅니다'],[/섭섭치/,'섭섭지','‘섭섭지’가 바릅니다'],[/생각컨대/,'생각건대','‘생각건대’가 바릅니다'],[/깨끗치/,'깨끗지','‘깨끗지’가 바릅니다'],[/들여마시/,'들이마시','‘들이마시다’가 바릅니다'],[/내노라/,'내로라','‘내로라하다’가 바릅니다'],[/알아맞추/,'알아맞히','‘알아맞히다’가 바릅니다'],[/안스럽/,'안쓰럽','‘안쓰럽다’가 바릅니다'],[/애띠/,'앳되','‘앳되다’가 바릅니다'],[/애닯/,'애달','‘애달프다’가 바릅니다'],[/간지르/,'간질이','‘간질이다’가 바릅니다'],[/추스리/,'추스르','‘추스르다’가 바릅니다'],[/치루/,'치르','‘치르다’가 바릅니다'],[/담궈/,'담가','‘담그다’여서 ‘담가’가 바릅니다'],[/담궜/,'담갔','‘담갔다’가 바릅니다'],[/잠궈/,'잠가','‘잠그다’여서 ‘잠가’가 바릅니다'],[/잠궜/,'잠갔','‘잠갔다’가 바릅니다'],[/바꼈/,'바뀌었','‘바뀌었다’가 바릅니다'],[/사겼/,'사귀었','‘사귀었다’가 바릅니다'],[/데였/,'데었','‘데었다’가 바릅니다'],[/베게/,'베개','머리에 베는 것은 ‘베개’예요'],[/찌게/,'찌개','‘찌개’가 바릅니다'],[/육계장/,'육개장','‘육개장’이 바릅니다'],[/떡볶기/,'떡볶이','‘떡볶이’가 바릅니다'],[/떡복이/,'떡볶이','‘떡볶이’가 바릅니다'],[/곱배기/,'곱빼기','‘곱빼기’가 바릅니다'],[/쭈꾸미/,'주꾸미','‘주꾸미’가 바릅니다'],[/깎두기/,'깍두기','‘깍두기’가 바릅니다'],[/숫가락/,'숟가락','‘숟가락’이 바릅니다'],[/안성마춤/,'안성맞춤','‘안성맞춤’이 바릅니다'],[/널판지/,'널빤지','‘널빤지’가 바릅니다'],[/문안하/,'무난하','무리가 없다는 뜻은 ‘무난하다’예요'],[/문지기? /,'문지기 ','오타 확인'],[/임신공격/,'인신공격','‘인신공격’이 바릅니다'],[/않하무인/,'안하무인','‘안하무인’이 바릅니다'],[/무릎쓰/,'무릅쓰','‘무릅쓰다’가 바릅니다'],[/눈꼽/,'눈곱','‘눈곱’이 바릅니다'],[/오무리/,'오므리','‘오므리다’가 바릅니다'],[/으례/,'으레','‘으레’가 바릅니다'],[/미쳐 /,'미처 ','아직의 뜻은 ‘미처’예요'],[/빈털털이/,'빈털터리','‘빈털터리’가 바릅니다'],[/삼가해/,'삼가 해','‘삼가다’여서 ‘삼가 해’가 바릅니다'],[/안절부절하/,'안절부절못하','‘안절부절못하다’가 바릅니다'],[/애시당초/,'애당초','‘애당초’가 바릅니다'],[/야밤도주/,'야반도주','‘야반도주’가 바릅니다'],[/절대절명/,'절체절명','‘절체절명’이 바릅니다'],[/홀홀단신/,'혈혈단신','‘혈혈단신’이 바릅니다'],[/동거동락/,'동고동락','‘동고동락’이 바릅니다'],[/일사분란/,'일사불란','‘일사불란’이 바릅니다'],[/성대묘사/,'성대모사','‘성대모사’가 바릅니다'],[/풍지박산/,'풍비박산','‘풍비박산’이 바릅니다'],[/포복졸도/,'포복절도','‘포복절도’가 바릅니다'],[/환골탈퇴/,'환골탈태','‘환골탈태’가 바릅니다'],[/임기웅변/,'임기응변','‘임기응변’이 바릅니다'],[/유도심문/,'유도신문','‘유도신문’이 바릅니다'],[/희노애락/,'희로애락','‘희로애락’이 바릅니다'],[/산수갑산/,'삼수갑산','‘삼수갑산’이 바릅니다'],[/체면불구/,'체면 불고','‘체면 불고’가 바릅니다'],[/토사광란/,'토사곽란','‘토사곽란’이 바릅니다'],[/흥망성세/,'흥망성쇠','‘흥망성쇠’가 바릅니다'],[/되물림/,'대물림','‘대물림’이 바릅니다'],[/인권비/,'인건비','‘인건비’가 바릅니다'],[/메세지/,'메시지','‘메시지’가 바릅니다'],[/컨셉/,'콘셉트','‘콘셉트’가 바릅니다'],[/악세사리/,'액세서리','‘액세서리’가 바릅니다'],[/초콜렛/,'초콜릿','‘초콜릿’이 바릅니다'],[/쥬스/,'주스','‘주스’가 바릅니다'],[/까페/,'카페','‘카페’가 바릅니다'],[/로보트/,'로봇','‘로봇’이 바릅니다'],[/리더쉽/,'리더십','‘리더십’이 바릅니다'],[/멤버쉽/,'멤버십','‘멤버십’이 바릅니다'],[/워크샵/,'워크숍','‘워크숍’이 바릅니다'],[/플랜카드/,'플래카드','‘플래카드’가 바릅니다'],[/비스켓/,'비스킷','‘비스킷’이 바릅니다'],[/소세지/,'소시지','‘소시지’가 바릅니다'],[/바베큐/,'바비큐','‘바비큐’가 바릅니다'],[/레파토리/,'레퍼토리','‘레퍼토리’가 바릅니다'],[/알콜/,'알코올','‘알코올’이 바릅니다'],[/데뷰/,'데뷔','‘데뷔’가 바릅니다'],[/넌센스/,'난센스','‘난센스’가 바릅니다'],[/미스테리/,'미스터리','‘미스터리’가 바릅니다'],[/쇼파/,'소파','‘소파’가 바릅니다'],[/샌달/,'샌들','‘샌들’이 바릅니다'],[/카라멜/,'캐러멜','‘캐러멜’이 바릅니다'],[/케잌/,'케이크','‘케이크’가 바릅니다'],[/케익/,'케이크','‘케이크’가 바릅니다'],[/탈렌트/,'탤런트','‘탤런트’가 바릅니다'],[/앙케이트/,'앙케트','‘앙케트’가 바릅니다'],[/리모콘/,'리모컨','‘리모컨’이 바릅니다'],[/에어콘/,'에어컨','‘에어컨’이 바릅니다'],[/스티로폴/,'스티로폼','‘스티로폼’이 바릅니다'],[/화이팅/,'파이팅','표준 표기는 ‘파이팅’이에요'],[/악세서리/,'액세서리','‘액세서리’가 바릅니다'],[/스넥/,'스낵','‘스낵’이 바릅니다'],[/바디로션/,'보디로션','표준 표기는 ‘보디’예요'],[/까스/,'가스','‘가스’가 바릅니다'],[/비젼/,'비전','‘비전’이 바릅니다'],[/컨텐츠/,'콘텐츠','‘콘텐츠’가 바릅니다'],[/타겟/,'타깃','‘타깃’이 바릅니다'],[/렌트카/,'렌터카','‘렌터카’가 바릅니다'],[/팜플렛/,'팸플릿','‘팸플릿’이 바릅니다'],[/싸인/,'사인','‘사인’이 바릅니다'],[/쵸콜릿/,'초콜릿','‘초콜릿’이 바릅니다'],[/곰곰히/,'곰곰이','‘곰곰이’가 바릅니다'],[/깨끗히/,'깨끗이','‘깨끗이’가 바릅니다'],[/깊숙히/,'깊숙이','‘깊숙이’가 바릅니다'],[/일일히/,'일일이','‘일일이’가 바릅니다'],[/틈틈히/,'틈틈이','‘틈틈이’가 바릅니다'],[/번번히/,'번번이','‘번번이’가 바릅니다'],[/샅샅히/,'샅샅이','‘샅샅이’가 바릅니다'],[/낱낱히/,'낱낱이','‘낱낱이’가 바릅니다'],[/더욱히/,'더욱이','‘더욱이’가 바릅니다'],[/일찌기/,'일찍이','‘일찍이’가 바릅니다'],[/꼼꼼이/,'꼼꼼히','‘꼼꼼히’가 바릅니다'],[/솔직이/,'솔직히','‘솔직히’가 바릅니다'],[/가만이/,'가만히','‘가만히’가 바릅니다'],[/분명이/,'분명히','‘분명히’가 바릅니다'],[/조용이/,'조용히','‘조용히’가 바릅니다'],[/간단이/,'간단히','‘간단히’가 바릅니다'],[/천천이/,'천천히','‘천천히’가 바릅니다'],[/가득이/,'가득히','‘가득히’가 바릅니다'],[/정확이/,'정확히','‘정확히’가 바릅니다'],[/특별이/,'특별히','‘특별히’가 바릅니다'],[/열심이 하/,'열심히 하','‘열심히 하다’가 바릅니다'],[/되요/,'돼요','‘되어요’의 준말은 ‘돼요’예요'],[/되서/,'돼서','‘되어서’의 준말은 ‘돼서’예요'],[/되써/,'돼서','‘돼서’가 바릅니다'],[/되는게/,'되는 게','‘되는 게’로 띄어 써요'],[/않되/,'안 되','‘안 되다’로 띄어 써요'],[/않돼/,'안 돼','‘안 돼’가 바릅니다'],[/않하/,'안 하','‘안 하다’로 띄어 써요'],[/않해/,'안 해','‘안 해’가 바릅니다'],[/않좋/,'안 좋','‘안 좋다’로 띄어 써요'],[/안되요/,'안 돼요','‘안 돼요’가 바릅니다'],[/돼고/,'되고','‘되고’가 바릅니다'],[/돼는/,'되는','‘되는’이 바릅니다'],[/돼서는/,'되어서는','‘되어서는’이 바릅니다'],[/돼지 않/,'되지 않','‘되지 않다’가 바릅니다'],[/할께/,'할게','‘할게’가 바릅니다'],[/갈께/,'갈게','‘갈게’가 바릅니다'],[/줄께/,'줄게','‘줄게’가 바릅니다'],[/올께/,'올게','‘올게’가 바릅니다'],[/볼께/,'볼게','‘볼게’가 바릅니다'],[/있을께/,'있을게','‘있을게’가 바릅니다'],[/먹을께/,'먹을게','‘먹을게’가 바릅니다'],[/잘께/,'잘게','‘잘게’가 바릅니다'],[/할꺼/,'할 거','‘할 거’로 띄어 써요'],[/갈꺼/,'갈 거','‘갈 거’로 띄어 써요'],[/볼꺼/,'볼 거','‘볼 거’로 띄어 써요'],[/올꺼/,'올 거','‘올 거’로 띄어 써요'],[/될꺼/,'될 거','‘될 거’로 띄어 써요'],[/줄꺼/,'줄 거','‘줄 거’로 띄어 써요'],[/먹을꺼/,'먹을 거','‘먹을 거’로 띄어 써요'],[/있을꺼/,'있을 거','‘있을 거’로 띄어 써요'],[/거에요/,'거예요','‘거예요’가 바릅니다'],[/뭐에요/,'뭐예요','‘뭐예요’가 바릅니다'],[/뵈요/,'봬요','‘뵈어요’의 준말은 ‘봬요’예요'],[/할려고/,'하려고','‘하려고’가 바릅니다'],[/할려면/,'하려면','‘하려면’이 바릅니다'],[/될려고/,'되려고','‘되려고’가 바릅니다'],[/볼려고/,'보려고','‘보려고’가 바릅니다'],[/줄려고/,'주려고','‘주려고’가 바릅니다'],[/할려는/,'하려는','‘하려는’이 바릅니다'],[/(할|갈|볼|올|줄|쓸|들|날|될|놀|읽을|먹을|있을|없을|만들)수(?=\s*(있|없))/,'$1 수','‘수’는 띄어 써요'],[/것같/,'것 같','‘것 같다’로 띄어 써요'],[/듯이(?=하)/,'듯이 ','‘듯이 하다’로 띄어 써요'],[/지않/,'지 않','‘-지 않다’로 띄어 써요'],[/그리고나서/,'그러고 나서','‘그러고 나서’가 바릅니다'],[/(할|갈|볼|올|먹을|잘|일)때/,'$1 때','‘때’는 띄어 써요'],[/그런것/,'그런 것','‘것’은 띄어 써요'],[/이런것/,'이런 것','‘것’은 띄어 써요'],[/저런것/,'저런 것','‘것’은 띄어 써요'],[/하는것/,'하는 것','‘것’은 띄어 써요'],[/한것/,'한 것','‘것’은 띄어 써요'],[/할지도몰라/,'할지도 몰라','‘몰라’는 띄어 써요'],[/아는체/,'아는 체','‘체’는 띄어 써요'],[/모르는체/,'모르는 체','‘체’는 띄어 써요'],[/할뻔/,'할 뻔','‘뻔’은 띄어 써요'],[/할만/,'할 만','‘만하다’는 띄어 써요'],[/하는김에/,'하는 김에','‘김에’는 띄어 써요'],[/하는대로/,'하는 대로','‘대로’는 띄어 써요'],[/할때마다/,'할 때마다','‘때’는 띄어 써요'],[/본적이/,'본 적이','‘적’은 띄어 써요'],[/한적이/,'한 적이','‘적’은 띄어 써요'],[/간적이/,'간 적이','‘적’은 띄어 써요'],[/하지말/,'하지 말','‘말다’는 띄어 써요'],[/가지마/,'가지 마','‘마’는 띄어 써요'],[/뿐만아니라/,'뿐만 아니라','‘아니라’는 띄어 써요'],[/그럼에도불구/,'그럼에도 불구','띄어 써요'],[/다름아닌/,'다름 아닌','띄어 써요'],[/오랜동안/,'오랫동안','‘오랫동안’이 바릅니다'],[/몇번/,'몇 번','‘번’은 띄어 써요'],[/몇명/,'몇 명','‘명’은 띄어 써요'],[/몇개/,'몇 개','‘개’는 띄어 써요'],[/예기치못/,'예기치 못','띄어 써요'],[/어떻해야/,'어떡해야','‘어떡해야’가 바릅니다'],[/오랫만에/,'오랜만에','‘오랜만에’가 바릅니다'],[/저희 나라/,'우리나라','‘우리나라’가 바릅니다'],[/바래요/,'바라요','소망의 뜻은 ‘바라요’예요'],[/바램/,'바람','소망의 뜻은 ‘바람’이에요'],[/틀린그림/,'다른 그림','서로 다를 때는 ‘다르다’예요'],[/갯수/,'개수','‘개수’가 바릅니다'],[/촛점/,'초점','‘초점’이 바릅니다'],[/댓가/,'대가','‘대가’가 바릅니다'],[/싯가/,'시가','‘시가’가 바릅니다'],[/전셋방/,'전세방','‘전세방’이 바릅니다'],[/최대값/,'최댓값','‘최댓값’이 바릅니다'],[/최소값/,'최솟값','‘최솟값’이 바릅니다'],[/등교길/,'등굣길','‘등굣길’이 바릅니다'],[/하교길/,'하굣길','‘하굣길’이 바릅니다'],[/만두국/,'만둣국','‘만둣국’이 바릅니다'],[/북어국/,'북엇국','‘북엇국’이 바릅니다']];
+function sph(){const t=$('#ed').textContent;return SPR.map((r,i)=>{let n=0,a=null,b=null;
+ t.replace(new RegExp(r[0].source,'g'),(...g)=>{const m0=g[0];n++;if(a===null){a=m0;b=String(r[1]).replace(/\$(\d)/g,(x,d)=>g[+d]==null?'':g[+d])}return m0});
+ return n?{i,n,a,b,d:r[2]}:null}).filter(Boolean)}
 function runSp(){const R=sph();$('#sp').innerHTML=(R.length?R.map(r=>`<div class="sr"><span><b>${esc(r.a)}</b> → <b>${esc(r.b)}</b> <span class="mu">${r.d}</span></span><button type="button" class="btn ghost" onclick="spf(${r.i})">고치기 (${r.n}곳)</button></div>`).join(''):'<span class="mu">자주 틀리는 표기 기준으로 확인했을 때 발견된 문제가 없어요.</span>')+'<button type="button" class="btn ghost" onclick="$(\'#sp\').hidden=true">닫기</button>'}
 function spc(){['lb','qp'].forEach(x=>$('#'+x).hidden=true);$('#sp').hidden=false;runSp()}
 function spf(i){const r=SPR[i],L=[],w=document.createTreeWalker($('#ed'),NodeFilter.SHOW_TEXT);while(w.nextNode())if(!w.currentNode.parentElement.closest('.nt'))L.push(w.currentNode);L.forEach(n=>{n.nodeValue=n.nodeValue.replace(new RegExp(r[0].source,'g'),r[1])});dr();runSp()}
@@ -631,21 +660,25 @@ function aset(){const a=Object.assign({},db.prefs.alias);document.querySelectorA
 function ares(){const a=Object.assign({},db.prefs.alias);document.querySelectorAll('#nsp [data-c]').forEach(i=>{delete a[i.dataset.c]});db.prefs.alias=a;save();rr()}
 function asv(id){const v=$('#al').value.trim(),a=Object.assign({},db.prefs.alias);if(v)a[id]=v;else delete a[id];db.prefs.alias=a;save();toast(v?'별명을 저장했습니다':'별명을 지웠습니다')}
 function parts(n){n=String(n).trim();if(/\s/.test(n)){const a=n.split(/\s+/);return{last:a[0],first:a.slice(1).join(' ')}}if(/^[가-힣]{3,4}$/.test(n))return{last:n[0],first:n.slice(1)};return{last:'',first:n}}
+const cparts=c=>c.split===false?{last:'',first:c.name}:parts(c.name);
 function mitems(q){const out=[],mine=db.chars.filter(c=>c.owner===ME||(c.share||[]).includes(ME)),L=[...mine,...db.chars.filter(c=>!mine.some(x=>x.id===c.id))];
-L.forEach(c=>{const p=parts(c.name);[['full',c.name,'풀네임'],['first',p.first,'이름'],['last',p.last,'성'],['dlg',c.name,'대사']].forEach(([k,t,l])=>{if(!t||(k==='first'||k==='last')&&t===c.name)return;if(q&&!t.includes(q)&&!c.name.includes(q))return;out.push({c,k,t,l})})});return out.slice(0,60)}
+L.forEach(c=>{const p=cparts(c);[['full',c.name,'풀네임'],['first',p.first,'이름'],['last',p.last,'성'],['dlg',c.name,'대사']].forEach(([k,t,l])=>{if(!t||(k==='first'||k==='last')&&t===c.name)return;if(q&&!t.includes(q)&&!c.name.includes(q))return;out.push({c,k,t,l})})});return out.slice(0,60)}
 function mnX(){mn=null;const e=$('#mn');if(e)e.hidden=true}
 function mnR(){const e=$('#mn'),s=getSelection();if(!e||!s.rangeCount)return;const r=s.getRangeAt(0).getBoundingClientRect(),h=$('#ed').getBoundingClientRect();e.innerHTML=mn.it.length?mn.it.map((x,i)=>`<button type="button" class="${i===mn.i?'on':''}" onmousedown="event.preventDefault();mnP(${i})">${av(x.c.img,x.c.name)}<span>${esc(x.t)}</span><span class="mu">${x.k==='full'?'풀네임':x.l+'('+esc(x.c.name)+')'}</span></button>`).join(''):'<div class="mu" style="padding:8px">내 캐릭터가 없어요. 위의 캐릭터 메뉴에서 먼저 만들어 주세요.</div>';e.hidden=false;e.style.left=Math.max(8,Math.min(r.left||h.left,innerWidth-240))+'px';e.style.top=((r.bottom||h.top)+6)+'px'}
 function mnChk(){const s=getSelection();if(!s.rangeCount||!s.isCollapsed){mnX();return}const n=s.anchorNode;if(!n||n.nodeType!==3||!$('#ed').contains(n)||n.parentElement.closest('.nt')){mnX();return}const m=/@([^\s@]{0,12})$/.exec(n.nodeValue.slice(0,s.anchorOffset));if(!m){mnX();return}const it=mitems(m[1]);if(!it.length&&db.chars.some(c=>c.owner===ME)){mnX();return}mn={it,i:0,n,len:m[0].length,off:s.anchorOffset};mnR()}
 function mnK(e){if(!mn||!mn.it.length)return;if(e.key==='ArrowDown'){e.preventDefault();mn.i=(mn.i+1)%mn.it.length;mnR()}else if(e.key==='ArrowUp'){e.preventDefault();mn.i=(mn.i-1+mn.it.length)%mn.it.length;mnR()}else if(e.key==='Enter'||e.key==='Tab'){e.preventDefault();mnP(mn.i)}else if(e.key==='Escape'){mnX()}}
 function mnP(i){const x=mn&&mn.it[i];if(!x)return;const{n,off,len}=mn,r=document.createRange();r.setStart(n,off-len);r.setEnd(n,off);const s=getSelection();s.removeAllRanges();s.addRange(r);r.deleteContents();s.removeAllRanges();s.addRange(r);if(x.k==='dlg')document.execCommand('insertHTML',false,`<span class="dg" data-c="${x.c.id}" style="${dgStyle(x.c)}">“<span id="cz"></span>”</span>&#8203;`);
 else document.execCommand('insertHTML',false,`<span class="nt" data-c="${x.c.id}" data-k="${x.k}" contenteditable="false">${esc(x.t)}</span>&#8203;`);
-ntfix();if(x.k==='dlg'){const z=document.getElementById('cz');if(z){const r2=document.createRange();r2.setStartBefore(z);r2.collapse(true);const s2=getSelection();s2.removeAllRanges();s2.addRange(r2);z.remove()}}const b=document.querySelector('[name=cs][value="'+x.c.id+'"]');if(b&&!b.checked)b.checked=true;mnX();dr()}
+ntfix();if(x.k==='dlg'){const z=document.getElementById('cz');if(z){const r2=document.createRange();r2.setStartBefore(z);r2.collapse(true);const s2=getSelection();s2.removeAllRanges();s2.addRange(r2);z.remove()}}const b=document.querySelector('[name=cs][value="'+x.c.id+'"]');if(b&&!b.checked){b.checked=true;autoC.add(x.c.id)}mnX();dr()}
 function tids(h){const d=document.createElement('div');d.innerHTML=h;return[...d.querySelectorAll('.nt[data-c]')].map(x=>x.dataset.c)}
 function amap2(h,e){const d=document.createElement('div');d.innerHTML=h;styleDlg(d);d.querySelectorAll('img').forEach(x=>x.classList.add('zoomable'));
  const al=(db.set.alias===false)?{}:(db.prefs.alias||{});if(!Object.keys(al).length)return d.innerHTML;
  d.querySelectorAll('.nt[data-c]').forEach(x=>{const a=al[x.dataset.c];if(!a)return;const p=parts(a),k=x.dataset.k,v=k==='full'?a:k==='first'?p.first:p.last;if(!v)return;x.textContent=v;const n=x.nextSibling;if(n&&n.nodeType===3){n.nodeValue=josa(n.nodeValue.replace(/^\u200b+/,''),v)}});return d.innerHTML}
 function tal(){db.set.alias=(db.set.alias===false);save();rr()}
-let mn=null;
+let mn=null,autoC=new Set();
+function syncCast(){const ed=$('#ed');if(!ed)return;const cur=new Set(tids(ed.innerHTML));
+ [...autoC].forEach(id=>{if(cur.has(id))return;autoC.delete(id);const b=document.querySelector('[name=cs][value="'+id+'"]');if(b&&b.checked)b.checked=false});
+ cur.forEach(id=>{const b=document.querySelector('[name=cs][value="'+id+'"]');if(b&&!b.checked){b.checked=true;autoC.add(id)}})}
 const lnk=c=>/^https?:\/\//i.test(c.link||'')?`<a class="btn ghost" href="${esc(c.link)}" target="_blank" rel="noopener noreferrer">콜라주 위키에서 보기</a>`:'';
 const THC={white:'#fff',sepia:'#f1e8d2',dark:'#0e0e0f'};
 const rb=(t,on,svg,cls)=>`<button type="button" class="ic ${cls||''}" title="${t}" aria-label="${t}" onclick="${on}">${svg}</button>`;
@@ -708,12 +741,13 @@ function zoom(src){zclose();zs=1;zx=0;zy=0;const o=document.createElement('div')
  o.addEventListener('touchmove',e=>{if(e.touches.length===2&&zd){e.preventDefault();const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);zset(zp*d/zd)}},{passive:false});
  o.addEventListener('touchend',()=>{zd=null})}
 document.addEventListener('click',e=>{const im=e.target;if(!im||im.tagName!=='IMG'||!im.classList||!im.classList.contains('zoomable'))return;if(im.closest('#ed')||im.closest('a')||im.closest('.cc')||im.closest('.zo'))return;e.preventDefault();zoom(im.currentSrc||im.src)});
-addEventListener('keydown',e=>{if(e.key==='Escape'){if($('#crw'))crClose();else zclose()}});
+addEventListener('keydown',e=>{if(e.key==='Escape'){if($('#crw'))crClose();else if($('#pvw'))pvClose();else zclose()}});
 
 // ----- 알림 -----
 const ntP=()=>Object.assign({eps:true,cm:'all',seen:''},db.set.nt||{});
 function nitems(){const n=ntP(),t0=Date.parse(n.seen||0)||0,out=[];
  if(n.eps!==false)db.series.forEach(s=>{if(s.author===ME||!db.subs.includes(s.id)||blk(s))return;pub(s).forEach(e=>{if((e.ts||0)>t0)out.push({ts:e.ts,t:`${s.title} · ${e.title}`,sub:'구독한 작품에 새 회차가 올라왔어요',href:`#read-${s.id}-${e.id}`})})});
+ (db.notices||[]).forEach(x=>{if(x.ts>t0)out.push({ts:x.ts,t:x.title,sub:'새 공지사항 · '+x.cat,href:`#notice-${x.id}`})});
  if(n.cm!=='none')db.series.filter(s=>s.author===ME).forEach(s=>s.eps.forEach(e=>(e.cm||[]).forEach(m=>{if(m.mine||(m.ts||0)<=t0)return;if(n.cm==='rp'&&m.kind!=='rp')return;if(n.cm==='normal'&&m.kind==='rp')return;
   out.push({ts:m.ts,t:`${m.name}: ${m.text.slice(0,50)}`,sub:`${s.title} · ${e.title}에 새 댓글`,href:`#read-${s.id}-${e.id}`,img:m.img,name:m.name})})));
  return out.sort((a,b)=>b.ts-a.ts).slice(0,60)}
@@ -733,6 +767,9 @@ async function pushE(s,e){if(e.img&&e.img.startsWith('data:'))e.img=await upImg(
  await ok(sb.from('episodes').update(Object.assign(rowE(e,s.eps.indexOf(e),s.id),{updated_at:new Date().toISOString()})).eq('id',e.id))}
 function admDelS(id){const s=find(id);if(!s||!isAdm)return;if(!confirm('관리자 권한으로 ‘'+s.title+'’을(를) 삭제할까요?\n\n회차와 댓글까지 모두 지워지고 되돌릴 수 없어요.'))return;adm(()=>ok(sb.from('series').delete().eq('id',id)),'작품을 삭제했어요')}
 function admDelC(id){const c=chById(id);if(!c||!isAdm)return;if(!confirm('관리자 권한으로 캐릭터 ‘'+c.name+'’을(를) 삭제할까요?\n\n되돌릴 수 없어요.'))return;adm(()=>ok(sb.from('characters').delete().eq('id',id)),'캐릭터를 삭제했어요')}
+function admXferC(id){if(!isAdm)return;const c=chById(id),v=$('#xc-'+id).value;if(!c||!v||v===c.owner)return;
+ if(!confirm('캐릭터 ‘'+c.name+'’의 주인을 '+pn(v)+'님으로 바꿀까요?'))return;
+ adm(()=>ok(sb.from('characters').update({owner:v,shared_with:(c.share||[]).filter(u=>u!==v)}).eq('id',id)),'캐릭터를 넘겼어요')}
 function admXfer(id){if(!isAdm)return;const s=find(id),v=$('#xo-'+id).value;if(!s||!v)return;if(!confirm('‘'+s.title+'’의 주인을 '+pn(v)+'님으로 바꿀까요?'))return;adm(()=>ok(sb.from('series').update({owner:v}).eq('id',id)),'작품을 넘겼어요')}
 function ctAdd(){if(!isAdm)return;const n=$('#ctn').value.trim();if(!n){toast('태그 이름을 입력해 주세요');return}if(db.core.some(c=>c.name===n)){toast('이미 있는 태그예요');return}
  adm(()=>ok(sb.from('core_tags').insert({name:n.slice(0,20),position:(db.core.length?Math.max(...db.core.map(c=>c.pos||0)):0)+1})),'중요 태그를 추가했어요')}
@@ -742,8 +779,50 @@ function ctRen(id){const c=db.core.find(x=>x.id===id);if(!c||!isAdm)return;const
  adm(async()=>{await ok(sb.from('core_tags').update({name:v.slice(0,20)}).eq('id',id));await ctFix(c.name,v.slice(0,20))},'태그 이름을 바꿨어요')}
 function ctDel(id){const c=db.core.find(x=>x.id===id);if(!c||!isAdm)return;if(!confirm('중요 태그 ‘'+c.name+'’을(를) 지울까요?\n\n이 태그를 쓰던 작품에서도 빠져요.'))return;
  adm(async()=>{await ok(sb.from('core_tags').delete().eq('id',id));await ctFix(c.name,'')},'태그를 지웠어요')}
-function route(){if(!ME){vAuth();return}const p=(location.hash.slice(1)||'home').split('-');if(p[0]!=='read')bgStop();if(p[0]!=='rev')rev=null;
-const m={series:()=>vSeries(p[1]),read:()=>vRead(p[1],p[2]),write:()=>vWrite(p[1],p[2]),rev:()=>vRev(p[1],p[2]),edit:()=>vEdit(p[1]),chars:()=>{ceid=null;avData='';vChars()},char:()=>vChar(p[1]),cast:()=>vCast(p[1],p[2]),settings:vSet,music:vMusic,alerts:vAlerts,mine:vMine};
+// ----- 독자 화면 미리보기 -----
+function pvClose(){const o=$('#pvw');if(o)o.remove();document.body.style.overflow=''}
+function pvOpen(){if(!$('#ed'))return;const p=db.prefs,e={title:$('#wt').value.trim()||'(제목 없음)',html:clean(dlgify($('#ed').innerHTML)),cast:gc(),img:'',rev:rev?((find(rev.s).eps.find(x=>x.id===rev.e)||{}).rev||0)+1:0,cm:[]};
+ const warns=(typeof gw==='function'&&$('#wx'))?gw():[];
+ const o=document.createElement('div');o.className='pv';o.id='pvw';
+ o.innerHTML=`<div class="pvb"><b>독자 화면 미리보기</b><span class="mu" style="flex:1">실제로 발행하면 이렇게 보여요</span><button type="button" class="btn ghost" onclick="pvClose()">닫기</button></div>
+ <main style="max-width:760px;margin:0 auto;padding:16px 20px 0">${warns.length?`<div class="wnote"><b>주의</b> 이 작품에는 ${warns.map(w=>esc(w)).join(', ')} 요소가 포함되어 있습니다.</div>`:''}
+ <div class="rc">${casts(castE(e),0,1)}</div>
+ <article class="reader rd-${p.th}" style="font-size:${p.size}px;line-height:${p.lh};${p.font?`font-family:'${esc(p.font)}',serif`:''}"><h2>${esc(e.title)}</h2>${e.rev?`<p class="mu" style="margin:-1.3em 0 1.8em;font-size:.78em">수정 ${e.rev}회</p>`:''}<div class="bd">${amap2(e.html,e)}</div></article>
+ <p class="mu" style="max-width:680px;margin:18px auto 0">글자 크기·줄 간격·배경색은 독자가 각자 고를 수 있어요. 지금은 내 읽기 설정으로 보여 주고 있어요.</p></main>`;
+ document.body.appendChild(o);document.body.style.overflow='hidden';o.scrollTop=0}
+
+// ----- 공지사항 -----
+const CAT=['필독','패치노트','안내사항'];
+const catC=c=>'c'+Math.max(0,CAT.indexOf(c));
+let nedit=null;
+function vNotices(){const L=db.notices||[];
+ app.innerHTML=`<div class="wrap"><h1>공지사항</h1><p class="mu">글을 쓸 때 지켜야 할 점과 새로 생긴 기능을 여기에 올려요.</p>
+ ${isAdm?`<div class="acts" style="margin-top:14px"><button class="btn" onclick="nNew()">공지 쓰기</button></div>`:''}
+ <div style="margin-top:14px">${L.map(n=>`<a class="nc" href="#notice-${n.id}"><span class="cat ${catC(n.cat)}">${esc(n.cat)}</span>${n.pin?'<span class="pin">고정</span>':''}<h3>${esc(n.title)}</h3><p class="mu" style="margin:4px 0 0">${new Date(n.ts).toLocaleDateString('ko-KR')}${n.up>n.ts+60000?' · 수정됨':''}</p></a>`).join('')||'<p class="mu" style="margin:20px 0">아직 공지가 없어요.</p>'}</div></div>`}
+function vNotice(id){const n=(db.notices||[]).find(x=>x.id===id);if(!n)return vNotices();
+ app.innerHTML=`<div class="wrap"><p><a class="lk" href="#notices">공지사항 목록</a></p>
+ <span class="cat ${catC(n.cat)}">${esc(n.cat)}</span>${n.pin?'<span class="pin">고정</span>':''}
+ <h1 style="margin-top:8px">${esc(n.title)}</h1>
+ <p class="mu">${new Date(n.ts).toLocaleString('ko-KR',{dateStyle:'medium',timeStyle:'short'})}${n.up>n.ts+60000?' · 수정 '+new Date(n.up).toLocaleDateString('ko-KR'):''}${n.author?' · '+esc(pn(n.author)):''}</p>
+ <div class="ntx" style="margin-top:20px">${esc(n.body)}</div>
+ ${isAdm?`<div class="acts" style="margin-top:28px;padding-top:18px;border-top:1px solid var(--line)"><button class="btn ghost" onclick="nEdit('${n.id}')">수정</button><button class="btn ghost" onclick="nDel('${n.id}')">삭제</button></div>`:''}</div>`}
+function nNew(){nedit=null;vNForm()}
+function nEdit(id){nedit=(db.notices||[]).find(x=>x.id===id)||null;vNForm()}
+function vNForm(){if(!isAdm)return vNotices();const n=nedit||{cat:'안내사항',title:'',body:'',pin:false};
+ app.innerHTML=`<div class="wrap"><h1>${nedit?'공지 수정':'공지 쓰기'}</h1>
+ <label>분류<select id="ncat">${CAT.map(c=>`<option${c===n.cat?' selected':''}>${c}</option>`).join('')}</select></label>
+ <label>제목<input id="ntt" maxlength="100" value="${esc(n.title)}"></label>
+ <label>내용 <span class="mu">줄바꿈은 그대로 보여요</span><textarea id="nbd" rows="14">${esc(n.body)}</textarea></label>
+ <label class="ck"><input type="checkbox" id="npn"${n.pin?' checked':''}>목록 맨 위에 고정</label>
+ <div class="acts"><button class="btn" onclick="nSave()">${nedit?'수정 저장':'올리기'}</button><a class="btn ghost" href="#notices">취소</a></div></div>`}
+function nSave(){if(!isAdm)return;const ti=$('#ntt').value.trim();if(!ti){toast('제목을 입력해 주세요');return}
+ const row={category:$('#ncat').value,title:ti,body:$('#nbd').value,pinned:$('#npn').checked,updated_at:new Date().toISOString()};
+ if(nedit){const id=nedit.id;nedit=null;location.hash='notices';adm(()=>ok(sb.from('notices').update(row).eq('id',id)),'공지를 수정했어요')}
+ else{location.hash='notices';adm(()=>ok(sb.from('notices').insert(Object.assign({author:UID},row))),'공지를 올렸어요')}}
+function nDel(id){if(!isAdm)return;const n=(db.notices||[]).find(x=>x.id===id);if(!n)return;
+ if(!confirm('공지 ‘'+n.title+'’을(를) 삭제할까요?\n\n되돌릴 수 없어요.'))return;location.hash='notices';adm(()=>ok(sb.from('notices').delete().eq('id',id)),'공지를 삭제했어요')}
+function route(){if(!ME){vAuth();return}const p=(location.hash.slice(1)||'home').split('-');if(p[0]!=='read')bgStop();if(p[0]!=='rev')rev=null;if(p[0]!=='notice'&&p[0]!=='notices')nedit=null;pvClose();
+const m={series:()=>vSeries(p[1]),read:()=>vRead(p[1],p[2]),write:()=>vWrite(p[1],p[2]),rev:()=>vRev(p[1],p[2]),edit:()=>vEdit(p[1]),chars:()=>{ceid=null;avData='';vChars()},char:()=>vChar(p[1]),cast:()=>vCast(p[1],p[2]),settings:vSet,music:vMusic,alerts:vAlerts,notices:vNotices,notice:()=>vNotice(p[1]),mine:vMine};
 (Object.prototype.hasOwnProperty.call(m,p[0])?m[p[0]]:vHome)();bellUI();hh();window.scrollTo(0,0);if(p[0]==='home'||p[0]==='series')stale()}
 addEventListener('hashchange',route);
 boot();
