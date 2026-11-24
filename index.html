@@ -26,6 +26,14 @@ h1,h2,h3{font-family:"Noto Serif KR",serif;line-height:1.35;margin:0}
 .hero{padding:20px 0 12px}
 .hero h1{font-size:clamp(28px,6vw,40px);font-weight:700}
 .hero p{margin:10px 0 0;color:var(--mute)}
+.srch{display:flex;align-items:center;gap:8px;margin:4px 0 14px}
+.srch input{margin:0;border-radius:999px;padding:10px 16px}
+.pg{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:24px 0 8px}
+.pgb{font:inherit;font-size:14px;min-width:36px;height:36px;padding:0 10px;border:1px solid var(--line);border-radius:8px;background:transparent;color:var(--ink);cursor:pointer}
+.pgb.on{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:600}
+.pgb:disabled{opacity:.35;cursor:default}
+.pgd{align-self:center;color:var(--mute)}
+.ulink{text-decoration:underline;cursor:pointer}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 6px}
 .chip{font:inherit;font-size:14px;padding:5px 14px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--ink);cursor:pointer}
 .chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
@@ -304,7 +312,7 @@ const urlA=p=>p?PUB+'audio/'+p:'';
 const pthI=u=>u&&u.startsWith(PUB+'images/')?u.slice((PUB+'images/').length):(u||null);
 const pthA=u=>u&&u.startsWith(PUB+'audio/')?u.slice((PUB+'audio/').length):u;
 const J=JSON.stringify;
-let PN={},isAdm=false,snap=null,syncQ=Promise.resolve(),syncT=0,pend=0,lastLoad=0,authMode='in';
+let PN={},PR={},isAdm=false,snap=null,syncQ=Promise.resolve(),syncT=0,pend=0,lastLoad=0,authMode='in';
 const pn=id=>PN[id]||'작가';
 const emptyDb=()=>({prefs:{size:18,lh:1.9,th:'white',vol:70,alias:{}},set:{alias:true,bgm:true,noRp:false,block:[],nt:{eps:true,cm:'all',seen:''}},subs:[],drafts:[],colors:[],tracks:[],chars:[],core:[],notices:[],series:[]});
 db=emptyDb();
@@ -332,7 +340,7 @@ async function loadAll(){
  const R=await Promise.all([q('profiles'),sb.from('series').select('*').order('created_at',{ascending:false}),sb.from('episodes').select('*').order('position'),q('characters'),q('tracks'),sb.from('comments').select('*').order('created_at'),sb.from('subscriptions').select('series_id').eq('user_id',UID),sb.from('drafts').select('*').eq('owner',UID).order('updated_at',{ascending:false}),sb.from('user_settings').select('*').eq('user_id',UID).maybeSingle(),sb.from('core_tags').select('*').order('position'),sb.from('notices').select('*').order('created_at',{ascending:false})]);
  R.forEach(r=>{if(r.error)throw r.error});
  const [pr,se,ep,ch,tr,cm,sub,dr,us,ct,nc]=R.map(r=>r.data);
- PN={};pr.forEach(p=>{PN[nid(p.id)]=p.nickname;if(nid(p.id)===ME)isAdm=!!p.is_admin});
+ PN={};PR={};pr.forEach(p=>{const k=nid(p.id);PN[k]=p.nickname;PR[k]={name:p.nickname,img:urlI(p.avatar_path),bio:p.bio||'',link:p.link||''};if(k===ME)isAdm=!!p.is_admin});
  const D=emptyDb(),u=us||{},rd=u.reader||{};
  D.set={alias:u.alias_on!==false,bgm:u.bgm_on!==false,noRp:!!u.hide_rp,hide:!!u.hide_online,block:u.block_warns||[],nt:Object.assign({eps:true,cm:'all',seen:''},u.notif||{})};
  D.core=(ct||[]).map(x=>({id:nid(x.id),name:x.name,pos:x.position}));
@@ -429,14 +437,33 @@ async function boot(){verInit();if(!sb){app.innerHTML='<p class="mu" style="padd
 async function logout(){if(pend||syncT){toast('저장 중이에요. 잠시 후 다시 눌러 주세요');return}bgStop();onLeave();await sb.auth.signOut()}
 
 // ----- 설정 화면: 내 계정, 초대 코드 관리 -----
-function vSet(){vSet0();$('.wrap').insertAdjacentHTML('beforeend',`<h2 class="h2" style="margin-top:36px">내 계정</h2><label>닉네임<input id="nk" maxlength="20" value="${esc(pn(ME))}"></label><div class="acts"><button class="btn" onclick="nkSave()">닉네임 저장</button><button class="btn ghost" onclick="logout()">로그아웃</button></div>${isAdm?'<h2 class="h2" style="margin-top:36px">초대 코드 관리</h2><div class="box"><div class="two"><label>사용 가능 횟수<input id="icm" type="number" min="1" max="100" value="1"></label><label>메모 <span class="mu">누구에게 줄 코드인지</span><input id="icn" maxlength="30"></label></div><div class="acts"><button class="btn" onclick="icAdd()">새 코드 만들기</button></div></div><div id="icl" style="margin-top:12px"></div>'+admPanel():''}`);if(isAdm)icLoad()}
+function vUser(id){const p=PR[id];if(!p)return vHome();
+ const works=db.series.filter(s=>s.author===id&&!blk(s)),chs=db.chars.filter(c=>c.owner===id);
+ app.innerHTML=`<div class="wrap"><div class="sh">${uPic(id)?`<img class="av lgav zoomable" src="${uPic(id)}" alt="">`:`<span class="av lgav">${esc(p.name.slice(0,1))}</span>`}
+ <div><h1>${esc(p.name)}</h1>${id===ME?'<p class="mu">나</p>':''}${p.bio?`<p style="margin:8px 0 0">${esc(p.bio)}</p>`:''}
+ <div class="acts">${/^https?:\/\//.test(p.link)?`<a class="btn ghost" href="${esc(p.link)}" target="_blank" rel="noopener noreferrer">링크 열기</a>`:''}${id===ME?'<a class="btn ghost" href="#settings">프로필 수정</a>':''}</div></div></div>
+ <h2 class="h2" style="margin-top:28px">작품 ${works.length}개</h2><div>${works.map(row).join('')||'<p class="mu">아직 올린 작품이 없어요.</p>'}</div>
+ <h2 class="h2" style="margin-top:28px">캐릭터 ${chs.length}명</h2><div class="casts">${chs.map(c=>`<a class="cc" href="#char-${c.id}">${av(c.img,c.name)}<span>${esc(c.name)}</span></a>`).join('')||'<p class="mu">아직 캐릭터가 없어요.</p>'}</div></div>`}
+function pickP(i){const f=i.files[0];i.value='';if(f)crOpen(f,1,320,1,'프로필 사진 맞추기',d=>{pfData=d;showP()})}
+function showP(){const c=$('#pfp');if(!c)return;const u=pfData||(PR[ME]&&PR[ME].img)||'';
+ c.innerHTML=u?`<div class="cp">${av(u,PN[ME]||'')}${pfData?`<button type="button" class="lk" onclick="pfData='';showP()">되돌리기</button>`:''}</div>`:''}
+async function pfSave(){const n=$('#nk').value.trim().slice(0,20);if(!n){toast('닉네임을 입력해 주세요');return}
+ const lk=$('#plk').value.trim();if(lk&&!/^https?:\/\//i.test(lk)){toast('링크는 http:// 또는 https:// 로 시작해야 해요');return}
+ const row={nickname:n,bio:$('#pbio').value.trim().slice(0,100),link:lk};
+ adm(async()=>{if(pfData&&pfData.startsWith('data:')){const u=await upImg(pfData);row.avatar_path=pthI(u)}
+  await ok(sb.from('profiles').update(row).eq('id',UID));pfData=''},'프로필을 저장했어요')}
+let pfData='';
+function vSet(){vSet0();$('.wrap').insertAdjacentHTML('beforeend',`<h2 class="h2" style="margin-top:36px">내 프로필</h2><label>닉네임<input id="nk" maxlength="20" value="${esc(pn(ME))}"></label>
+<label>한 줄 소개<input id="pbio" maxlength="100" value="${esc((PR[ME]||{}).bio||'')}" placeholder="예: 느린 연재, 해피엔딩 보장"></label>
+<label>링크 <span class="mu">블로그나 콜라주 위키 주소 (선택)</span><input id="plk" maxlength="300" value="${esc((PR[ME]||{}).link||'')}" placeholder="https://"></label>
+<label>프로필 사진<input type="file" id="paf" accept="image/*" onchange="pickP(this)"></label><div id="pfp"></div>
+<div class="acts"><button class="btn" onclick="pfSave()">프로필 저장</button><a class="btn ghost" href="#user-${ME}">내 프로필 보기</a><button class="btn ghost" onclick="logout()">로그아웃</button></div>${isAdm?'<h2 class="h2" style="margin-top:36px">초대 코드 관리</h2><div class="box"><div class="two"><label>사용 가능 횟수<input id="icm" type="number" min="1" max="100" value="1"></label><label>메모 <span class="mu">누구에게 줄 코드인지</span><input id="icn" maxlength="30"></label></div><div class="acts"><button class="btn" onclick="icAdd()">새 코드 만들기</button></div></div><div id="icl" style="margin-top:12px"></div>'+admPanel():''}`);if(isAdm)icLoad();showP()}
 const admPanel=()=>!isAdm?'':`<h2 class="h2" style="margin-top:36px">중요 태그 관리</h2><p class="mu">작품 목록에서 모아볼 수 있는 태그예요. 작가는 여기 있는 태그 중에서 고릅니다.</p>
 <div class="box"><label>새 태그<input id="ctn" maxlength="20" placeholder="예: 판타지"></label><div class="acts"><button class="btn" onclick="ctAdd()">추가</button></div></div>
 <div style="margin-top:10px">${db.core.map(c=>`<div class="dr"><span><b>${esc(c.name)}</b> <span class="mu">${db.series.filter(s=>(s.core||[]).includes(c.name)).length}개 작품</span></span><span><button class="lk" onclick="ctRen('${c.id}')">이름 바꾸기</button> <button class="lk" onclick="ctDel('${c.id}')">삭제</button></span></div>`).join('')||'<p class="mu">아직 중요 태그가 없어요.</p>'}</div>
 <h2 class="h2" style="margin-top:36px">모든 작품 관리</h2><p class="mu">다른 사람의 작품도 고치거나 지울 수 있고, 주인을 바꿀 수 있어요.</p>
 <div>${db.series.map(s=>`<div class="dr" style="flex-wrap:wrap"><span><b>${esc(s.title)}</b> <span class="mu">${esc(pn(s.author))} · ${s.eps.length}화</span></span><span style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><a class="lk" href="#series-${s.id}">열기</a><a class="lk" href="#edit-${s.id}">정보 수정</a><select id="xo-${s.id}" class="fs">${Object.keys(PN).map(u=>`<option value="${u}"${u===s.author?' selected':''}>${esc(pn(u))}</option>`).join('')}</select><button class="lk" onclick="admXfer('${s.id}')">양도</button><button class="lk" onclick="admDelS('${s.id}')">삭제</button></span></div>`).join('')||'<p class="mu">아직 작품이 없어요.</p>'}</div>
 <h2 class="h2" style="margin-top:36px">모든 캐릭터 관리</h2><div>${db.chars.map(c=>`<div class="dr" style="flex-wrap:wrap"><span><b style="${chStyle(c.id)}">${esc(c.name)}</b> <span class="mu">${esc(pn(c.owner))}</span></span><span style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><a class="lk" href="#char-${c.id}">열기</a><select id="xc-${c.id}" class="fs">${Object.keys(PN).map(u=>`<option value="${u}"${u===c.owner?' selected':''}>${esc(pn(u))}</option>`).join('')}</select><button class="lk" onclick="admXferC('${c.id}')">양도</button>${c.owner===ME?'':`<button class="lk" onclick="admDelC('${c.id}')">삭제</button>`}</span></div>`).join('')||'<p class="mu">아직 캐릭터가 없어요.</p>'}</div>`;
-async function nkSave(){const v=$('#nk').value.trim().slice(0,20);if(!v){toast('닉네임을 입력해 주세요');return}const r=await sb.from('profiles').update({nickname:v}).eq('id',UID);if(r.error){toast('저장하지 못했어요');return}PN[ME]=v;toast('닉네임을 바꿨어요')}
 async function icLoad(){const l=$('#icl');if(!l)return;const r=await sb.from('invite_codes').select('*').order('created_at',{ascending:false});if(r.error){l.innerHTML='<p class="mu">불러오지 못했어요</p>';return}
  l.innerHTML=r.data.map(c=>`<div class="dr"><span><b>${esc(c.code)}</b> <span class="mu">${c.used_count}/${c.max_uses}회 사용${c.note?' / '+esc(c.note):''}</span></span><button class="lk" onclick="icDel('${esc(c.code)}')">삭제</button></div>`).join('')||'<p class="mu">만든 코드가 없어요.</p>'}
 async function icAdd(){const A='ABCDEFGHJKMNPQRSTUVWXYZ23456789';let c='';crypto.getRandomValues(new Uint8Array(8)).forEach(b=>{c+=A[b%A.length]});
@@ -456,18 +483,39 @@ if(dg){c.className='dg';c.setAttribute('data-c',dg);const ch=chById(dg);if(ch)c.
 
 function hue(t){let h=0;for(const c of t)h=(h*31+c.charCodeAt(0))%360;return h}
 const spine=(s,l)=>IMG.test(s.cover||'')?`<img class="th${l?' lg':''} zoomable" src="${s.cover}" alt="">`:'';
-const meta=s=>`<p class="mu"><span>${esc(pn(s.author))}</span>${s.kind==='short'?'<span>단편</span>':`<span>장편</span><span>${esc(s.status)}</span><span>${pub(s).length}화</span>`}</p>${(s.core&&s.core.length)||s.tags.length?`<p class="tags">${(s.core||[]).map(t=>`<b class="ctg">${esc(t)}</b>`).join('')}${s.tags.map(t=>`<span>#${esc(t)}</span>`).join('')}</p>`:''}${wn(s)}`;
+const meta=s=>`<p class="mu"><span class="ulink" role="link" tabindex="0" onclick="event.preventDefault();event.stopPropagation();location.hash='user-${s.author}'" onkeydown="if(event.key==='Enter'){event.preventDefault();location.hash='user-${s.author}'}">${esc(pn(s.author))}</span>${s.kind==='short'?'<span>단편</span>':`<span>장편</span><span>${esc(s.status)}</span><span>${pub(s).length}화</span>`}</p>${(s.core&&s.core.length)||s.tags.length?`<p class="tags">${(s.core||[]).map(t=>`<b class="ctg">${esc(t)}</b>`).join('')}${s.tags.map(t=>`<span>#${esc(t)}</span>`).join('')}</p>`:''}${wn(s)}`;
 const row=s=>`<a class="row" href="#series-${s.id}">${spine(s)}<div><h3>${esc(s.title)}</h3>${meta(s)}<p class="ds">${esc(s.desc)}</p>${castTxt(s)}</div></a>`;
 
 function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),2200)}
 
-function setG(i){gf=gs[i];vHome()}
+const PGS=10;let gq='',gp=1;
+const sTxt=s=>[s.title,s.desc,...(s.tags||[]),...(s.core||[]),pn(s.author),...sCast(s).guests,
+ ...sCast(s).cast.map(id=>(chById(id)||{}).name||''),...((s.author===ME||isAdm)?s.eps:pub(s)).map(e=>e.title)].join(' ').toLowerCase();
+function hFilter(){const q=gq.trim().toLowerCase();
+ return db.series.filter(s=>(gf==='전체'||(s.core||[]).includes(gf))&&(gk==='전체'||(gk==='구독중'?db.subs.includes(s.id):(gk==='단편')===(s.kind==='short')))&&!blk(s)&&(!q||q.split(/\s+/).every(w=>sTxt(s).includes(w))))}
+const pager=(tot)=>{const o=[];let a=Math.max(1,gp-3),b=Math.min(tot,a+6);a=Math.max(1,b-6);
+ o.push(`<button class="pgb" ${gp<=1?'disabled':''} onclick="gPage(${gp-1})" aria-label="이전">‹</button>`);
+ if(a>1)o.push(`<button class="pgb" onclick="gPage(1)">1</button>`,a>2?'<span class="pgd">…</span>':'');
+ for(let i=a;i<=b;i++)o.push(`<button class="pgb${i===gp?' on':''}" onclick="gPage(${i})">${i}</button>`);
+ if(b<tot)o.push(b<tot-1?'<span class="pgd">…</span>':'',`<button class="pgb" onclick="gPage(${tot})">${tot}</button>`);
+ o.push(`<button class="pgb" ${gp>=tot?'disabled':''} onclick="gPage(${gp+1})" aria-label="다음">›</button>`);
+ return o.join('')};
+function hList(){const L=hFilter(),tot=Math.max(1,Math.ceil(L.length/PGS));if(gp>tot)gp=tot;if(gp<1)gp=1;
+ const el=$('#hl');if(!el)return;
+ el.innerHTML=L.slice((gp-1)*PGS,gp*PGS).map(row).join('')||`<p class="mu" style="margin:24px 0">${gq.trim()?'검색 결과가 없습니다.':'이 태그의 작품이 아직 없습니다.'}</p>`;
+ const c=$('#hc');if(c)c.textContent=L.length?`작품 ${L.length}개${tot>1?` · ${gp}/${tot} 쪽`:''}`:'';
+ const g=$('#pg');if(g)g.innerHTML=tot>1?pager(tot):''}
+function gSearch(v){gq=v;gp=1;hList()}
+function gPage(n){gp=n;hList();window.scrollTo(0,0)}
+function setG(i){gf=gs[i];gp=1;vHome()}
 function vHome(){gs=['전체',...db.core.map(c=>c.name)];if(!gs.includes(gf))gf='전체';
-const l=db.series.filter(s=>(gf==='전체'||(s.core||[]).includes(gf))&&(gk==='전체'||(gk==='구독중'?db.subs.includes(s.id):(gk==='단편')===(s.kind==='short')))&&!blk(s));
 app.innerHTML=`
-<div class="chips">${['전체','단편','장편','구독중'].map(k=>`<button class="chip${k===gk?' on':''}" onclick="gk='${k}';vHome()">${k}</button>`).join('')}</div>
+<div class="srch"><input id="sq" type="search" value="${esc(gq)}" placeholder="제목, 작가, 태그, 등장인물로 찾기" oninput="gSearch(this.value)" autocomplete="off">${gq?`<button class="lk" onclick="gSearch('');$('#sq').value=''">지우기</button>`:''}</div>
+<div class="chips">${['전체','단편','장편','구독중'].map(k=>`<button class="chip${k===gk?' on':''}" onclick="gk='${k}';gp=1;vHome()">${k}</button>`).join('')}</div>
 <div class="chips" style="margin-top:8px">${gs.map((g,i)=>`<button class="chip${g===gf?' on':''}" onclick="setG(${i})">${esc(g)}</button>`).join('')}</div>
-<div>${l.map(row).join('')||'<p class="mu">이 태그의 작품이 아직 없습니다.</p>'}</div>`}
+<p class="mu" id="hc" style="margin:14px 0 0"></p>
+<div id="hl"></div><nav class="pg" id="pg"></nav>`;
+hList()}
 
 function tSub(id){const i=db.subs.indexOf(id);i<0?db.subs.push(id):db.subs.splice(i,1);save();vSeries(id)}
 function vSeries(id){const s=find(id);if(!s)return vHome();if(blk(s)&&!okb.has(s.id))return vBlk(s);setTimeout(()=>{if($('#bgc')&&find(id))bgInit(find(id),{bgm:'',sc:{},cast:[]})},0);
@@ -709,7 +757,7 @@ function cmx(s,e){const L=(e.cm||[]).filter(m=>!(db.set.noRp&&m.kind==='rp')),T=
  return `<section class="cms"><h2 class="h2">댓글 ${L.length}개</h2>${rcid?'':cfrm(s,e,null)}<div>${T.map(x=>`<div class="cmw" style="margin-left:${x.d*20}px">${cm1(s,e,x.m)}${rcid===x.m.id?cfrm(s,e,x.m.name):''}</div>`).join('')||'<p class="mu">첫 댓글을 남겨 보세요.</p>'}</div></section>`}
 function crep(sid,eid,id){rcid=id;vRead(sid,eid);
  const f=$('.cmf.rep');if(f)f.scrollIntoView({block:'center'});const x=$('#ct');if(x)x.focus()}
-function cadd(sid,eid){const s=find(sid),e=s&&s.eps.find(x=>x.id===eid),t=$('#ct').value.trim();if(!e)return;if(!t){toast('댓글 내용을 입력해 주세요');return}const c=myChars().find(x=>x.id===$('#cid').value);(e.cm=e.cm||[]).push({id:uid('m'),mine:1,d:today(),ts:Date.now(),text:t,parent:rcid||null,kind:c?'rp':(s.author===ME?'author':'reader'),name:c?c.name:pn(ME),cid:c?c.id:null,img:c?c.img:''});if(!save()){e.cm.pop();return}rcid=null;vRead(sid,eid)}
+function cadd(sid,eid){const s=find(sid),e=s&&s.eps.find(x=>x.id===eid),t=$('#ct').value.trim();if(!e)return;if(!t){toast('댓글 내용을 입력해 주세요');return}const c=myChars().find(x=>x.id===$('#cid').value);(e.cm=e.cm||[]).push({id:uid('m'),mine:1,d:today(),ts:Date.now(),text:t,parent:rcid||null,kind:c?'rp':(s.author===ME?'author':'reader'),name:c?c.name:pn(ME),cid:c?c.id:null,img:c?c.img:(uPic(ME)||'')});if(!save()){e.cm.pop();return}rcid=null;vRead(sid,eid)}
 function cdel(sid,eid,mid){const e=find(sid).eps.find(x=>x.id===eid),L=e.cm||[];
  const kill=new Set([mid]);let n=1;while(n){n=0;L.forEach(m=>{if(m.parent&&kill.has(m.parent)&&!kill.has(m.id)){kill.add(m.id);n++}})}
  if(kill.size>1&&!confirm('이 댓글에 달린 답글 '+(kill.size-1)+'개도 함께 지워져요. 삭제할까요?'))return;
@@ -719,7 +767,7 @@ function pickA(i){const f=i.files[0];i.value='';if(f)crOpen(f,1,320,1,'프로필
 const myChars=()=>db.chars.filter(c=>c.owner===ME||(c.share||[]).includes(ME));
 const chById=id=>db.chars.find(c=>c.id===id);
 const chStyle=id=>{const c=chById(id);return c&&c.color?cvar(c.color):''};
-const crow=(c,mine)=>`<div class="row" style="align-items:center">${av(c.img,c.name)}<div style="flex:1;min-width:0"><h3 style="${chStyle(c.id)}">${esc(c.name)}</h3><p class="mu">${esc(pn(c.owner))}의 캐릭터${(c.share||[]).length?' · 공유 '+(c.share||[]).map(u=>esc(pn(u))).join(', '):''}</p>${c.quote?`<p class="cq sm" style="${c.font?`font-family:'${esc(c.font)}',serif;${fsCss(c.font)}`:''}${cvar(c.tcolor)}">“${esc(c.quote)}”</p>`:''}<div class="acts" style="margin-top:8px"><a class="btn ghost" href="#char-${c.id}">자세히</a>${mine?`<button class="btn ghost" onclick="ced('${c.id}')">수정</button><button class="btn ghost" onclick="cdl('${c.id}')">삭제</button>`:(isAdm?`<button class="btn ghost" onclick="admDelC('${c.id}')">삭제(관리자)</button>`:'')}</div></div></div>`;
+const crow=(c,mine)=>`<div class="row" style="align-items:center">${av(c.img,c.name)}<div style="flex:1;min-width:0"><h3 style="${chStyle(c.id)}">${esc(c.name)}</h3><p class="mu"><a href="#user-${c.owner}" style="text-decoration:underline">${esc(pn(c.owner))}</a>의 캐릭터${(c.share||[]).length?' · 공유 '+(c.share||[]).map(u=>esc(pn(u))).join(', '):''}</p>${c.quote?`<p class="cq sm" style="${c.font?`font-family:'${esc(c.font)}',serif;${fsCss(c.font)}`:''}${cvar(c.tcolor)}">“${esc(c.quote)}”</p>`:''}<div class="acts" style="margin-top:8px"><a class="btn ghost" href="#char-${c.id}">자세히</a>${mine?`<button class="btn ghost" onclick="ced('${c.id}')">수정</button><button class="btn ghost" onclick="cdl('${c.id}')">삭제</button>`:(isAdm?`<button class="btn ghost" onclick="admDelC('${c.id}')">삭제(관리자)</button>`:'')}</div></div></div>`;
 function vChars(){const my=db.chars.filter(c=>c.owner===ME),sh=db.chars.filter(c=>c.owner!==ME&&(c.share||[]).includes(ME)),ot=db.chars.filter(c=>c.owner!==ME&&!(c.share||[]).includes(ME));
 const uOpts=Object.keys(PN).filter(u=>u!==ME);
 const ed=ceid&&db.chars.find(x=>x.id===ceid&&x.owner===ME);
@@ -753,7 +801,7 @@ function csv(){const n=$('#cn').value.trim(),my=db.chars.filter(c=>c.owner===ME)
 function cdl(id){const c=db.chars.find(x=>x.id===id&&x.owner===ME);if(!c)return;
 if(!confirm('캐릭터 ‘'+c.name+'’을(를) 삭제할까요?\n\n작품의 등장인물 목록에서도 빠지고 되돌릴 수 없어요.\n이 캐릭터로 쓴 RP 댓글은 그대로 남아요.'))return;
 db.chars=db.chars.filter(x=>x.id!==id);db.series.forEach(s=>s.eps.forEach(e=>{e.cast=(e.cast||[]).filter(x=>x!==id)}));save();toast('캐릭터를 삭제했어요');ceid=null;avData='';vChars()}
-function vChar(id){const c=db.chars.find(x=>x.id===id);if(!c)return vHome();const L=db.series.filter(s=>castL(s).some(c=>c.id===id)&&!blk(s));app.innerHTML=`<div class="wrap"><div class="sh">${av(c.img,c.name).replace('class="av"','class="av lgav"')}<div><h1 style="${chStyle(c.id)}">${esc(c.name)}</h1><p class="mu">${esc(pn(c.owner))}의 캐릭터${(c.share||[]).length?' · RP 공유: '+(c.share||[]).map(u=>esc(pn(u))).join(', '):''}</p>${c.quote||c.font||c.tcolor?`<p class="cq" style="${c.font?`font-family:'${esc(c.font)}',serif;${fsCss(c.font)}`:''}${cvar(c.tcolor)}">“${esc(c.quote||PVS)}”</p>`:''}${lnk(c)?`<div class="acts">${lnk(c)}</div>`:''}</div></div><div class="box" style="margin:0 0 24px"><label>이 캐릭터의 내 별명 <span class="mu">내 화면의 소설에서만 이 이름으로 보여요</span><input id="al" maxlength="20" value="${esc((db.prefs.alias||{})[c.id]||'')}"></label><div class="acts"><button class="btn" onclick="asv('${c.id}')">별명 저장</button></div></div><h2 class="h2">등장하는 작품 ${L.length}개</h2><div>${L.map(row).join('')||'<p class="mu">아직 이 캐릭터가 등장하는 작품이 없습니다.</p>'}</div></div>`}
+function vChar(id){const c=db.chars.find(x=>x.id===id);if(!c)return vHome();const L=db.series.filter(s=>castL(s).some(c=>c.id===id)&&!blk(s));app.innerHTML=`<div class="wrap"><div class="sh">${av(c.img,c.name).replace('class="av"','class="av lgav"')}<div><h1 style="${chStyle(c.id)}">${esc(c.name)}</h1><p class="mu"><a href="#user-${c.owner}" style="text-decoration:underline">${esc(pn(c.owner))}</a>의 캐릭터${(c.share||[]).length?' · RP 공유: '+(c.share||[]).map(u=>esc(pn(u))).join(', '):''}</p>${c.quote||c.font||c.tcolor?`<p class="cq" style="${c.font?`font-family:'${esc(c.font)}',serif;${fsCss(c.font)}`:''}${cvar(c.tcolor)}">“${esc(c.quote||PVS)}”</p>`:''}${lnk(c)?`<div class="acts">${lnk(c)}</div>`:''}</div></div><div class="box" style="margin:0 0 24px"><label>이 캐릭터의 내 별명 <span class="mu">내 화면의 소설에서만 이 이름으로 보여요</span><input id="al" maxlength="20" value="${esc((db.prefs.alias||{})[c.id]||'')}"></label><div class="acts"><button class="btn" onclick="asv('${c.id}')">별명 저장</button></div></div><h2 class="h2">등장하는 작품 ${L.length}개</h2><div>${L.map(row).join('')||'<p class="mu">아직 이 캐릭터가 등장하는 작품이 없습니다.</p>'}</div></div>`}
 function vSet0(){const st=db.set;app.innerHTML=`<div class="wrap"><h1>보기 설정</h1><label class="ck" style="margin-top:20px"><input type="checkbox" id="sal"${st.alias===false?'':' checked'} onchange="sset()">별명으로 보기</label><p class="mu">내가 정한 캐릭터 별명으로 소설 속 이름이 보여요. 끄면 원래 이름으로 돌아가요.</p><label class="ck" style="margin-top:20px"><input type="checkbox" id="sbg"${st.bgm===false?'':' checked'} onchange="sset()">배경음악(BGM) 재생</label><p class="mu">끄면 읽기 화면에서 BGM 재생 버튼이 사라져요. 켜 두어도 자동으로 재생되지는 않아요.</p><label>기본 음량<input type="range" id="svol" min="0" max="100" value="${db.prefs.vol==null?70:db.prefs.vol}" oninput="bgV(this.value)" onchange="bgSv()"></label><label class="ck" style="margin-top:20px"><input type="checkbox" id="snr"${st.noRp?' checked':''} onchange="sset()">RP 댓글 숨기기</label><p class="mu">캐릭터로 쓴 RP 댓글이 댓글 목록에 보이지 않아요.</p><h2 class="h2" style="margin-top:28px">이런 작품은 보지 않을래요</h2><p class="mu">선택한 주의 요소가 있는 작품은 목록에서 숨겨져요.</p><div>${WN.map(w=>`<label class="ck"><input type="checkbox" name="bl" value="${w}"${st.block.includes(w)?' checked':''} onchange="sset()">${w}</label>`).join('')}</div><label>직접 입력 <span class="mu">쉼표로 구분</span><input id="blx" maxlength="80" value="${esc(st.block.filter(w=>!WN.includes(w)).join(', '))}" onchange="sset()"></label>
 <label class="ck" style="margin-top:20px"><input type="checkbox" id="shd"${st.hide===true?'':' checked'} onchange="sset()">접속 중인 것 보여 주기</label><p class="mu">끄면 다른 사람에게 내 접속과 활동이 보이지 않아요. 대신 나도 다른 사람이 뭘 하는지는 볼 수 있어요.</p>
 <h2 class="h2" style="margin-top:32px">알림</h2><p class="mu">알림은 머리말의 종 모양에 쌓여요.</p>
@@ -1009,10 +1057,10 @@ function onTrack(){if(!ch)return;const hide=db.set.hide===true;
 function onLeave(){onl={};const s=$('#side');if(s){s.hidden=true}document.body.classList.remove('sideon');const b=$('#onl');if(b)b.hidden=true;if(!ch)return;try{ch.unsubscribe()}catch(e){}ch=null}
 function onList(){const L=[];Object.keys(onl).forEach(k=>{const v=(onl[k]||[])[0];if(v&&v.name)L.push({id:k,name:v.name,act:v.act||''})});
  return L.sort((a,b)=>a.id===ME?-1:b.id===ME?1:a.name.localeCompare(b.name,'ko'))}
-const uPic=id=>{const c=db.chars.filter(x=>x.owner===id&&IMG.test(x.img||''))[0];return c?c.img:''};
+const uPic=id=>{const p=PR[id];if(p&&IMG.test(p.img||''))return p.img;const c=db.chars.filter(x=>x.owner===id&&IMG.test(x.img||''))[0];return c?c.img:''};
 const onEx=new Set();
 const onRow=(id,name,act,off)=>{const p=uPic(id),ex=onEx.has(id);
- return `<div class="onr${off?' off':''}${ex?' exp':''}" data-u="${esc(id)}"${act?` title="${esc(name+' · '+act)}"`:''}><span class="pic">${p?`<img class="av" src="${p}" alt="">`:`<span class="av">${esc((name||'?').slice(0,1))}</span>`}${off?'':'<span class="dot"></span>'}</span><div style="min-width:0"><div class="nm">${esc(name)}${id===ME?' <span class="mu">(나)</span>':''}</div>${act?`<div class="ac2">${esc(act)}</div>`:''}</div></div>`};
+ return `<div class="onr${off?' off':''}${ex?' exp':''}" data-u="${esc(id)}"${act?` title="${esc(name+' · '+act)}"`:''}><span class="pic">${p?`<img class="av" src="${p}" alt="">`:`<span class="av">${esc((name||'?').slice(0,1))}</span>`}${off?'':'<span class="dot"></span>'}</span><div style="min-width:0"><div class="nm"><a href="#user-${esc(id)}">${esc(name)}</a>${id===ME?' <span class="mu">(나)</span>':''}</div>${act?`<div class="ac2">${esc(act)}</div>`:''}</div></div>`};
 document.addEventListener('click',e=>{const r=e.target.closest&&e.target.closest('.onr[data-u]');if(!r||!e.target.closest('#sdl'))return;
  const u=r.dataset.u;onEx.has(u)?onEx.delete(u):onEx.add(u);r.classList.toggle('exp')});
 function onlUI(){const b=$('#onl'),s=$('#side');if(!b||!s)return;const L=onList(),on=new Set(L.map(x=>x.id));
@@ -1039,7 +1087,7 @@ function verShow(){if($('#upb'))return;const d=document.createElement('div');d.c
  d.innerHTML=`<span>사이트가 새로 바뀌었어요. 새로고침하면 바뀐 내용이 보여요.</span><button type="button" class="go" onclick="location.reload()">새로고침</button><button type="button" onclick="this.parentNode.remove()">나중에</button>`;
  document.body.insertBefore(d,document.body.firstChild);hh()}
 function route(){if(!ME){vAuth();return}const p=(location.hash.slice(1)||'home').split('-');if(p[0]!=='read'&&p[0]!=='series')bgStop();if(p[0]!=='rev')rev=null;if(p[0]!=='read')rcid=null;if(p[0]!=='notice'&&p[0]!=='notices')nedit=null;pvClose();
-const m={series:()=>vSeries(p[1]),read:()=>vRead(p[1],p[2]),write:()=>vWrite(p[1],p[2]),rev:()=>vRev(p[1],p[2]),edit:()=>vEdit(p[1]),chars:()=>{ceid=null;avData='';vChars()},char:()=>vChar(p[1]),cast:()=>vCast(p[1],p[2]),settings:vSet,music:vMusic,alerts:vAlerts,notices:vNotices,notice:()=>vNotice(p[1]),mine:vMine};
+const m={series:()=>vSeries(p[1]),read:()=>vRead(p[1],p[2]),write:()=>vWrite(p[1],p[2]),rev:()=>vRev(p[1],p[2]),edit:()=>vEdit(p[1]),chars:()=>{ceid=null;avData='';vChars()},char:()=>vChar(p[1]),user:()=>vUser(p[1]),cast:()=>vCast(p[1],p[2]),settings:vSet,music:vMusic,alerts:vAlerts,notices:vNotices,notice:()=>vNotice(p[1]),mine:vMine};
 (Object.prototype.hasOwnProperty.call(m,p[0])?m[p[0]]:vHome)();bellUI();hh();onJoin();onTrack();window.scrollTo(0,0);if(p[0]==='home'||p[0]==='series')stale()}
 addEventListener('hashchange',route);
 boot();
