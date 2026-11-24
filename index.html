@@ -106,6 +106,12 @@ img.sp{display:block;padding:0;object-fit:cover}
 .onr .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .onr .ac2{color:var(--mute);font-size:12px;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sdn{color:var(--mute);font-size:13px;padding:10px 8px}
+.sdg{margin:16px 8px 6px;font:600 12px/1 "Noto Sans KR",sans-serif;color:var(--mute);letter-spacing:.04em}
+.onr.off{opacity:.45}
+.upb{position:sticky;top:0;z-index:11;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 16px;background:var(--ac);color:var(--on);font-size:14px}
+.upb button{font:inherit;font-size:13px;font-weight:600;padding:6px 12px;border-radius:6px;border:1px solid currentColor;background:transparent;color:inherit;cursor:pointer}
+.upb button.go{background:var(--on);color:var(--ac);border-color:var(--on)}
+.upb span{flex:1;min-width:150px}
 body.sideon{padding-right:248px}
 @media (max-width:899px){body.sideon{padding-right:0}.side{top:0;width:min(280px,86vw);box-shadow:-6px 0 24px rgba(0,0,0,.25);padding-top:calc(12px + env(safe-area-inset-top,0px))}}
 .ctb{gap:6px;flex-wrap:wrap}
@@ -390,7 +396,7 @@ async function doRst(){const em=$('#ae').value.trim();if(!em){am('이메일을 �
 function vPw(){app.innerHTML=`<div class="wrap" style="max-width:420px;margin:40px auto"><h1>새 비밀번호</h1><label>새 비밀번호 <span class="mu">6자 이상</span><input id="np1" type="password" autocomplete="new-password"></label><div class="acts"><button class="btn" onclick="pwSet()">변경하기</button></div><p id="am" class="mu" style="margin-top:14px"></p></div>`}
 async function pwSet(){const v=$('#np1').value;if(v.length<6){am('6자 이상 입력해 주세요');return}const r=await sb.auth.updateUser({password:v});if(r.error){am('변경하지 못했어요: '+r.error.message);return}const s=await sb.auth.getSession();location.hash='home';await enter(s.data.session.user)}
 async function enter(u){UID=u.id;ME=nid(u.id);try{await loadAll()}catch(e){console.error(e);toast('데이터를 불러오지 못했어요: '+((e&&e.message)||e))}if(!location.hash)location.hash='home';route()}
-async function boot(){if(!sb){app.innerHTML='<p class="mu" style="padding:40px">서버 연결 라이브러리를 불러오지 못했어요. 인터넷 연결을 확인하고 새로고침해 주세요.</p>';return}
+async function boot(){verInit();if(!sb){app.innerHTML='<p class="mu" style="padding:40px">서버 연결 라이브러리를 불러오지 못했어요. 인터넷 연결을 확인하고 새로고침해 주세요.</p>';return}
  sb.auth.onAuthStateChange((ev)=>{if(ev==='PASSWORD_RECOVERY')setTimeout(vPw,0);if(ev==='SIGNED_OUT')setTimeout(()=>{onLeave();ME='';UID='';isAdm=false;snap=null;db=emptyDb();authMode='in';vAuth()},0)});
  try{const r=await sb.auth.getSession();if(r.data.session){await enter(r.data.session.user);return}}catch(e){console.error(e)}
  vAuth()}
@@ -920,18 +926,31 @@ function onLeave(){onl={};const s=$('#side');if(s){s.hidden=true}document.body.c
 function onList(){const L=[];Object.keys(onl).forEach(k=>{const v=(onl[k]||[])[0];if(v&&v.name)L.push({id:k,name:v.name,act:v.act||''})});
  return L.sort((a,b)=>a.id===ME?-1:b.id===ME?1:a.name.localeCompare(b.name,'ko'))}
 const uPic=id=>{const c=db.chars.filter(x=>x.owner===id&&IMG.test(x.img||''))[0];return c?c.img:''};
-function onlUI(){const b=$('#onl'),s=$('#side');if(!b||!s)return;const L=onList();
+const onRow=(id,name,act,off)=>{const p=uPic(id);
+ return `<div class="onr${off?' off':''}"><span class="pic">${p?`<img class="av" src="${p}" alt="">`:`<span class="av">${esc((name||'?').slice(0,1))}</span>`}${off?'':'<span class="dot"></span>'}</span><div style="min-width:0"><div class="nm">${esc(name)}${id===ME?' <span class="mu">(나)</span>':''}</div>${act?`<div class="ac2">${esc(act)}</div>`:''}</div></div>`};
+function onlUI(){const b=$('#onl'),s=$('#side');if(!b||!s)return;const L=onList(),on=new Set(L.map(x=>x.id));
+ const off=Object.keys(PN).filter(u=>!on.has(u)).map(u=>({id:u,name:pn(u)})).sort((a,b2)=>a.name.localeCompare(b2.name,'ko'));
  b.hidden=!ME;b.innerHTML=`<span class="dot"></span>${L.length}`;b.title=L.length?L.map(x=>x.name+' · '+x.act).join('\n'):'접속 중인 사람';
  const c=$('#sdc');if(c)c.textContent=`온라인 — ${L.length}`;
- const l=$('#sdl');if(l)l.innerHTML=L.length?L.map(x=>{const p=uPic(x.id);
-  return `<div class="onr"><span class="pic">${p?`<img class="av" src="${p}" alt="">`:`<span class="av">${esc(x.name.slice(0,1))}</span>`}<span class="dot"></span></span><div style="min-width:0"><div class="nm">${esc(x.name)}${x.id===ME?' <span class="mu">(나)</span>':''}</div><div class="ac2">${esc(x.act)}</div></div></div>`}).join('')+(db.set.hide===true?'<p class="sdn">내 활동은 숨기고 있어요. 설정에서 바꿀 수 있어요.</p>':'')
-  :'<p class="sdn">아직 아무도 없어요.</p>';
+ const l=$('#sdl');if(!l)return;
+ l.innerHTML=(L.length?L.map(x=>onRow(x.id,x.name,x.act,0)).join(''):'<p class="sdn">아직 아무도 없어요.</p>')
+  +(db.set.hide===true?'<p class="sdn">내 활동은 숨기고 있어요. 설정에서 바꿀 수 있어요.</p>':'')
+  +(off.length?`<h5 class="sdg">오프라인 — ${off.length}</h5>`+off.map(x=>onRow(x.id,x.name,'',1)).join(''):'');
  sideSet(onp,1)}
 function sideSet(v,quiet){onp=!!v;const s=$('#side');if(!s)return;
  s.hidden=!onp||!ME;document.body.classList.toggle('sideon',onp&&!!ME);
  if(!quiet){try{localStorage.setItem('cn-side',onp?'1':'0')}catch(e){}}
  hh()}
 function pvToggle(){sideSet(!onp)}
+// ----- 새 버전이 올라오면 알려 주기 -----
+let verTag=null,verOn=false;
+async function verGet(){try{const r=await fetch(location.pathname+'?v='+Date.now(),{method:'HEAD',cache:'no-store'});
+ return r.headers.get('etag')||r.headers.get('last-modified')||null}catch(e){return null}}
+async function verInit(){verTag=await verGet();setInterval(verCheck,180000);addEventListener('focus',verCheck)}
+async function verCheck(){if(verOn||!verTag||document.hidden)return;const v=await verGet();if(!v||v===verTag)return;verOn=true;verShow()}
+function verShow(){if($('#upb'))return;const d=document.createElement('div');d.className='upb';d.id='upb';
+ d.innerHTML=`<span>사이트가 새로 바뀌었어요. 새로고침하면 바뀐 내용이 보여요.</span><button type="button" class="go" onclick="location.reload()">새로고침</button><button type="button" onclick="this.parentNode.remove()">나중에</button>`;
+ document.body.insertBefore(d,document.body.firstChild);hh()}
 function route(){if(!ME){vAuth();return}const p=(location.hash.slice(1)||'home').split('-');if(p[0]!=='read')bgStop();if(p[0]!=='rev')rev=null;if(p[0]!=='notice'&&p[0]!=='notices')nedit=null;pvClose();
 const m={series:()=>vSeries(p[1]),read:()=>vRead(p[1],p[2]),write:()=>vWrite(p[1],p[2]),rev:()=>vRev(p[1],p[2]),edit:()=>vEdit(p[1]),chars:()=>{ceid=null;avData='';vChars()},char:()=>vChar(p[1]),cast:()=>vCast(p[1],p[2]),settings:vSet,music:vMusic,alerts:vAlerts,notices:vNotices,notice:()=>vNotice(p[1]),mine:vMine};
 (Object.prototype.hasOwnProperty.call(m,p[0])?m[p[0]]:vHome)();bellUI();hh();onJoin();onTrack();window.scrollTo(0,0);if(p[0]==='home'||p[0]==='series')stale()}
