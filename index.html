@@ -125,16 +125,18 @@ img.sp{display:block;padding:0;object-fit:cover}
 .sdh b{font:600 12px/1 "Noto Sans KR",sans-serif;color:var(--mute);letter-spacing:.04em}
 .sdx{font:inherit;font-size:15px;line-height:1;padding:4px 8px;border:0;border-radius:6px;background:transparent;color:var(--mute);cursor:pointer}
 .sdx:hover{background:color-mix(in srgb,var(--ink) 10%,transparent);color:var(--ink)}
-.onr{display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:8px;font-size:14px}
+.onr{display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:8px;font-size:14px;color:inherit;text-decoration:none}
 .onr:hover{background:color-mix(in srgb,var(--ink) 7%,transparent)}
 .onr .pic{position:relative;flex:none;width:32px;height:32px}
 .onr .pic .av{width:32px;height:32px;font-size:13px}
 .onr .dot{position:absolute;right:-1px;bottom:-1px;width:11px;height:11px;border-radius:50%;background:#2ecc71;border:2px solid var(--card)}
-.onr .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.onr .ac2{color:var(--mute);font-size:12px;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.onr>span:last-child{display:block}
+.onr .nm,.onr .ac2{display:block}
+.onr .nm{font-weight:600;overflow-wrap:anywhere}
+.onr .ac2{color:var(--mute);font-size:12px;margin-top:1px;overflow-wrap:anywhere}
 #sdl .onr{cursor:pointer}
-.onr.exp{align-items:flex-start}
-.onr.exp .nm,.onr.exp .ac2{white-space:normal;overflow:visible;overflow-wrap:anywhere;text-overflow:clip}
+.onr:has(.ac2){align-items:flex-start}
+#sdl .onr:hover .nm{text-decoration:underline}
 .sdn{color:var(--mute);font-size:13px;padding:10px 8px}
 .sdg{margin:16px 8px 6px;font:600 12px/1 "Noto Sans KR",sans-serif;color:var(--mute);letter-spacing:.04em}
 .onr.off{opacity:.45}
@@ -1121,11 +1123,8 @@ function onLeave(){onl={};const s=$('#side');if(s){s.hidden=true}document.body.c
 function onList(){const L=[];Object.keys(onl).forEach(k=>{const v=(onl[k]||[])[0];if(v&&v.name)L.push({id:k,name:v.name,act:v.act||''})});
  return L.sort((a,b)=>a.id===ME?-1:b.id===ME?1:a.name.localeCompare(b.name,'ko'))}
 const uPic=id=>{const p=PR[id];if(p&&IMG.test(p.img||''))return p.img;const c=db.chars.filter(x=>x.owner===id&&IMG.test(x.img||''))[0];return c?c.img:''};
-const onEx=new Set();
-const onRow=(id,name,act,off)=>{const p=uPic(id),ex=onEx.has(id);
- return `<div class="onr${off?' off':''}${ex?' exp':''}" data-u="${esc(id)}"${act?` title="${esc(name+' · '+act)}"`:''}><span class="pic">${p?`<img class="av" src="${p}" alt="">`:`<span class="av">${esc((name||'?').slice(0,1))}</span>`}${off?'':'<span class="dot"></span>'}</span><div style="min-width:0"><div class="nm"><a href="#user-${esc(id)}">${esc(name)}</a>${id===ME?' <span class="mu">(나)</span>':''}</div>${act?`<div class="ac2">${esc(act)}</div>`:''}</div></div>`};
-document.addEventListener('click',e=>{const r=e.target.closest&&e.target.closest('.onr[data-u]');if(!r||!e.target.closest('#sdl'))return;
- const u=r.dataset.u;onEx.has(u)?onEx.delete(u):onEx.add(u);r.classList.toggle('exp')});
+const onRow=(id,name,act,off)=>{const p=uPic(id);
+ return `<a class="onr${off?' off':''}" href="#user-${esc(id)}" data-u="${esc(id)}" title="${esc(name+(act?' · '+act:'')+' · 프로필 보기')}"><span class="pic">${p?`<img class="av" src="${p}" alt="">`:`<span class="av">${esc((name||'?').slice(0,1))}</span>`}${off?'':'<span class="dot"></span>'}</span><span style="min-width:0"><span class="nm">${esc(name)}${id===ME?' <span class="mu">(나)</span>':''}</span>${act?`<span class="ac2">${esc(act)}</span>`:''}</span></a>`};
 function onlUI(){const b=$('#onl'),s=$('#side');if(!b||!s)return;const L=onList(),on=new Set(L.map(x=>x.id));
  const off=Object.keys(PN).filter(u=>!on.has(u)).map(u=>({id:u,name:pn(u)})).sort((a,b2)=>a.name.localeCompare(b2.name,'ko'));
  b.hidden=!ME;b.innerHTML=`<span class="dot"></span>${L.length}`;b.title=L.length?L.map(x=>x.name+' · '+x.act).join('\n'):'접속 중인 사람';
