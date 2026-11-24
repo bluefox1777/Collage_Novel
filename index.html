@@ -247,6 +247,10 @@ body.sideon{padding-right:248px}
 .tplay{margin:10px 0 0;align-items:center}
 .bgn{max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin:0 4px}
 .epw .lk{display:inline-block;margin-top:6px;font-size:13px}
+.eact{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.ebtn{display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:500;padding:5px 11px;border:1px solid var(--line);border-radius:7px;color:var(--mute)}
+.ebtn:hover{border-color:var(--ac);color:var(--ac)}
+.ebtn svg{width:14px;height:14px}
 .q1{text-align:center}
 .q1::before{content:"“";display:block;font-size:2.4em;line-height:.8;opacity:.45}
 .q2::before{content:"“";font-size:1.8em;line-height:0;margin-right:.3em;opacity:.45;vertical-align:-.25em}
@@ -318,7 +322,7 @@ const emptyDb=()=>({prefs:{size:18,lh:1.9,th:'white',vol:70,alias:{}},set:{alias
 db=emptyDb();
 
 // ----- 표 한 줄로 바꾸는 함수들 (서버에 보낼 모양) -----
-const rowS=s=>({id:s.id,owner:s.author===ME?UID:s.author,title:s.title,kind:s.kind||'long',status:s.status||'연재중',description:s.desc||'',tags:s.tags||[],core_tags:s.core||[],warns:s.warns||[],cover_path:s.cover?pthI(s.cover):null,theme_track:s.theme||null});
+const rowS=s=>({id:s.id,owner:s.author===ME?UID:s.author,title:s.title,kind:s.kind||'long',status:s.status||'연재중',description:s.desc||'',tags:s.tags||[],core_tags:s.core||[],cast_ids:s.cast||[],leads:s.leads||[],guests:s.guests||[],warns:s.warns||[],cover_path:s.cover?pthI(s.cover):null,theme_track:s.theme||null});
 const rowE=(e,i,sid)=>({id:e.id,series_id:sid,position:i,title:e.title,html:e.html||'',status:e.st||'공개',thumb_path:e.img?pthI(e.img):null,cast_ids:e.cast||[],leads:e.leads||[],guests:e.guests||[],warns:e.warns||[],bgm:e.bgm||'',scenes:e.sc||{},edit_count:e.rev||0,pov:e.pov||'',pov_char:e.povc||null,pov_scenes:e.psc||{}});
 const rowC=c=>({id:c.id,owner:c.owner===ME?UID:c.owner,name:c.name,wiki_link:c.link||'',avatar_path:c.img?pthI(c.img):null,shared_with:c.share||[],font:c.font||'',color:c.color||'',text_color:c.tcolor||'',split_name:c.split!==false,quote:c.quote||''});
 const rowD=d=>({id:d.id,owner:UID,target:d.sid||'',title:d.title||'',html:d.html||'',cast_ids:d.cast||[],leads:d.leads||[],guests:d.guests||[],warns:d.warns||[],thumb_path:d.img||null,bgm:d.bgm||'',scenes:d.sc||{},pov:d.pov||'',pov_char:d.povc||null,pov_scenes:d.psc||{}});
@@ -352,7 +356,7 @@ async function loadAll(){
  D.tracks=tr.map(t=>({id:nid(t.id),owner:nid(t.owner),name:t.name,path:t.path,src:urlA(t.path)}));
  const cmBy={};cm.forEach(c=>{const k=nid(c.episode_id);(cmBy[k]=cmBy[k]||[]).push({id:nid(c.id),kind:c.kind,name:c.display_name,img:urlI(c.avatar_path),text:c.body,d:c.created_at.slice(0,10),ts:Date.parse(c.created_at),mine:nid(c.author)===ME?1:0,cid:c.character_id?nid(c.character_id):null,parent:c.parent?nid(c.parent):null})});
  const epBy={};ep.forEach(e=>{const k=nid(e.series_id);(epBy[k]=epBy[k]||[]).push({id:nid(e.id),title:e.title,st:e.status,d:e.created_at.slice(0,10),html:e.html,img:urlI(e.thumb_path),cast:(e.cast_ids||[]).map(nid),leads:(e.leads||[]).map(nid),guests:e.guests||[],warns:e.warns||[],bgm:nid(e.bgm)||'',sc:e.scenes||{},rev:e.edit_count||0,pov:e.pov||'',povc:e.pov_char?nid(e.pov_char):'',psc:e.pov_scenes||{},ts:Date.parse(e.created_at),cm:cmBy[nid(e.id)]||[]})});
- D.series=se.map(s=>({id:nid(s.id),title:s.title,author:nid(s.owner),kind:s.kind,status:s.status,desc:s.description,tags:s.tags||[],core:s.core_tags||[],warns:s.warns||[],cover:urlI(s.cover_path),theme:s.theme_track?nid(s.theme_track):'',eps:epBy[nid(s.id)]||[]}));
+ D.series=se.map(s=>({id:nid(s.id),title:s.title,author:nid(s.owner),kind:s.kind,status:s.status,desc:s.description,tags:s.tags||[],core:s.core_tags||[],cast:(s.cast_ids||[]).map(nid),leads:(s.leads||[]).map(nid),guests:s.guests||[],warns:s.warns||[],cover:urlI(s.cover_path),theme:s.theme_track?nid(s.theme_track):'',eps:epBy[nid(s.id)]||[]}));
  D.drafts=dr.map(d=>({id:nid(d.id),sid:d.target,title:d.title,html:d.html,cast:(d.cast_ids||[]).map(nid),leads:(d.leads||[]).map(nid),guests:d.guests||[],warns:d.warns||[],img:d.thumb_path||'',bgm:nid(d.bgm)||'',sc:d.scenes||{},pov:d.pov||'',povc:d.pov_char?nid(d.pov_char):'',psc:d.pov_scenes||{},ts:Date.parse(d.updated_at)}));
  db=D;snap=mkSnap();lastLoad=Date.now();setTimeout(fsInit,0)}
 
@@ -523,7 +527,7 @@ const own=s.author===ME||isAdm,es=own?s.eps:pub(s),sub=db.subs.includes(s.id);
 app.innerHTML=`<div class="wrap"><div class="sh">${spine(s,1)}<div><h1>${esc(s.title)}</h1>${meta(s)}${s.theme&&db.tracks.find(x=>x.id===s.theme)&&db.set.bgm!==false?`<div class="rset tplay"><span class="mu">테마곡</span><span id="bgc" class="bgc"></span></div>`:''}<p>${esc(s.desc)}</p>${cast(s)}</div></div><div class="shb">
 <div class="acts">${es.length?`<a class="btn" href="#read-${s.id}-${es[0].id}">${s.kind==='short'?'읽기':'첫 화 읽기'}</a>`:''}<button class="btn ghost" onclick="tSub('${s.id}')">${sub?'구독 중':'구독하기'}</button>${own?`${s.kind==='short'?'':`<a class="btn ghost" href="#write-${s.id}">새 회차 쓰기</a>`}<a class="btn ghost" href="#edit-${s.id}">작품 정보 수정</a>`:''}</div></div>
 <h2 class="h2">${s.kind==='short'?'본문':`회차 ${es.length}개`}</h2>
-<div>${es.map(e=>`<div class="epw">${eth(e)}<div class="epc"><a class="ep" href="#read-${s.id}-${e.id}"><span>${esc(e.title)}</span><span class="mu">${e.st==='공개'?'':'비공개 '}${esc(e.d)}${e.rev?` · 수정 ${e.rev}회`:''}</span></a>${(e.warns||[]).length?`<p class="warns" style="margin:2px 0 0">${e.warns.map(w=>`<span>${esc(w)}</span>`).join('')}</p>`:''}${povTxt(e)?`<p class="mu" style="margin:2px 0 0">시점 · ${esc(povTxt(e))}</p>`:''}${casts(e,0,0,e.povc)}${own?`<a class="lk" href="#rev-${s.id}-${e.id}">글 수정</a> <a class="lk" href="#cast-${s.id}-${e.id}">회차 설정(등장인물·썸네일)</a>`:''}</div></div>`).join('')||'<p class="mu">아직 올라온 회차가 없습니다.</p>'}</div></div>`}
+<div>${es.map(e=>`<div class="epw">${eth(e)}<div class="epc"><a class="ep" href="#read-${s.id}-${e.id}"><span>${esc(e.title)}</span><span class="mu">${e.st==='공개'?'':'비공개 '}${esc(e.d)}${e.rev?` · 수정 ${e.rev}회`:''}</span></a>${(e.warns||[]).length?`<p class="warns" style="margin:2px 0 0">${e.warns.map(w=>`<span>${esc(w)}</span>`).join('')}</p>`:''}${povTxt(e)?`<p class="mu" style="margin:2px 0 0">시점 · ${esc(povTxt(e))}</p>`:''}${casts(e,0,0,e.povc)}${own?`<div class="eact"><a class="ebtn" href="#rev-${s.id}-${e.id}" title="제목과 본문 고치기">${SV(ICO.pen)}수정</a><a class="ebtn" href="#cast-${s.id}-${e.id}" title="등장인물·썸네일·시점·BGM">${SV(ICO.gear)}회차 설정</a></div>`:''}</div></div>`).join('')||'<p class="mu">아직 올라온 회차가 없습니다.</p>'}</div></div>`}
 
 const THN={white:'흰색',sepia:'세피아',dark:'어둡게'};
 function ap(){const r=$('#rd');if(!r)return;const f=db.prefs.font;r.style.fontSize=Math.round(db.prefs.size*fsc(f))+'px';r.style.lineHeight=db.prefs.lh;r.style.fontFamily=f?'"'+f+'", serif':''}
@@ -584,7 +588,7 @@ if(save()){toast(ch?'수정했습니다':'저장했습니다');location.hash='se
 function publish(){const t=$('#wt').value.trim(),html=clean(dlgify($('#ed').innerHTML)),v=$('#ws').value;
 if(!t||!$('#ed').textContent.trim()){toast('회차 제목과 본문을 입력해 주세요');return}
 let s;if(v==='new'||v==='short'){const sh=v==='short',nt=sh?t:$('#nt').value.trim();if(!nt){toast('시리즈 제목을 입력해 주세요');return}
-s={id:uid('s'),title:nt,author:ME,kind:sh?'short':'long',tags:tg($('#ng').value),core:gcore(),warns:gw(),status:sh?'완결':$('#nst').value,theme:$('#nth').value,desc:$('#nd').value.trim(),cover:coverData,eps:[]};db.series.unshift(s)}else s=find(v);
+s={id:uid('s'),title:nt,author:ME,kind:sh?'short':'long',tags:tg($('#ng').value),core:gcore(),cast:gsc(),leads:gsl(),guests:gsg(),warns:gw(),status:sh?'완결':$('#nst').value,theme:$('#nth').value,desc:$('#nd').value.trim(),cover:coverData,eps:[]};db.series.unshift(s)}else s=find(v);
 const dd=db.drafts.slice();s.eps.push({id:uid('e'),title:t,st:$('#wst').value,cast:[...new Set([...gc(),...tids(html)])],leads:gl(),guests:gg(),warns:gwE(),d:today(),html,img:eiData,bgm:bgm0,sc:cleanSc(bsc,html),pov:gpv().pov,povc:gpv().povc,psc:gpsc(html)});db.drafts=db.drafts.filter(x=>x.id!==cd);cd=null;clearTimeout(tm);if(!save()){s.eps.pop();db.drafts=dd;if(!s.eps.length&&(v==='new'||v==='short'))db.series.shift();return}toast('발행했습니다');eiData='';bgm0='';bsc={};location.hash='series-'+s.id}
 
 function vMine(){const m=db.series.filter(s=>s.author===ME);
@@ -593,12 +597,18 @@ app.innerHTML=`<div class="wrap"><h1>내 작품</h1><p class="mu">내가 올린 
 <div class="acts"><a class="btn" href="#write">새 글 쓰기</a></div></div>`}
 
 const tg=v=>[...new Set(v.split(/[,\s]+/).map(x=>x.replace(/^#/,'').slice(0,12)).filter(Boolean))].slice(0,10);
+const sbox=(c,sel,ld)=>`<span class="cpair"><label class="ck"><input type="checkbox" name="scs" value="${c.id}"${sel.includes(c.id)?' checked':''}>${av(c.img,c.name)}<span style="${chStyle(c.id)}">${esc(c.name)}</span></label><label class="ck lead"><input type="checkbox" name="scl" value="${c.id}"${(ld||[]).includes(c.id)?' checked':''}><span class="mu">주요</span></label></span>`;
+const scfs=s=>{const sel=s.cast||[],ld=s.leads||[],mine=myChars(),pick=db.chars.filter(c=>sel.includes(c.id)&&c.owner!==ME),head=[...new Map([...mine,...pick].map(c=>[c.id,c])).values()],rest=db.chars.filter(c=>!head.some(x=>x.id===c.id));
+ return `<fieldset class="wf"><legend>작품의 등장인물 <span class="mu">회차마다 정하는 것과 별개로, 작품 전체에 늘 표시돼요</span></legend>${head.length?head.map(c=>sbox(c,sel,ld)).join(''):'<p class="mu">먼저 <a href="#chars" style="text-decoration:underline">캐릭터</a>를 만들어 주세요.</p>'}${rest.length?`<details class="dls" style="margin-top:10px"><summary>다른 사람의 캐릭터 ${rest.length}명 펼치기</summary><div style="margin-top:6px">${rest.map(c=>sbox(c,sel,ld)).join('')}</div></details>`:''}<label>캐릭터로 없는 등장인물 <span class="mu">쉼표로 구분해서 이름만 적어요</span><input id="sg" maxlength="120" value="${esc((s.guests||[]).join(', '))}" placeholder="예: 담임 선생님"></label></fieldset>`};
+const gsc=()=>[...document.querySelectorAll('[name=scs]:checked')].map(e=>e.value);
+const gsl=()=>{const c=gsc();return [...document.querySelectorAll('[name=scl]:checked')].map(e=>e.value).filter(x=>c.includes(x))};
+const gsg=()=>[...new Set((($('#sg')&&$('#sg').value)||'').split(',').map(x=>x.trim().slice(0,20)).filter(Boolean))].slice(0,10);
 const sfields=s=>`<label class="lt">${s.kind==='short'?'작품 제목':'시리즈 제목'}<input id="nt" maxlength="60" value="${esc(s.title||'')}"></label>
 ${db.core.length?`<fieldset class="wf"><legend>중요 태그 <span class="mu">작품 목록에서 이 태그로 모아볼 수 있어요</span></legend>${db.core.map(c=>`<label class="ck"><input type="checkbox" name="ctg" value="${esc(c.name)}"${(s.core||[]).includes(c.name)?' checked':''}>${esc(c.name)}</label>`).join('')}</fieldset>`:''}
 <label>일반 태그 <span class="mu">쉼표나 띄어쓰기로 구분, 최대 10개</span><input id="ng" value="${esc((s.tags||[]).join(', '))}" placeholder="예: 회귀, 가족, 복수"></label>
 <label class="ls">연재 상태<select id="nst">${STS.map(g=>`<option${g===s.status?' selected':''}>${g}</option>`).join('')}</select></label>
 <label>소개<textarea id="nd" rows="2" maxlength="200">${esc(s.desc||'')}</textarea></label>
-${tsel(s)}${wfs(s)}<label>대표 이미지 <span class="mu">선택 사항이에요. 올리지 않으면 표지 없이 표시돼요</span><input type="file" id="cf" accept="image/*" onchange="pickC(this)"></label><div id="cp" class="cp"></div>`;
+${scfs(s)}${tsel(s)}${wfs(s)}<label>대표 이미지 <span class="mu">선택 사항이에요. 올리지 않으면 표지 없이 표시돼요</span><input type="file" id="cf" accept="image/*" onchange="pickC(this)"></label><div id="cp" class="cp"></div>`;
 function showC(){const c=$('#cp');if(c)c.innerHTML=coverData?`<img class="th lg" src="${coverData}" alt="대표 이미지 미리보기"><button type="button" class="lk" onclick="coverData='';showC()">이미지 지우기</button>`:''}
 let cr=null;
 const WEBP=(()=>{try{const c=document.createElement('canvas');c.width=c.height=1;return c.toDataURL('image/webp').indexOf('data:image/webp')===0}catch(e){return false}})();
@@ -643,7 +653,7 @@ function pickI(i){const f=i.files[0];i.value='';if(f)shrink(f,900,.8,d=>{rs();do
 function clr(c){rs();document.execCommand('styleWithCSS',false,true);document.execCommand('foreColor',false,c);document.execCommand('styleWithCSS',false,false);dr()}
 function vEdit(id){const s=find(id);if(!s||(s.author!==ME&&!isAdm))return vHome();coverData=s.cover||'';
 app.innerHTML=`<div class="wrap"><h1>작품 정보 수정</h1>${sfields(s)}<div class="acts"><button class="btn" onclick="saveS('${s.id}')">저장하기</button><a class="btn ghost" href="#series-${s.id}">취소</a></div><div class="acts" style="margin-top:28px;padding-top:18px;border-top:1px solid var(--line)"><button class="btn ghost" onclick="delS('${s.id}')">작품 삭제</button><span class="mu">회차와 댓글까지 모두 지워지고 되돌릴 수 없어요.</span></div></div>`;showC();document.querySelectorAll('.ls').forEach(e=>e.hidden=s.kind==='short')}
-function saveS(id){const s=find(id),t=$('#nt').value.trim();if(!t){toast('시리즈 제목을 입력해 주세요');return}Object.assign(s,{title:t,tags:tg($('#ng').value),core:gcore(),warns:gw(),status:$('#nst').value,theme:$('#nth').value,desc:$('#nd').value.trim(),cover:coverData});if(s.kind==='short'&&s.eps[0])s.eps[0].title=t;
+function saveS(id){const s=find(id),t=$('#nt').value.trim();if(!t){toast('시리즈 제목을 입력해 주세요');return}Object.assign(s,{title:t,tags:tg($('#ng').value),core:gcore(),cast:gsc(),leads:gsl(),guests:gsg(),warns:gw(),status:$('#nst').value,theme:$('#nth').value,desc:$('#nd').value.trim(),cover:coverData});if(s.kind==='short'&&s.eps[0])s.eps[0].title=t;
 if(s.author!==ME){location.hash='series-'+id;adm(()=>pushS(s),'저장했습니다');return}
 if(save()){toast('저장했습니다');location.hash='series-'+id}}
 document.addEventListener('selectionchange',()=>{const e=$('#ed'),s=getSelection();if(e&&s.rangeCount&&e.contains(s.anchorNode))sr=s.getRangeAt(0).cloneRange()});
@@ -717,7 +727,7 @@ function dlgify(h){const d=document.createElement('div');d.innerHTML=h;styleDlg(
  return d.innerHTML}
 const av=(i,n)=>IMG.test(i||'')?`<img class="av zoomable" src="${i}" alt="">`:`<span class="av">${esc((n||'?').slice(0,1))}</span>`;
 const castE=e=>(e.cast||[]).map(id=>db.chars.find(c=>c.id===id)).filter(Boolean);
-const sCast=s=>{const es=(s.author===ME||isAdm)?s.eps:pub(s),cast=[],leads=[],guests=[];
+const sCast=s=>{const es=(s.author===ME||isAdm)?s.eps:pub(s),cast=(s.cast||[]).slice(),leads=(s.leads||[]).slice(),guests=(s.guests||[]).slice();
  es.forEach(e=>{(e.cast||[]).forEach(x=>{if(!cast.includes(x))cast.push(x)});(e.leads||[]).forEach(x=>{if(!leads.includes(x))leads.push(x)});(e.guests||[]).forEach(x=>{if(!guests.includes(x))guests.push(x)})});
  return{cast,leads,guests}};
 const castL=s=>sCast(s).cast.map(id=>db.chars.find(c=>c.id===id)).filter(Boolean);
@@ -893,7 +903,7 @@ function syncCast(){const ed=$('#ed');if(!ed)return;const cur=new Set(tids(ed.in
 const lnk=c=>/^https?:\/\//i.test(c.link||'')?`<a class="btn ghost" href="${esc(c.link)}" target="_blank" rel="noopener noreferrer">콜라주 위키에서 보기</a>`:'';
 const THC={white:'#fff',sepia:'#f1e8d2',dark:'#0e0e0f'};
 const rb=(t,on,svg,cls)=>`<button type="button" class="ic ${cls||''}" title="${t}" aria-label="${t}" onclick="${on}">${svg}</button>`;
-ICO.fdn=`<path d='m14 12 4 4 4-4M18 16V7M2 16l4.5-9 4.5 9M3.3 13h6.4'/>`;ICO.fup=`<path d='m14 11 4-4 4 4M18 16V7M2 16l4.5-9 4.5 9M3.3 13h6.4'/>`;ICO.lh=`<path d='M12 6h9M12 12h9M12 18h9M6 5v14M3 8l3-3 3 3M3 16l3 3 3-3'/>`;ICO.pen=`<path d='M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z'/><path d='m15 5 4 4'/>`;
+ICO.fdn=`<path d='m14 12 4 4 4-4M18 16V7M2 16l4.5-9 4.5 9M3.3 13h6.4'/>`;ICO.fup=`<path d='m14 11 4-4 4 4M18 16V7M2 16l4.5-9 4.5 9M3.3 13h6.4'/>`;ICO.lh=`<path d='M12 6h9M12 12h9M12 18h9M6 5v14M3 8l3-3 3 3M3 16l3 3 3-3'/>`;ICO.pen=`<path d='M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z'/><path d='m15 5 4 4'/>`;ICO.gear=`<circle cx='12' cy='12' r='3'/><path d='M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z'/>`;
 ICO.user=`<path d='M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2'/><circle cx='12' cy='7' r='4'/>`;
 let eiData='';
 const eth=e=>IMG.test(e.img||'')?`<img class="eth zoomable" src="${e.img}" alt="">`:'';
