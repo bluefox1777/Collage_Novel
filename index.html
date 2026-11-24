@@ -89,6 +89,30 @@ img.sp{display:block;padding:0;object-fit:cover}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .cat.c0{color:#e58a7a}:root:not([data-theme="light"]) .cat.c1{color:#7fb3d9}}
 :root[data-theme="dark"] .cat.c0{color:#e58a7a}:root[data-theme="dark"] .cat.c1{color:#7fb3d9}
 .pin{font-size:12px;color:var(--ac);margin-left:8px}
+.onl{display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:13px;padding:4px 10px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--mute);cursor:pointer;white-space:nowrap}
+.onl:hover{border-color:var(--ac);color:var(--ink)}
+.onl .dot{width:7px;height:7px;border-radius:50%;background:#2ecc71;flex:none}
+.hd{position:relative}
+.side{position:fixed;top:var(--hh,54px);right:0;bottom:0;width:248px;z-index:8;background:var(--card);border-left:1px solid var(--line);overflow:auto;padding:12px 8px calc(20px + env(safe-area-inset-bottom,0px))}
+.sdh{display:flex;align-items:center;justify-content:space-between;padding:4px 8px 10px}
+.sdh b{font:600 12px/1 "Noto Sans KR",sans-serif;color:var(--mute);letter-spacing:.04em}
+.sdx{font:inherit;font-size:15px;line-height:1;padding:4px 8px;border:0;border-radius:6px;background:transparent;color:var(--mute);cursor:pointer}
+.sdx:hover{background:color-mix(in srgb,var(--ink) 10%,transparent);color:var(--ink)}
+.onr{display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:8px;font-size:14px}
+.onr:hover{background:color-mix(in srgb,var(--ink) 7%,transparent)}
+.onr .pic{position:relative;flex:none;width:32px;height:32px}
+.onr .pic .av{width:32px;height:32px;font-size:13px}
+.onr .dot{position:absolute;right:-1px;bottom:-1px;width:11px;height:11px;border-radius:50%;background:#2ecc71;border:2px solid var(--card)}
+.onr .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.onr .ac2{color:var(--mute);font-size:12px;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sdn{color:var(--mute);font-size:13px;padding:10px 8px}
+body.sideon{padding-right:248px}
+@media (max-width:899px){body.sideon{padding-right:0}.side{top:0;width:min(280px,86vw);box-shadow:-6px 0 24px rgba(0,0,0,.25);padding-top:calc(12px + env(safe-area-inset-top,0px))}}
+.ctb{gap:6px;flex-wrap:wrap}
+.tb .chb,.chb{display:inline-flex;align-items:center;justify-content:center;flex:none;width:30px;height:30px;min-width:30px;padding:0;border:2px solid var(--line);border-radius:50%;background:var(--card);cursor:pointer;overflow:hidden}
+.tb .chb:hover,.chb:hover{box-shadow:0 0 0 2px var(--ac)}
+.chb img{width:100%;height:100%;object-fit:cover;display:block}
+.chb .ini{font:600 13px/1 "Noto Sans KR",sans-serif;color:var(--ink)}
 .cq{margin:10px 0 0;font-size:19px;line-height:1.6}
 .cq.sm{margin:4px 0 0;font-size:15px}
 .povl{margin:1.6em 0 1.2em!important;text-align:center;font-size:.78em;letter-spacing:.08em;opacity:.65}
@@ -219,8 +243,9 @@ footer{max-width:760px;margin:0 auto;padding:0 20px 36px;font-size:13px;color:va
 </style>
 </head>
 <body>
-<header><div class="hd"><a class="logo" href="#home">콜라주 노블</a><nav><a href="#home">작품</a><a href="#mine">내 작품</a><a href="#chars">캐릭터</a><a href="#music">음원</a><a href="#notices">공지</a><a href="#settings">설정</a><a class="bell" href="#alerts" id="bl" aria-label="알림"></a><a class="btn" href="#write">글쓰기</a></nav></div></header>
+<header><div class="hd"><a class="logo" href="#home">콜라주 노블</a><button type="button" class="onl" id="onl" hidden onclick="pvToggle()"></button><nav><a href="#home">작품</a><a href="#mine">내 작품</a><a href="#chars">캐릭터</a><a href="#music">음원</a><a href="#notices">공지</a><a href="#settings">설정</a><a class="bell" href="#alerts" id="bl" aria-label="알림"></a><a class="btn" href="#write">글쓰기</a></nav></div></header>
 <main id="app"></main>
+<aside class="side" id="side" hidden><div class="sdh"><b id="sdc">온라인</b><button type="button" class="sdx" onclick="sideSet(0)" aria-label="접기">✕</button></div><div id="sdl"></div></aside>
 <footer></footer>
 <div id="toast" role="status"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"></script>
@@ -257,7 +282,7 @@ const rowS=s=>({id:s.id,owner:s.author===ME?UID:s.author,title:s.title,kind:s.ki
 const rowE=(e,i,sid)=>({id:e.id,series_id:sid,position:i,title:e.title,html:e.html||'',status:e.st||'공개',thumb_path:e.img?pthI(e.img):null,cast_ids:e.cast||[],bgm:e.bgm||'',scenes:e.sc||{},edit_count:e.rev||0,pov:e.pov||'',pov_char:e.povc||null,pov_scenes:e.psc||{}});
 const rowC=c=>({id:c.id,owner:c.owner===ME?UID:c.owner,name:c.name,wiki_link:c.link||'',avatar_path:c.img?pthI(c.img):null,shared_with:c.share||[],font:c.font||'',color:c.color||'',text_color:c.tcolor||'',split_name:c.split!==false,quote:c.quote||''});
 const rowD=d=>({id:d.id,owner:UID,target:d.sid||'',title:d.title||'',html:d.html||'',cast_ids:d.cast||[],thumb_path:d.img||null,bgm:d.bgm||'',scenes:d.sc||{},pov:d.pov||'',pov_char:d.povc||null,pov_scenes:d.psc||{}});
-const rowU=()=>({user_id:UID,alias_on:db.set.alias!==false,hide_rp:!!db.set.noRp,block_warns:db.set.block||[],bgm_on:db.set.bgm!==false,volume:db.prefs.vol==null?70:db.prefs.vol,reader:{size:db.prefs.size,lh:db.prefs.lh,th:db.prefs.th,font:db.prefs.font||null,colors:db.colors||[]},aliases:db.prefs.alias||{},notif:db.set.nt||{}});
+const rowU=()=>({user_id:UID,alias_on:db.set.alias!==false,hide_rp:!!db.set.noRp,block_warns:db.set.block||[],bgm_on:db.set.bgm!==false,hide_online:db.set.hide===true,volume:db.prefs.vol==null?70:db.prefs.vol,reader:{size:db.prefs.size,lh:db.prefs.lh,th:db.prefs.th,font:db.prefs.font||null,colors:db.colors||[]},aliases:db.prefs.alias||{},notif:db.set.nt||{}});
 const mineS=()=>db.series.filter(s=>s.author===ME);
 
 // 서버와 같은 상태라고 기억해 두는 사본 (바뀐 것만 보내려고)
@@ -277,7 +302,7 @@ async function loadAll(){
  const [pr,se,ep,ch,tr,cm,sub,dr,us,ct,nc]=R.map(r=>r.data);
  PN={};pr.forEach(p=>{PN[nid(p.id)]=p.nickname;if(nid(p.id)===ME)isAdm=!!p.is_admin});
  const D=emptyDb(),u=us||{},rd=u.reader||{};
- D.set={alias:u.alias_on!==false,bgm:u.bgm_on!==false,noRp:!!u.hide_rp,block:u.block_warns||[],nt:Object.assign({eps:true,cm:'all',seen:''},u.notif||{})};
+ D.set={alias:u.alias_on!==false,bgm:u.bgm_on!==false,noRp:!!u.hide_rp,hide:!!u.hide_online,block:u.block_warns||[],nt:Object.assign({eps:true,cm:'all',seen:''},u.notif||{})};
  D.core=(ct||[]).map(x=>({id:nid(x.id),name:x.name,pos:x.position}));
  D.notices=(nc||[]).map(x=>({id:nid(x.id),cat:x.category,title:x.title,body:x.body||'',pin:!!x.pinned,author:x.author?nid(x.author):'',ts:Date.parse(x.created_at),up:Date.parse(x.updated_at)})).sort((a,b)=>(b.pin-a.pin)||(b.ts-a.ts));
  D.prefs={size:rd.size||18,lh:rd.lh||1.9,th:rd.th||'white',font:rd.font||undefined,vol:u.volume==null?70:u.volume,alias:u.aliases||{}};
@@ -297,7 +322,7 @@ const put=async(t,row,isNew)=>{if(isNew)await ok(sb.from(t).insert(row));else aw
 const EXT={'image/jpeg':'jpg','image/png':'png','image/webp':'webp','image/gif':'gif','audio/mpeg':'mp3','audio/mp3':'mp3','audio/wav':'wav','audio/x-wav':'wav','audio/ogg':'ogg','audio/mp4':'m4a','audio/aac':'aac','audio/webm':'webm'};
 const d2b=async u=>(await fetch(u)).blob();
 async function upImg(u){const b=await d2b(u),p=UID+'/'+rid()+'.'+(EXT[b.type]||'jpg');await ok(sb.storage.from('images').upload(p,b,{contentType:b.type||'image/jpeg'}));return PUB+'images/'+p}
-async function upHtml(h){const L=[...new Set([...h.matchAll(/src="(data:image\/[a-z]+;base64,[A-Za-z0-9+\/=]+)"/g)].map(m=>m[1]))];for(const u of L){const n=await upImg(u);h=h.split(u).join(n)}return h}
+async function upHtml(h){const L=[...new Set([...h.matchAll(/src="(data:image\/[a-z+]+;base64,[A-Za-z0-9+\/=]+)"/g)].map(m=>m[1]))];for(const u of L){const n=await upImg(u);h=h.split(u).join(n)}return h}
 
 async function doSync(){
  if(!ME||!snap)return;const S=snap;
@@ -366,10 +391,10 @@ function vPw(){app.innerHTML=`<div class="wrap" style="max-width:420px;margin:40
 async function pwSet(){const v=$('#np1').value;if(v.length<6){am('6자 이상 입력해 주세요');return}const r=await sb.auth.updateUser({password:v});if(r.error){am('변경하지 못했어요: '+r.error.message);return}const s=await sb.auth.getSession();location.hash='home';await enter(s.data.session.user)}
 async function enter(u){UID=u.id;ME=nid(u.id);try{await loadAll()}catch(e){console.error(e);toast('데이터를 불러오지 못했어요: '+((e&&e.message)||e))}if(!location.hash)location.hash='home';route()}
 async function boot(){if(!sb){app.innerHTML='<p class="mu" style="padding:40px">서버 연결 라이브러리를 불러오지 못했어요. 인터넷 연결을 확인하고 새로고침해 주세요.</p>';return}
- sb.auth.onAuthStateChange((ev)=>{if(ev==='PASSWORD_RECOVERY')setTimeout(vPw,0);if(ev==='SIGNED_OUT')setTimeout(()=>{ME='';UID='';isAdm=false;snap=null;db=emptyDb();authMode='in';vAuth()},0)});
+ sb.auth.onAuthStateChange((ev)=>{if(ev==='PASSWORD_RECOVERY')setTimeout(vPw,0);if(ev==='SIGNED_OUT')setTimeout(()=>{onLeave();ME='';UID='';isAdm=false;snap=null;db=emptyDb();authMode='in';vAuth()},0)});
  try{const r=await sb.auth.getSession();if(r.data.session){await enter(r.data.session.user);return}}catch(e){console.error(e)}
  vAuth()}
-async function logout(){if(pend||syncT){toast('저장 중이에요. 잠시 후 다시 눌러 주세요');return}bgStop();await sb.auth.signOut()}
+async function logout(){if(pend||syncT){toast('저장 중이에요. 잠시 후 다시 눌러 주세요');return}bgStop();onLeave();await sb.auth.signOut()}
 
 // ----- 설정 화면: 내 계정, 초대 코드 관리 -----
 function vSet(){vSet0();$('.wrap').insertAdjacentHTML('beforeend',`<h2 class="h2" style="margin-top:36px">내 계정</h2><label>닉네임<input id="nk" maxlength="20" value="${esc(pn(ME))}"></label><div class="acts"><button class="btn" onclick="nkSave()">닉네임 저장</button><button class="btn ghost" onclick="logout()">로그아웃</button></div>${isAdm?'<h2 class="h2" style="margin-top:36px">초대 코드 관리</h2><div class="box"><div class="two"><label>사용 가능 횟수<input id="icm" type="number" min="1" max="100" value="1"></label><label>메모 <span class="mu">누구에게 줄 코드인지</span><input id="icn" maxlength="30"></label></div><div class="acts"><button class="btn" onclick="icAdd()">새 코드 만들기</button></div></div><div id="icl" style="margin-top:12px"></div>'+admPanel():''}`);if(isAdm)icLoad()}
@@ -433,7 +458,7 @@ ${nsp2(s,e)}${wnote(s)}<div class="rc">${casts(castE(e),1,1)}${povTxt(e)?`<p cla
 
 function nwT(){const v=$('#ws').value;$('#nw').hidden=v!=='new'&&v!=='short';document.querySelectorAll('.lt,.ls').forEach(e=>e.hidden=v==='short')}
 function cnt(){const t=$('#ed').textContent,n=t.replace(/\s/g,'').length;$('#cnt').textContent=`공백 제외 ${n.toLocaleString()}자, 원고지 약 ${Math.ceil(t.length/200)}매`}
-function dr(){if(!$('#ed'))return;cnt();bsr();syncCast();pvc();pscr();if(rev)return;$('#sv').textContent='저장 중';clearTimeout(tm);tm=setTimeout(()=>{if(!$('#ed'))return;if(!$('#wt').value.trim()&&!$('#ed').textContent.trim())return;if(!cd)cd=uid('d');const x={id:cd,sid:$('#ws').value,title:$('#wt').value,cast:gc(),img:eiData,bgm:bgm0,sc:bsc,pov:gpv().pov,povc:gpv().povc,psc:pscv,html:clean($('#ed').innerHTML),ts:Date.now()},i=db.drafts.findIndex(y=>y.id===cd);i<0?db.drafts.unshift(x):db.drafts[i]=x;$('#sv').textContent=save()?'임시 저장됨':'저장 실패';dl()},600)}
+function dr(){if(!$('#ed'))return;cnt();bsr();syncCast();pvc();pscr();ctbr();if(rev)return;$('#sv').textContent='저장 중';clearTimeout(tm);tm=setTimeout(()=>{if(!$('#ed'))return;if(!$('#wt').value.trim()&&!$('#ed').textContent.trim())return;if(!cd)cd=uid('d');const x={id:cd,sid:$('#ws').value,title:$('#wt').value,cast:gc(),img:eiData,bgm:bgm0,sc:bsc,pov:gpv().pov,povc:gpv().povc,psc:pscv,html:clean($('#ed').innerHTML),ts:Date.now()},i=db.drafts.findIndex(y=>y.id===cd);i<0?db.drafts.unshift(x):db.drafts[i]=x;$('#sv').textContent=save()?'임시 저장됨':'저장 실패';dl()},600)}
 function fmt(c,v){document.execCommand(c,false,c==='formatBlock'?'<'+v+'>':v||null);$('#ed').focus();dr()}
 function vWrite(sid,did){rev=null;const mine=db.series.filter(s=>s.author===ME&&s.kind!=='short'),d=(db.drafts||[]).find(x=>x.id===did)||{};cd=d.id||null;bgm0=d.bgm||'';bsc=Object.assign({},d.sc);
 const sel=sid&&mine.some(s=>s.id===sid)?sid:(d.sid&&(d.sid==='new'||d.sid==='short'||mine.some(s=>s.id===d.sid))?d.sid:(mine[0]?mine[0].id:'new'));
@@ -447,14 +472,25 @@ const edBody=d=>`<label>회차 제목<input id="wt" maxlength="80" value="${esc(
 <div class="tb" onmousedown="if(!/INPUT|SELECT|OPTION/.test(event.target.tagName))event.preventDefault()">${tbar()}</div><div id="lb" class="pn2" hidden><input id="lu" placeholder="https://로 시작하는 링크 주소" aria-label="링크 주소"><button type="button" class="btn" onclick="lka()">링크 적용</button><button type="button" class="btn ghost" onclick="$('#lb').hidden=true">닫기</button></div><div id="qp" class="pn2" hidden onmousedown="event.preventDefault()">${[1,2,3,4,5,6].map(n=>`<button type="button" class="qb" onclick="qt(${n})"><blockquote class="q${n}">인용</blockquote></button>`).join('')}<button type="button" class="qb" onclick="qt(0)">인용 해제</button></div><div id="sp" class="pn2" hidden></div>
 <p class="mu" style="margin:0 0 6px">본문에서 @를 입력하면 내 캐릭터를 불러올 수 있어요. 태그로 넣은 이름만 독자의 별명으로 바뀝니다.</p><div id="ed" class="ed" contenteditable="true" spellcheck="true" lang="ko" data-ph="여기에 이야기를 써 보세요"></div>
 <div id="mn" class="mn" hidden></div><div id="ip" class="pn2" hidden><span>삽화 크기</span><input type="range" id="iw" min="10" max="100" step="5" value="100" oninput="isz(this.value)" aria-label="삽화 크기"><b id="ivl">100%</b><button type="button" class="btn ghost" onclick="idl()">삽화 삭제</button></div><div class="meta"><span id="cnt"></span><span id="sv"></span></div>`;
-function edInit(d){$('#ed').innerHTML=clean(d.html||'');styleDlg($('#ed'));autoC=new Set(tids($('#ed').innerHTML));coverData='';showC();eiData=d.img||'';cx=null;showE();bsn=-1;bsr();cnt();rsw();ntfix();$('#ed').addEventListener('click',ie);$('#ed').addEventListener('input',mnChk);$('#ed').addEventListener('keydown',mnK);$('#ed').addEventListener('blur',()=>setTimeout(mnX,150));
-$('#ed').addEventListener('input',dr);$('#wt').addEventListener('input',dr)}
+function edInit(d){$('#ed').innerHTML=clean(d.html||'');styleDlg($('#ed'));setTimeout(ctbr,0);autoC=new Set(tids($('#ed').innerHTML));coverData='';showC();eiData=d.img||'';cx=null;showE();bsn=-1;bsr();cnt();rsw();ntfix();$('#ed').addEventListener('click',ie);$('#ed').addEventListener('input',mnChk);$('#ed').addEventListener('keydown',mnK);$('#ed').addEventListener('blur',()=>setTimeout(mnX,150));
+$('#ed').addEventListener('input',dr);$('#wt').addEventListener('input',dr);
+$('#ed').addEventListener('paste',pasteTxt);$('#ed').addEventListener('drop',pasteTxt)}
+function pasteTxt(e){const dt=e.clipboardData||e.dataTransfer;if(!dt)return;const s=dt.getData('text/plain');if(!s)return;
+ e.preventDefault();document.execCommand('insertHTML',false,esc(s).replace(/\r\n|\r|\n/g,'<br>'));dr()}
 function vRev(sid,eid){const s=find(sid),e=s&&(s.author===ME||isAdm)&&s.eps.find(x=>x.id===eid);if(!e)return vHome();
 rev={s:sid,e:eid};cd=null;bgm0=e.bgm||'';bsc=Object.assign({},e.sc||{});
 app.innerHTML=`<div class="wrap"><h1>글 수정</h1><p class="mu">${esc(s.title)}${s.kind==='short'?'':' / '+esc(e.title)} · ${esc(e.d)} 발행${e.rev?` · 수정 ${e.rev}회`:''}</p>
 ${edBody(e)}
 <div class="acts"><select id="wst" aria-label="공개 설정"><option${e.st==='비공개'?'':' selected'}>공개</option><option${e.st==='비공개'?' selected':''}>비공개</option></select><button class="btn ghost" onclick="pvOpen()">미리보기</button><button class="btn" onclick="saveRev()">수정 완료</button><a class="btn ghost" href="#series-${sid}">취소</a></div></div>`;
 edInit(e);pvSet(e)}
+function ctbr(){const w=$('#ctb');if(!w)return;const L=db.chars.filter(c=>gc().includes(c.id));
+ const key=L.map(c=>c.id+(c.img||'')+(c.tcolor||'')+(c.font||'')).join('|');if(w.dataset.k===key)return;w.dataset.k=key;
+ w.innerHTML=L.length?L.map(c=>`<button type="button" class="chb" title="${esc(c.name)} 대사 서식" aria-label="${esc(c.name)} 대사 서식" onclick="dgApply('${c.id}')" style="border-color:${esc(c.color||'var(--line)')}">${IMG.test(c.img||'')?`<img src="${c.img}" alt="">`:`<span class="ini">${esc(c.name.slice(0,1))}</span>`}</button>`).join(''):''}
+function dgApply(id){const c=chById(id);if(!c||!$('#ed'))return;rs();const s=getSelection(),txt=(s&&!s.isCollapsed)?s.toString():'';
+ if(txt)document.execCommand('insertHTML',false,`<span class="dg" data-c="${id}" style="${dgStyle(c)}">${esc(txt)}</span>&#8203;`);
+ else{document.execCommand('insertHTML',false,`<span class="dg" id="dgz" data-c="${id}" style="${dgStyle(c)}">“대사”</span>&#8203;`);
+  const z=document.getElementById('dgz');if(z){z.removeAttribute('id');const tn=z.firstChild;if(tn&&tn.nodeType===3){const r=document.createRange();r.setStart(tn,1);r.setEnd(tn,tn.nodeValue.length-1);const s2=getSelection();s2.removeAllRanges();s2.addRange(r)}}}
+ dr()}
 function pvSet(e){const s=$('#pvc');if(s){s.dataset.v=e.povc||''}pscv=Object.assign({},e.psc||{});psn=-1;pvc();pscr()}
 function saveRev(){if(!rev)return;const s=find(rev.s),e=s&&s.eps.find(x=>x.id===rev.e);if(!e){rev=null;return vHome()}
 const t=$('#wt').value.trim(),html=clean(dlgify($('#ed').innerHTML)),st=$('#wst').value;
@@ -485,6 +521,9 @@ ${db.core.length?`<fieldset class="wf"><legend>중요 태그 <span class="mu">�
 ${tsel(s)}${wfs(s)}<label>대표 이미지 <span class="mu">선택 사항이에요. 올리지 않으면 표지 없이 표시돼요</span><input type="file" id="cf" accept="image/*" onchange="pickC(this)"></label><div id="cp" class="cp"></div>`;
 function showC(){const c=$('#cp');if(c)c.innerHTML=coverData?`<img class="th lg" src="${coverData}" alt="대표 이미지 미리보기"><button type="button" class="lk" onclick="coverData='';showC()">이미지 지우기</button>`:''}
 let cr=null;
+const WEBP=(()=>{try{const c=document.createElement('canvas');c.width=c.height=1;return c.toDataURL('image/webp').indexOf('data:image/webp')===0}catch(e){return false}})();
+function encImg(c,q){return WEBP?c.toDataURL('image/webp',q):c.toDataURL('image/jpeg',q)}
+function fillBg(x,c){if(!WEBP){x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height)}}
 function crOpen(f,aspect,outW,round,title,cb){const r=new FileReader();
  r.onerror=()=>toast('파일을 읽을 수 없어요');
  r.onload=()=>{const im=new Image();im.onerror=()=>toast('이미지를 불러올 수 없어요');
@@ -513,11 +552,11 @@ function crZ(v){if(!cr)return;cr.z=Math.min(4,Math.max(.3,(+v||100)/100));crT()}
 function crFit(full){if(!cr)return;cr.z=full?1:cr.all/cr.fit;cr.x=0;cr.y=0;crT()}
 function crClose(){const o=$('#crw');if(o)o.remove();document.body.style.overflow='';cr=null}
 function crDone(){if(!cr)return;const{im,FW,FH,fit,z,x,y,outW,aspect,cb}=cr,r=outW/FW,c=document.createElement('canvas');
- c.width=outW;c.height=Math.round(outW/aspect);const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);
+ c.width=outW;c.height=Math.round(outW/aspect);const g=c.getContext('2d');fillBg(g,c);
  const s=fit*z,w=im.width*s,h=im.height*s;
  g.imageSmoothingQuality='high';g.drawImage(im,(FW/2+x-w/2)*r,(FH/2+y-h/2)*r,w*r,h*r);
- const d=c.toDataURL('image/jpeg',.85);crClose();cb(d)}
-function shrink(f,max,q,cb){const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',q))};im.onerror=()=>toast('이미지를 불러올 수 없습니다');im.src=r.result};r.readAsDataURL(f)}
+ const d=encImg(c,.85);crClose();cb(d)}
+function shrink(f,max,q,cb){const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);const x=c.getContext('2d');fillBg(x,c);x.drawImage(im,0,0,c.width,c.height);cb(encImg(c,q))};im.onerror=()=>toast('이미지를 불러올 수 없습니다');im.src=r.result};r.readAsDataURL(f)}
 function pickC(i){const f=i.files[0];i.value='';if(f)crOpen(f,3/4,600,0,'대표 이미지 맞추기',d=>{coverData=d;showC()})}
 function rs(){const e=$('#ed');e.focus();if(sr&&e.contains(sr.startContainer)){const s=getSelection();s.removeAllRanges();s.addRange(sr)}}
 function pickI(i){const f=i.files[0];i.value='';if(f)shrink(f,900,.8,d=>{rs();document.execCommand('insertImage',false,d);dr()})}
@@ -540,7 +579,7 @@ ICO.swap=`<path d='M8 3 4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4'/>`;ICO.spell=`<pat
 const TB2=[['굵게','bold','','bold'],['기울임','italic','','italic'],['밑줄','underline','','underline'],['취소선','strikeThrough','','strike'],['소제목','formatBlock','H2','h2'],['본문','formatBlock','P','p'],['왼쪽 정렬','justifyLeft','','left'],['가운데 정렬','justifyCenter','','center'],['오른쪽 정렬','justifyRight','','right'],['양쪽 정렬','justifyFull','','full'],['점 목록','insertUnorderedList','','ul'],['숫자 목록','insertOrderedList','','ol'],['장면 구분','insertHorizontalRule','','hr']];
 const ib=(t,on,svg)=>`<button type="button" class="ic" title="${t}" aria-label="${t}" onclick="${on}">${svg}</button>`;
 const tb1=b=>ib(b[0],`fmt('${b[1]}','${b[2]}')`,SV(ICO[b[3]]));
-function tbar(){return TB2.slice(0,6).map(tb1).join('')+ib('인용',`pnl('qp')`,SV(ICO.quote))+ib('링크 넣기',`pnl('lb');if(!$('#lb').hidden)$('#lu').focus()`,SV(ICO.link))+ib('링크 해제',`fmt('unlink')`,SV(ICO.unlink))+ib('맞춤법 검사',`spc()`,SV(ICO.spell))+TB2.slice(6).map(tb1).join('')+ib('되돌리기',`fmt('undo')`,UNDO)+ib('다시 실행',`fmt('redo')`,REDO)+`<span class="sw">${COL.map(c=>`<button type="button" class="dot" title="글자색" aria-label="글자색 ${c}" style="background:${c}" onclick="clr('${c}')"></button>`).join('')}<input type="color" id="cc" value="#2471a3" title="글자색 직접 선택" aria-label="글자색 직접 선택" onchange="clr(this.value)">${ib('고른 색을 저장',`svc($('#cc').value)`,SV(ICO.plus))}${window.EyeDropper?ib('스포이드로 화면에서 색 고르기',`eye()`,SV(ICO.pip)):''}</span><span class="sw" id="sc"></span><select class="fs" aria-label="글꼴" onchange="fnt(this.value);this.selectedIndex=0"><option value="">글꼴</option>${FONTS.map(f=>`<option value="${f[1]}">${f[0]}</option>`).join('')}</select>`+ib('삽화 넣기',`$('#if').click()`,SV(ICO.img))+ib('서식 지우기',`fmt('removeFormat')`,SV(ICO.eraser))+`<input type="file" id="if" accept="image/*" onchange="pickI(this)">`}
+function tbar(){return TB2.slice(0,6).map(tb1).join('')+ib('인용',`pnl('qp')`,SV(ICO.quote))+ib('링크 넣기',`pnl('lb');if(!$('#lb').hidden)$('#lu').focus()`,SV(ICO.link))+ib('링크 해제',`fmt('unlink')`,SV(ICO.unlink))+ib('맞춤법 검사',`spc()`,SV(ICO.spell))+TB2.slice(6).map(tb1).join('')+ib('되돌리기',`fmt('undo')`,UNDO)+ib('다시 실행',`fmt('redo')`,REDO)+`<span class="sw">${COL.map(c=>`<button type="button" class="dot" title="글자색" aria-label="글자색 ${c}" style="background:${c}" onclick="clr('${c}')"></button>`).join('')}<input type="color" id="cc" value="#2471a3" title="글자색 직접 선택" aria-label="글자색 직접 선택" onchange="clr(this.value)">${ib('고른 색을 저장',`svc($('#cc').value)`,SV(ICO.plus))}${window.EyeDropper?ib('스포이드로 화면에서 색 고르기',`eye()`,SV(ICO.pip)):''}</span><span class="sw" id="sc"></span><select class="fs" aria-label="글꼴" onchange="fnt(this.value);this.selectedIndex=0"><option value="">글꼴</option>${FONTS.map(f=>`<option value="${f[1]}">${f[0]}</option>`).join('')}</select>`+ib('삽화 넣기',`$('#if').click()`,SV(ICO.img))+ib('서식 지우기',`fmt('removeFormat')`,SV(ICO.eraser))+`<span class="sw ctb" id="ctb"></span><input type="file" id="if" accept="image/*" onchange="pickI(this)">`}
 function svc(c){c=String(c).toLowerCase();if(!/^#[0-9a-f]{6}$/.test(c))return;db.colors=[c,...(db.colors||[]).filter(x=>x!==c)].slice(0,12);save();rsw()}
 function rsw(){const e=$('#sc');if(e)e.innerHTML=(db.colors||[]).map((c,i)=>/^#[0-9a-f]{6}$/.test(c)?`<button type="button" class="dot" title="저장한 색 (클릭: 적용, 우클릭 또는 길게 누르기: 삭제)" aria-label="저장한 색 ${c}" style="background:${c}" onclick="clr('${c}')" oncontextmenu="dc(${i});return false"></button>`:'').join('')}
 function dc(i){db.colors.splice(i,1);save();rsw()}
@@ -558,8 +597,9 @@ function rr(){const p=location.hash.slice(1).split('-');vRead(p[1],p[2])}
 function nset(){db.prefs.myName={last:$('#ml').value.trim(),first:$('#mf').value.trim()};save();rr()}
 function nres(){delete db.prefs.myName;save();rr()}
 const dgStyle=c=>`${c.font?`font-family:'${esc(c.font)}',serif;`:''}${c.tcolor?`color:${esc(c.tcolor)}`:''}`;
-function styleDlg(root){if(!root)return;root.querySelectorAll('.dg[data-c]').forEach(x=>{const c=chById(x.dataset.c);x.setAttribute('style',c?dgStyle(c):'')})}
-function dlgify(h){const d=document.createElement('div');d.innerHTML=h;
+function styleDlg(root){if(!root)return;root.querySelectorAll('.dg[data-c]').forEach(x=>{const c=chById(x.dataset.c);x.setAttribute('style',c?dgStyle(c):'');
+ x.querySelectorAll('[style]').forEach(y=>{y.style.color='';y.style.fontFamily='';if(!y.getAttribute('style'))y.removeAttribute('style')})})}
+function dlgify(h){const d=document.createElement('div');d.innerHTML=h;styleDlg(d);
  d.querySelectorAll('.dg').forEach(x=>{if(/^[\s\u200b“”"'‘’]*$/.test(x.textContent))x.remove()});
  d.querySelectorAll('.nt[data-c]').forEach(x=>{let n=x.nextSibling;if(n&&n.nodeType===3&&/^\u200b/.test(n.nodeValue))n.nodeValue=n.nodeValue.replace(/^\u200b+/,'');
   n=x.nextSibling;if(!n||n.nodeType!==3)return;const m=/^\s*:\s*(["\u201c\u2018'])/.exec(n.nodeValue);if(!m)return;
@@ -625,10 +665,12 @@ if(!confirm('캐릭터 ‘'+c.name+'’을(를) 삭제할까요?\n\n작품의 �
 db.chars=db.chars.filter(x=>x.id!==id);db.series.forEach(s=>s.eps.forEach(e=>{e.cast=(e.cast||[]).filter(x=>x!==id)}));save();toast('캐릭터를 삭제했어요');ceid=null;avData='';vChars()}
 function vChar(id){const c=db.chars.find(x=>x.id===id);if(!c)return vHome();const L=db.series.filter(s=>castL(s).some(c=>c.id===id)&&!blk(s));app.innerHTML=`<div class="wrap"><div class="sh">${av(c.img,c.name).replace('class="av"','class="av lgav"')}<div><h1 style="${chStyle(c.id)}">${esc(c.name)}</h1><p class="mu">${esc(pn(c.owner))}의 캐릭터${(c.share||[]).length?' · RP 공유: '+(c.share||[]).map(u=>esc(pn(u))).join(', '):''}</p>${c.quote||c.font||c.tcolor?`<p class="cq" style="${c.font?`font-family:'${esc(c.font)}',serif;`:''}${c.tcolor?`color:${esc(c.tcolor)}`:''}">“${esc(c.quote||PVS)}”</p>`:''}${lnk(c)?`<div class="acts">${lnk(c)}</div>`:''}</div></div><div class="box" style="margin:0 0 24px"><label>이 캐릭터의 내 별명 <span class="mu">내 화면의 소설에서만 이 이름으로 보여요</span><input id="al" maxlength="20" value="${esc((db.prefs.alias||{})[c.id]||'')}"></label><div class="acts"><button class="btn" onclick="asv('${c.id}')">별명 저장</button></div></div><h2 class="h2">등장하는 작품 ${L.length}개</h2><div>${L.map(row).join('')||'<p class="mu">아직 이 캐릭터가 등장하는 작품이 없습니다.</p>'}</div></div>`}
 function vSet0(){const st=db.set;app.innerHTML=`<div class="wrap"><h1>보기 설정</h1><label class="ck" style="margin-top:20px"><input type="checkbox" id="sal"${st.alias===false?'':' checked'} onchange="sset()">별명으로 보기</label><p class="mu">내가 정한 캐릭터 별명으로 소설 속 이름이 보여요. 끄면 원래 이름으로 돌아가요.</p><label class="ck" style="margin-top:20px"><input type="checkbox" id="sbg"${st.bgm===false?'':' checked'} onchange="sset()">배경음악(BGM) 재생</label><p class="mu">끄면 읽기 화면에서 BGM 재생 버튼이 사라져요. 켜 두어도 자동으로 재생되지는 않아요.</p><label>기본 음량<input type="range" id="svol" min="0" max="100" value="${db.prefs.vol==null?70:db.prefs.vol}" oninput="bgV(this.value)" onchange="bgSv()"></label><label class="ck" style="margin-top:20px"><input type="checkbox" id="snr"${st.noRp?' checked':''} onchange="sset()">RP 댓글 숨기기</label><p class="mu">캐릭터로 쓴 RP 댓글이 댓글 목록에 보이지 않아요.</p><h2 class="h2" style="margin-top:28px">이런 작품은 보지 않을래요</h2><p class="mu">선택한 주의 요소가 있는 작품은 목록에서 숨겨져요.</p><div>${WN.map(w=>`<label class="ck"><input type="checkbox" name="bl" value="${w}"${st.block.includes(w)?' checked':''} onchange="sset()">${w}</label>`).join('')}</div><label>직접 입력 <span class="mu">쉼표로 구분</span><input id="blx" maxlength="80" value="${esc(st.block.filter(w=>!WN.includes(w)).join(', '))}" onchange="sset()"></label>
+<label class="ck" style="margin-top:20px"><input type="checkbox" id="shd"${st.hide===true?'':' checked'} onchange="sset()">접속 중인 것 보여 주기</label><p class="mu">끄면 다른 사람에게 내 접속과 활동이 보이지 않아요. 대신 나도 다른 사람이 뭘 하는지는 볼 수 있어요.</p>
 <h2 class="h2" style="margin-top:32px">알림</h2><p class="mu">알림은 머리말의 종 모양에 쌓여요.</p>
 <label class="ck"><input type="checkbox" id="nte"${ntP().eps!==false?' checked':''} onchange="sset()">구독한 작품에 새 회차가 올라오면 알림</label>
 <label>내 작품에 달린 댓글 알림<select id="ntc" onchange="sset()">${[['all','모든 댓글'],['rp','RP 댓글만'],['normal','RP가 아닌 댓글만'],['none','받지 않기']].map(o=>`<option value="${o[0]}"${ntP().cm===o[0]?' selected':''}>${o[1]}</option>`).join('')}</select></label></div>`}
-function sset(){const nt=Object.assign(ntP(),{eps:$('#nte').checked,cm:$('#ntc').value});db.set={nt,alias:$('#sal').checked,bgm:$('#sbg').checked,noRp:$('#snr').checked,block:[...new Set([...[...document.querySelectorAll('[name=bl]:checked')].map(e=>e.value),...$('#blx').value.split(',').map(x=>x.trim().slice(0,12)).filter(Boolean)])].slice(0,20)};save();toast('설정을 저장했습니다')}
+function sset0(){const nt=Object.assign(ntP(),{eps:$('#nte').checked,cm:$('#ntc').value});db.set={nt,hide:!$('#shd').checked,alias:$('#sal').checked,bgm:$('#sbg').checked,noRp:$('#snr').checked,block:[...new Set([...[...document.querySelectorAll('[name=bl]:checked')].map(e=>e.value),...$('#blx').value.split(',').map(x=>x.trim().slice(0,12)).filter(Boolean)])].slice(0,20)};save();toast('설정을 저장했습니다')}
+function sset(){sset0();onTrack();onlUI()}
 function dl(){const e=$('#dl');if(!e)return;const L=db.drafts||[],o=e.querySelector('details'),op=o&&o.open;e.innerHTML=`<details class="dls"${op?' open':''}><summary>임시 저장한 글 ${L.length}개</summary>${L.map(x=>`<div class="dr"><span>${esc(x.title||'제목 없음')} <span class="mu">${new Date(x.ts).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}</span></span><span><a class="lk" href="#write-x-${x.id}">열기</a> <button class="lk" onclick="ddr('${x.id}')">삭제</button></span></div>`).join('')}<div style="margin-top:10px"><button type="button" class="btn ghost" onclick="nw()">새 글 쓰기</button></div></details>`}
 function nw(){cd=null;if(location.hash==='#write')vWrite();else location.hash='write'}
 function ddr(id){db.drafts=db.drafts.filter(x=>x.id!==id);if(cd===id)cd=null;save();dl()}
@@ -722,7 +764,7 @@ const eis=()=>`<label>회차 썸네일 <span class="mu">선택 사항이에요. 
 function showE(){const c=$('#ep');if(c)c.innerHTML=IMG.test(eiData||'')?`<img class="eth" src="${eiData}" alt="회차 삽화 미리보기" style="margin-top:0"><button type="button" class="lk" onclick="eiData='';showE();dr()">썸네일 지우기</button>`:''}
 function pickE(i){const f=i.files[0];i.value='';if(f)crOpen(f,3/4,480,0,'회차 썸네일 맞추기',d=>{eiData=d;showE();dr()})}
 let cx=null;
-function shrinkSrc(u,max,q,cb){const im=new Image();im.onload=()=>{const k=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',q))};im.src=u}
+function shrinkSrc(u,max,q,cb){const im=new Image();im.onload=()=>{const k=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);const x=c.getContext('2d');fillBg(x,c);x.drawImage(im,0,0,c.width,c.height);cb(encImg(c,q))};im.src=u}
 function pbi(){const ed=$('#ed');let h=ed?ed.innerHTML:'';if(!ed&&cx){const s=find(cx.s),e=s&&s.eps.find(x=>x.id===cx.e);h=e?(e.html||''):''}const d=document.createElement('div');d.innerHTML=clean(h);const L=[...new Set([...d.querySelectorAll('img')].map(i=>i.getAttribute('src')))],b=$('#bi');if(!L.length){b.innerHTML='<span class="mu">본문에 넣은 삽화가 아직 없어요.</span>';return}b._l=L;b.innerHTML=L.map((u,i)=>`<img class="eth" src="${u}" alt="본문 삽화 ${i+1}" title="이 삽화를 썸네일로" style="margin-top:0;cursor:pointer" onclick="pbs(${i})">`).join('')+'<span class="mu" style="flex-basis:100%">썸네일로 쓸 삽화를 눌러 주세요.</span>'}
 function pbs(i){const b=$('#bi'),u=b&&b._l&&b._l[i];if(!u)return;shrinkSrc(u,300,.82,d=>{eiData=d;showE();$('#bi').innerHTML='';dr()})}
 let bsc={},bgm0='',bsn=-1,bgCur=null,bgOn=false,bgIv=0,bgCtx=null,rev=null;
@@ -852,9 +894,47 @@ function nSave(){if(!isAdm)return;const ti=$('#ntt').value.trim();if(!ti){toast(
  else{location.hash='notices';adm(()=>ok(sb.from('notices').insert(Object.assign({author:UID},row))),'공지를 올렸어요')}}
 function nDel(id){if(!isAdm)return;const n=(db.notices||[]).find(x=>x.id===id);if(!n)return;
  if(!confirm('공지 ‘'+n.title+'’을(를) 삭제할까요?\n\n되돌릴 수 없어요.'))return;location.hash='notices';adm(()=>ok(sb.from('notices').delete().eq('id',id)),'공지를 삭제했어요')}
+// ----- 지금 누가 와 있는지 -----
+let ch=null,onp=false,onl={},actT=0;
+function actTxt(){const p=(location.hash.slice(1)||'home').split('-'),s=p[1]&&find(p[1]);
+ switch(p[0]){
+  case 'read':{const e=s&&s.eps.find(x=>x.id===p[2]);return s&&(!blk(s))&&e&&e.st==='공개'?`‘${s.title}’ 읽는 중`:'소설 읽는 중'}
+  case 'series':return s&&!blk(s)?`‘${s.title}’ 보는 중`:'작품 보는 중';
+  case 'write':case 'rev':return '소설 작성 중';
+  case 'edit':case 'cast':return '작품 손보는 중';case 'notice':return '공지 보는 중';
+  case 'chars':return '캐릭터 작성 중';case 'char':return '캐릭터 보는 중';
+  case 'music':return '음원 정리 중';
+  case 'notices':return '공지 보는 중';
+  case 'alerts':return '알림 보는 중';
+  case 'mine':return '내 작품 보는 중';
+  case 'settings':return '설정 중';
+  default:return '작품 둘러보는 중'}}
+function onJoin(){if(!sb||!ME||ch)return;try{onp=localStorage.getItem('cn-side')!=='0'&&innerWidth>=900}catch(e){onp=innerWidth>=900}
+
+ try{ch=sb.channel('site',{config:{presence:{key:ME}}});
+  ch.on('presence',{event:'sync'},()=>{onl=ch.presenceState()||{};onlUI()})
+    .subscribe(st=>{if(st==='SUBSCRIBED')onTrack()})}catch(e){console.error(e);ch=null}}
+function onTrack(){if(!ch)return;const hide=db.set.hide===true;
+ try{hide?ch.untrack():ch.track({name:pn(ME),act:actTxt(),at:Date.now()})}catch(e){}}
+function onLeave(){onl={};const s=$('#side');if(s){s.hidden=true}document.body.classList.remove('sideon');const b=$('#onl');if(b)b.hidden=true;if(!ch)return;try{ch.unsubscribe()}catch(e){}ch=null}
+function onList(){const L=[];Object.keys(onl).forEach(k=>{const v=(onl[k]||[])[0];if(v&&v.name)L.push({id:k,name:v.name,act:v.act||''})});
+ return L.sort((a,b)=>a.id===ME?-1:b.id===ME?1:a.name.localeCompare(b.name,'ko'))}
+const uPic=id=>{const c=db.chars.filter(x=>x.owner===id&&IMG.test(x.img||''))[0];return c?c.img:''};
+function onlUI(){const b=$('#onl'),s=$('#side');if(!b||!s)return;const L=onList();
+ b.hidden=!ME;b.innerHTML=`<span class="dot"></span>${L.length}`;b.title=L.length?L.map(x=>x.name+' · '+x.act).join('\n'):'접속 중인 사람';
+ const c=$('#sdc');if(c)c.textContent=`온라인 — ${L.length}`;
+ const l=$('#sdl');if(l)l.innerHTML=L.length?L.map(x=>{const p=uPic(x.id);
+  return `<div class="onr"><span class="pic">${p?`<img class="av" src="${p}" alt="">`:`<span class="av">${esc(x.name.slice(0,1))}</span>`}<span class="dot"></span></span><div style="min-width:0"><div class="nm">${esc(x.name)}${x.id===ME?' <span class="mu">(나)</span>':''}</div><div class="ac2">${esc(x.act)}</div></div></div>`}).join('')+(db.set.hide===true?'<p class="sdn">내 활동은 숨기고 있어요. 설정에서 바꿀 수 있어요.</p>':'')
+  :'<p class="sdn">아직 아무도 없어요.</p>';
+ sideSet(onp,1)}
+function sideSet(v,quiet){onp=!!v;const s=$('#side');if(!s)return;
+ s.hidden=!onp||!ME;document.body.classList.toggle('sideon',onp&&!!ME);
+ if(!quiet){try{localStorage.setItem('cn-side',onp?'1':'0')}catch(e){}}
+ hh()}
+function pvToggle(){sideSet(!onp)}
 function route(){if(!ME){vAuth();return}const p=(location.hash.slice(1)||'home').split('-');if(p[0]!=='read')bgStop();if(p[0]!=='rev')rev=null;if(p[0]!=='notice'&&p[0]!=='notices')nedit=null;pvClose();
 const m={series:()=>vSeries(p[1]),read:()=>vRead(p[1],p[2]),write:()=>vWrite(p[1],p[2]),rev:()=>vRev(p[1],p[2]),edit:()=>vEdit(p[1]),chars:()=>{ceid=null;avData='';vChars()},char:()=>vChar(p[1]),cast:()=>vCast(p[1],p[2]),settings:vSet,music:vMusic,alerts:vAlerts,notices:vNotices,notice:()=>vNotice(p[1]),mine:vMine};
-(Object.prototype.hasOwnProperty.call(m,p[0])?m[p[0]]:vHome)();bellUI();hh();window.scrollTo(0,0);if(p[0]==='home'||p[0]==='series')stale()}
+(Object.prototype.hasOwnProperty.call(m,p[0])?m[p[0]]:vHome)();bellUI();hh();onJoin();onTrack();window.scrollTo(0,0);if(p[0]==='home'||p[0]==='series')stale()}
 addEventListener('hashchange',route);
 boot();
 </script>
