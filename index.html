@@ -36,6 +36,23 @@ h1,h2,h3{font-family:"Noto Serif KR",serif;line-height:1.35;margin:0}
 .pgb:disabled{opacity:.35;cursor:default}
 .pgd{align-self:center;color:var(--mute)}
 .ulink{text-decoration:underline;cursor:pointer}
+.uc{display:inline-flex;align-items:center;gap:6px;max-width:100%;padding:2px 11px 2px 2px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font-size:13px;line-height:1.5;cursor:pointer;vertical-align:middle;transition:border-color .12s,background .12s}
+.uc:hover,.uc:focus-visible{border-color:var(--ac);background:var(--bg)}
+.uc>*{margin:0!important}
+.uc b{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.uav{flex:none;width:22px;height:22px;border-radius:50%;object-fit:cover;display:inline-flex;align-items:center;justify-content:center;background:var(--ac);color:var(--on);font-weight:700;font-size:11px}
+.uc.sm{font-size:12px;padding:1px 9px 1px 1px}
+.uc.sm .uav{width:19px;height:19px;font-size:10px}
+.mrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.mrow span{margin-right:0!important}
+.kb{padding:1px 9px;border:1px solid var(--line);border-radius:999px;font-size:12px}
+.stb{display:inline-flex;align-items:center;gap:5px;padding:1px 10px;border-radius:999px;border:1px solid currentColor;font-size:12px;font-weight:600}
+.stb::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.stb.s0{color:#1e8449}
+.stb.s1{color:#2471a3}
+.stb.s2{color:#b7950b}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .stb.s0{color:#5fc48a}:root:not([data-theme="light"]) .stb.s1{color:#79b4e0}:root:not([data-theme="light"]) .stb.s2{color:#e0b64a}}
+:root[data-theme="dark"] .stb.s0{color:#5fc48a}:root[data-theme="dark"] .stb.s1{color:#79b4e0}:root[data-theme="dark"] .stb.s2{color:#e0b64a}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 6px}
 .chip{font:inherit;font-size:14px;padding:5px 14px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--ink);cursor:pointer}
 .chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
@@ -494,7 +511,10 @@ if(dg){c.className='dg';c.setAttribute('data-c',dg);const ch=chById(dg);if(ch)c.
 
 function hue(t){let h=0;for(const c of t)h=(h*31+c.charCodeAt(0))%360;return h}
 const spine=(s,l)=>IMG.test(s.cover||'')?`<img class="th${l?' lg':''} zoomable" src="${s.cover}" alt="">`:'';
-const meta=s=>`<p class="mu"><span class="ulink" role="link" tabindex="0" onclick="event.preventDefault();event.stopPropagation();location.hash='user-${s.author}'" onkeydown="if(event.key==='Enter'){event.preventDefault();location.hash='user-${s.author}'}">${esc(pn(s.author))}</span>${s.kind==='short'?'<span>단편</span>':`<span>장편</span><span>${esc(s.status)}</span><span>${pub(s).length}화</span>`}</p>${(s.core&&s.core.length)||s.tags.length?`<p class="tags">${(s.core||[]).map(t=>`<b class="ctg">${esc(t)}</b>`).join('')}${s.tags.map(t=>`<span>#${esc(t)}</span>`).join('')}</p>`:''}${wn(s)}`;
+const uchip=(id,cls)=>`<span class="uc ${cls||''}" role="link" tabindex="0" title="${esc(pn(id))}님의 페이지" onclick="event.preventDefault();event.stopPropagation();location.hash='user-${id}'" onkeydown="if(event.key==='Enter'){event.preventDefault();event.stopPropagation();location.hash='user-${id}'}">${uPic(id)?`<img class="uav" src="${uPic(id)}" alt="">`:`<span class="uav">${esc(pn(id).slice(0,1))}</span>`}<b>${esc(pn(id))}</b></span>`;
+const STC={'연재중':'s0','완결':'s1','휴재':'s2'};
+const stb=v=>`<span class="stb ${STC[v]||'s0'}">${esc(v||'연재중')}</span>`;
+const meta=s=>`<p class="mu mrow">${uchip(s.author)}${s.kind==='short'?`<span class="kb">단편</span>${stb(s.status)}`:`<span class="kb">장편</span>${stb(s.status)}<span>${pub(s).length}화</span>`}</p>${(s.core&&s.core.length)||s.tags.length?`<p class="tags">${(s.core||[]).map(t=>`<b class="ctg">${esc(t)}</b>`).join('')}${s.tags.map(t=>`<span>#${esc(t)}</span>`).join('')}</p>`:''}${wn(s)}`;
 const row=s=>`<a class="row" href="#series-${s.id}">${spine(s)}<div><h3>${esc(s.title)}</h3>${meta(s)}<p class="ds">${esc(s.desc)}</p>${castTxt(s)}</div></a>`;
 
 function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),2200)}
@@ -810,7 +830,7 @@ function pickA(i){const f=i.files[0];i.value='';if(f)crOpen(f,1,320,1,'프로필
 const myChars=()=>db.chars.filter(c=>c.owner===ME||(c.share||[]).includes(ME));
 const chById=id=>db.chars.find(c=>c.id===id);
 const chStyle=id=>{const c=chById(id);return c&&c.color?cvar(c.color):''};
-const crow=(c,mine)=>`<div class="row" style="align-items:center">${av(c.img,c.name)}<div style="flex:1;min-width:0"><h3 style="${chStyle(c.id)}">${esc(c.name)}</h3><p class="mu"><a href="#user-${c.owner}" style="text-decoration:underline">${esc(pn(c.owner))}</a>의 캐릭터${(c.share||[]).length?' · 공유 '+(c.share||[]).map(u=>esc(pn(u))).join(', '):''}</p>${c.quote?`<p class="cq sm" style="${c.font?`font-family:'${esc(c.font)}',serif;${fsCss(c.font)}`:''}${cvar(c.tcolor)}">“${esc(c.quote)}”</p>`:''}<div class="acts" style="margin-top:8px"><a class="btn ghost" href="#char-${c.id}">자세히</a>${mine?`<button class="btn ghost" onclick="ced('${c.id}')">수정</button><button class="btn ghost" onclick="cdl('${c.id}')">삭제</button>`:(isAdm?`<button class="btn ghost" onclick="admDelC('${c.id}')">삭제(관리자)</button>`:'')}</div></div></div>`;
+const crow=(c,mine)=>`<div class="row" style="align-items:center">${av(c.img,c.name)}<div style="flex:1;min-width:0"><h3 style="${chStyle(c.id)}">${esc(c.name)}</h3><p class="mu mrow">${uchip(c.owner,'sm')}<span>의 캐릭터${(c.share||[]).length?' · 공유 '+(c.share||[]).map(u=>esc(pn(u))).join(', '):''}</span></p>${c.quote?`<p class="cq sm" style="${c.font?`font-family:'${esc(c.font)}',serif;${fsCss(c.font)}`:''}${cvar(c.tcolor)}">“${esc(c.quote)}”</p>`:''}<div class="acts" style="margin-top:8px"><a class="btn ghost" href="#char-${c.id}">자세히</a>${mine?`<button class="btn ghost" onclick="ced('${c.id}')">수정</button><button class="btn ghost" onclick="cdl('${c.id}')">삭제</button>`:(isAdm?`<button class="btn ghost" onclick="admDelC('${c.id}')">삭제(관리자)</button>`:'')}</div></div></div>`;
 function vChars(){const my=db.chars.filter(c=>c.owner===ME),sh=db.chars.filter(c=>c.owner!==ME&&(c.share||[]).includes(ME)),ot=db.chars.filter(c=>c.owner!==ME&&!(c.share||[]).includes(ME));
 const uOpts=Object.keys(PN).filter(u=>u!==ME);
 const ed=ceid&&db.chars.find(x=>x.id===ceid&&x.owner===ME);
@@ -844,7 +864,7 @@ function csv(){const n=$('#cn').value.trim(),my=db.chars.filter(c=>c.owner===ME)
 function cdl(id){const c=db.chars.find(x=>x.id===id&&x.owner===ME);if(!c)return;
 if(!confirm('캐릭터 ‘'+c.name+'’을(를) 삭제할까요?\n\n작품의 등장인물 목록에서도 빠지고 되돌릴 수 없어요.\n이 캐릭터로 쓴 RP 댓글은 그대로 남아요.'))return;
 db.chars=db.chars.filter(x=>x.id!==id);db.series.forEach(s=>s.eps.forEach(e=>{e.cast=(e.cast||[]).filter(x=>x!==id)}));save();toast('캐릭터를 삭제했어요');ceid=null;avData='';vChars()}
-function vChar(id){const c=db.chars.find(x=>x.id===id);if(!c)return vHome();const L=db.series.filter(s=>castL(s).some(c=>c.id===id)&&!blk(s));app.innerHTML=`<div class="wrap"><div class="sh">${av(c.img,c.name).replace('class="av"','class="av lgav"')}<div><h1 style="${chStyle(c.id)}">${esc(c.name)}</h1><p class="mu"><a href="#user-${c.owner}" style="text-decoration:underline">${esc(pn(c.owner))}</a>의 캐릭터${(c.share||[]).length?' · RP 공유: '+(c.share||[]).map(u=>esc(pn(u))).join(', '):''}</p>${c.quote||c.font||c.tcolor?`<p class="cq" style="${c.font?`font-family:'${esc(c.font)}',serif;${fsCss(c.font)}`:''}${cvar(c.tcolor)}">“${esc(c.quote||PVS)}”</p>`:''}${lnk(c)?`<div class="acts">${lnk(c)}</div>`:''}</div></div><div class="box" style="margin:0 0 24px"><label>이 캐릭터의 내 별명 <span class="mu">내 화면의 소설에서만 이 이름으로 보여요</span><input id="al" maxlength="20" value="${esc((db.prefs.alias||{})[c.id]||'')}"></label><div class="acts"><button class="btn" onclick="asv('${c.id}')">별명 저장</button></div></div><h2 class="h2">등장하는 작품 ${L.length}개</h2><div>${L.map(row).join('')||'<p class="mu">아직 이 캐릭터가 등장하는 작품이 없습니다.</p>'}</div></div>`}
+function vChar(id){const c=db.chars.find(x=>x.id===id);if(!c)return vHome();const L=db.series.filter(s=>castL(s).some(c=>c.id===id)&&!blk(s));app.innerHTML=`<div class="wrap"><div class="sh">${av(c.img,c.name).replace('class="av"','class="av lgav"')}<div><h1 style="${chStyle(c.id)}">${esc(c.name)}</h1><p class="mu mrow">${uchip(c.owner)}<span>의 캐릭터${(c.share||[]).length?' · RP 공유: '+(c.share||[]).map(u=>esc(pn(u))).join(', '):''}</span></p>${c.quote||c.font||c.tcolor?`<p class="cq" style="${c.font?`font-family:'${esc(c.font)}',serif;${fsCss(c.font)}`:''}${cvar(c.tcolor)}">“${esc(c.quote||PVS)}”</p>`:''}${lnk(c)?`<div class="acts">${lnk(c)}</div>`:''}</div></div><div class="box" style="margin:0 0 24px"><label>이 캐릭터의 내 별명 <span class="mu">내 화면의 소설에서만 이 이름으로 보여요</span><input id="al" maxlength="20" value="${esc((db.prefs.alias||{})[c.id]||'')}"></label><div class="acts"><button class="btn" onclick="asv('${c.id}')">별명 저장</button></div></div><h2 class="h2">등장하는 작품 ${L.length}개</h2><div>${L.map(row).join('')||'<p class="mu">아직 이 캐릭터가 등장하는 작품이 없습니다.</p>'}</div></div>`}
 function vSet0(){const st=db.set;app.innerHTML=`<div class="wrap"><h1>보기 설정</h1><label class="ck" style="margin-top:20px"><input type="checkbox" id="sal"${st.alias===false?'':' checked'} onchange="sset()">별명으로 보기</label><p class="mu">내가 정한 캐릭터 별명으로 소설 속 이름이 보여요. 끄면 원래 이름으로 돌아가요.</p><label class="ck" style="margin-top:20px"><input type="checkbox" id="sbg"${st.bgm===false?'':' checked'} onchange="sset()">배경음악(BGM) 재생</label><p class="mu">끄면 읽기 화면에서 BGM 재생 버튼이 사라져요. 켜 두어도 자동으로 재생되지는 않아요.</p><label>기본 음량<input type="range" id="svol" min="0" max="100" value="${db.prefs.vol==null?70:db.prefs.vol}" oninput="bgV(this.value)" onchange="bgSv()"></label><label class="ck" style="margin-top:20px"><input type="checkbox" id="snr"${st.noRp?' checked':''} onchange="sset()">RP 댓글 숨기기</label><p class="mu">캐릭터로 쓴 RP 댓글이 댓글 목록에 보이지 않아요.</p><h2 class="h2" style="margin-top:28px">이런 작품은 보지 않을래요</h2><p class="mu">선택한 주의 요소가 있는 작품은 목록에서 숨겨져요.</p><div>${WN.map(w=>`<label class="ck"><input type="checkbox" name="bl" value="${w}"${st.block.includes(w)?' checked':''} onchange="sset()">${w}</label>`).join('')}</div><label>직접 입력 <span class="mu">쉼표로 구분</span><input id="blx" maxlength="80" value="${esc(st.block.filter(w=>!WN.includes(w)).join(', '))}" onchange="sset()"></label>
 <label class="ck" style="margin-top:20px"><input type="checkbox" id="shd"${st.hide===true?'':' checked'} onchange="sset()">접속 중인 것 보여 주기</label><p class="mu">끄면 다른 사람에게 내 접속과 활동이 보이지 않아요. 대신 나도 다른 사람이 뭘 하는지는 볼 수 있어요.</p>
 <h2 class="h2" style="margin-top:32px">알림</h2><p class="mu">알림은 머리말의 종 모양에 쌓여요.</p>
