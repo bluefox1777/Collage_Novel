@@ -211,9 +211,14 @@ body.sideon{padding-right:248px}
 .cc.sub .av{width:22px;height:22px;font-size:10px}
 .cc.gst{border-style:dashed;padding-left:12px}
 .casts .sl{font-size:12px;margin:0 2px 0 6px}
-.cpair{display:inline-flex;align-items:center;gap:2px;margin-right:10px}
-.cpair .ck{margin-right:0}
-.cpair .lead{opacity:.8;font-size:12px}
+.cpair{display:inline-block}
+.cchip{display:inline-flex;align-items:center;gap:6px;margin:8px 8px 0 0;padding:4px 12px 4px 4px;border:1px solid var(--line);border-radius:999px;background:none;font:inherit;font-size:14px;color:var(--mute);cursor:pointer;opacity:.62;transition:opacity .12s,border-color .12s,box-shadow .12s}
+.cchip .av{width:26px;height:26px;font-size:11px}
+.cchip:hover{opacity:1;border-color:var(--mute)}
+.cchip.on{opacity:1;color:var(--ink);border-color:var(--mute)}
+.cchip.lead{border-color:var(--ac);box-shadow:0 0 0 1px var(--ac);font-weight:600}
+.cchip .cst{font-size:12px;color:var(--ac);min-width:0}
+.cchip.lead .cst{margin-left:2px}
 .cc.pov::after{content:"시점";margin-left:2px;font-size:11px;color:var(--ac);font-weight:600}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) [style*="--c-d"]{color:var(--c-d)!important}}
 :root[data-theme="dark"] [style*="--c-d"]{color:var(--c-d)!important}
@@ -493,8 +498,10 @@ const row=s=>`<a class="row" href="#series-${s.id}">${spine(s)}<div><h3>${esc(s.
 function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),2200)}
 
 const PGS=10;let gq='',gp=1;
-const sTxt=s=>[s.title,s.desc,...(s.tags||[]),...(s.core||[]),pn(s.author),...sCast(s).guests,
- ...sCast(s).cast.map(id=>(chById(id)||{}).name||''),...((s.author===ME||isAdm)?s.eps:pub(s)).map(e=>e.title)].join(' ').toLowerCase();
+const sTxt=s=>{const es=(s.author===ME||isAdm)?s.eps:pub(s);
+ const ids=[...new Set([...(s.cast||[]),...es.flatMap(e=>e.cast||[])])];
+ const gs=[...(s.guests||[]),...es.flatMap(e=>e.guests||[])];
+ return [s.title,s.desc,...(s.tags||[]),...(s.core||[]),pn(s.author),...gs,...ids.map(id=>(chById(id)||{}).name||''),...es.map(e=>e.title)].join(' ').toLowerCase()};
 function hFilter(){const q=gq.trim().toLowerCase();
  return db.series.filter(s=>(gf==='전체'||(s.core||[]).includes(gf))&&(gk==='전체'||(gk==='구독중'?db.subs.includes(s.id):(gk==='단편')===(s.kind==='short')))&&!blk(s)&&(!q||q.split(/\s+/).every(w=>sTxt(s).includes(w))))}
 const pager=(tot)=>{const o=[];let a=Math.max(1,gp-3),b=Math.min(tot,a+6);a=Math.max(1,b-6);
@@ -597,9 +604,20 @@ app.innerHTML=`<div class="wrap"><h1>내 작품</h1><p class="mu">내가 올린 
 <div class="acts"><a class="btn" href="#write">새 글 쓰기</a></div></div>`}
 
 const tg=v=>[...new Set(v.split(/[,\s]+/).map(x=>x.replace(/^#/,'').slice(0,12)).filter(Boolean))].slice(0,10);
-const sbox=(c,sel,ld)=>`<span class="cpair"><label class="ck"><input type="checkbox" name="scs" value="${c.id}"${sel.includes(c.id)?' checked':''}>${av(c.img,c.name)}<span style="${chStyle(c.id)}">${esc(c.name)}</span></label><label class="ck lead"><input type="checkbox" name="scl" value="${c.id}"${(ld||[]).includes(c.id)?' checked':''}><span class="mu">주요</span></label></span>`;
-const scfs=s=>{const sel=s.cast||[],ld=s.leads||[],mine=myChars(),pick=db.chars.filter(c=>sel.includes(c.id)&&c.owner!==ME),head=[...new Map([...mine,...pick].map(c=>[c.id,c])).values()],rest=db.chars.filter(c=>!head.some(x=>x.id===c.id));
- return `<fieldset class="wf"><legend>작품의 등장인물 <span class="mu">회차마다 정하는 것과 별개로, 작품 전체에 늘 표시돼요</span></legend>${head.length?head.map(c=>sbox(c,sel,ld)).join(''):'<p class="mu">먼저 <a href="#chars" style="text-decoration:underline">캐릭터</a>를 만들어 주세요.</p>'}${rest.length?`<details class="dls" style="margin-top:10px"><summary>다른 사람의 캐릭터 ${rest.length}명 펼치기</summary><div style="margin-top:6px">${rest.map(c=>sbox(c,sel,ld)).join('')}</div></details>`:''}<label>캐릭터로 없는 등장인물 <span class="mu">쉼표로 구분해서 이름만 적어요</span><input id="sg" maxlength="120" value="${esc((s.guests||[]).join(', '))}" placeholder="예: 담임 선생님"></label></fieldset>`};
+const chip=(c,sel,ld,ns,nl)=>{const s=sel.includes(c.id),l=s&&(ld||[]).includes(c.id);
+ return `<span class="cpair"><input type="checkbox" name="${ns}" value="${c.id}"${s?' checked':''} hidden><input type="checkbox" name="${nl}" value="${c.id}"${l?' checked':''} hidden><button type="button" class="cchip${s?(l?' on lead':' on'):''}" aria-pressed="${s}" onclick="ctog(this)">${av(c.img,c.name)}<span style="${chStyle(c.id)}">${esc(c.name)}</span><span class="cst">${l?'★ 주요':''}</span></button></span>`};
+function cpaint(r){(r||document).querySelectorAll('.cpair').forEach(w=>{const a=w.children[0],b=w.children[1],k=w.children[2];if(!a||!b||!k)return;
+ if(!a.checked)b.checked=false;
+ k.className='cchip'+(a.checked?(b.checked?' on lead':' on'):'');k.setAttribute('aria-pressed',a.checked?'true':'false');
+ const st=k.querySelector('.cst');if(st)st.textContent=b.checked?'★ 주요':''})}
+function ctog(k){const w=k.parentNode,a=w.children[0],b=w.children[1];
+ if(!a.checked){a.checked=true;b.checked=false}else if(!b.checked){b.checked=true}else{a.checked=false;b.checked=false}
+ cpaint(w);dr()}
+const sbox=(c,sel,ld)=>chip(c,sel,ld,'scs','scl');
+const scfs=s=>{const sel=s.cast||[],ld=s.leads||[],ep=epCast(s),byId=id=>db.chars.find(c=>c.id===id);
+ const order=[...ep.map(byId).filter(Boolean),...sel.map(byId).filter(Boolean),...myChars()];
+ const head=[...new Map(order.map(c=>[c.id,c])).values()],rest=db.chars.filter(c=>!head.some(x=>x.id===c.id));
+ return `<fieldset class="wf"><legend>작품의 등장인물 <span class="mu">한 번 누르면 선택, 한 번 더 누르면 ★주요, 한 번 더 누르면 해제돼요</span></legend>${ep.length?`<p class="mu" style="margin:0 0 6px">회차에 나온 캐릭터를 앞에 보여 줘요(${ep.map(byId).filter(Boolean).map(c=>esc(c.name)).join(', ')}). 여기서 고른 인물만 작품 화면에 표시돼요.</p>`:''}${head.length?head.map(c=>sbox(c,sel,ld)).join(''):'<p class="mu">먼저 <a href="#chars" style="text-decoration:underline">캐릭터</a>를 만들어 주세요.</p>'}${rest.length?`<details class="dls" style="margin-top:10px"><summary>다른 사람의 캐릭터 ${rest.length}명 펼치기</summary><div style="margin-top:6px">${rest.map(c=>sbox(c,sel,ld)).join('')}</div></details>`:''}<label>캐릭터로 없는 등장인물 <span class="mu">쉼표로 구분해서 이름만 적어요</span><input id="sg" maxlength="120" value="${esc((s.guests||[]).join(', '))}" placeholder="예: 담임 선생님"></label></fieldset>`};
 const gsc=()=>[...document.querySelectorAll('[name=scs]:checked')].map(e=>e.value);
 const gsl=()=>{const c=gsc();return [...document.querySelectorAll('[name=scl]:checked')].map(e=>e.value).filter(x=>c.includes(x))};
 const gsg=()=>[...new Set((($('#sg')&&$('#sg').value)||'').split(',').map(x=>x.trim().slice(0,20)).filter(Boolean))].slice(0,10);
@@ -727,9 +745,8 @@ function dlgify(h){const d=document.createElement('div');d.innerHTML=h;styleDlg(
  return d.innerHTML}
 const av=(i,n)=>IMG.test(i||'')?`<img class="av zoomable" src="${i}" alt="">`:`<span class="av">${esc((n||'?').slice(0,1))}</span>`;
 const castE=e=>(e.cast||[]).map(id=>db.chars.find(c=>c.id===id)).filter(Boolean);
-const sCast=s=>{const es=(s.author===ME||isAdm)?s.eps:pub(s),cast=(s.cast||[]).slice(),leads=(s.leads||[]).slice(),guests=(s.guests||[]).slice();
- es.forEach(e=>{(e.cast||[]).forEach(x=>{if(!cast.includes(x))cast.push(x)});(e.leads||[]).forEach(x=>{if(!leads.includes(x))leads.push(x)});(e.guests||[]).forEach(x=>{if(!guests.includes(x))guests.push(x)})});
- return{cast,leads,guests}};
+const sCast=s=>({cast:(s.cast||[]).slice(),leads:(s.leads||[]).slice(),guests:(s.guests||[]).slice()});
+const epCast=s=>{const o=[];((s&&s.eps)||[]).forEach(e=>(e.cast||[]).forEach(x=>{if(!o.includes(x))o.push(x)}));return o};
 const castL=s=>sCast(s).cast.map(id=>db.chars.find(c=>c.id===id)).filter(Boolean);
 const ccOne=(c,lk,pv,sub)=>{const cl=`cc${c.id===pv?' pov':''}${sub?' sub':''}`,tt=c.id===pv?'시점 인물':(c.quote?`“${c.quote}”`:'');
  return lk?`<a class="${cl}" href="#char-${c.id}"${tt?` title="${esc(tt)}"`:''}>${av(c.img,c.name)}<span>${esc(c.name)}</span></a>`
@@ -837,7 +854,7 @@ function sph(){const t=$('#ed').textContent;return SPR.map((r,i)=>{let n=0,a=nul
 function runSp(){const R=sph();$('#sp').innerHTML=(R.length?R.map(r=>`<div class="sr"><span><b>${esc(r.a)}</b> → <b>${esc(r.b)}</b> <span class="mu">${r.d}</span></span><button type="button" class="btn ghost" onclick="spf(${r.i})">고치기 (${r.n}곳)</button></div>`).join(''):'<span class="mu">자주 틀리는 표기 기준으로 확인했을 때 발견된 문제가 없어요.</span>')+'<button type="button" class="btn ghost" onclick="$(\'#sp\').hidden=true">닫기</button>'}
 function spc(){['lb','qp'].forEach(x=>$('#'+x).hidden=true);$('#sp').hidden=false;runSp()}
 function spf(i){const r=SPR[i],L=[],w=document.createTreeWalker($('#ed'),NodeFilter.SHOW_TEXT);while(w.nextNode())if(!w.currentNode.parentElement.closest('.nt'))L.push(w.currentNode);L.forEach(n=>{n.nodeValue=n.nodeValue.replace(new RegExp(r[0].source,'g'),r[1])});dr();runSp()}
-const cbox=(c,sel,ld)=>`<span class="cpair"><label class="ck"><input type="checkbox" name="cs" value="${c.id}"${sel.includes(c.id)?' checked':''} onchange="dr()">${av(c.img,c.name)}<span style="${chStyle(c.id)}">${esc(c.name)}</span></label><label class="ck lead"><input type="checkbox" name="cl" value="${c.id}"${(ld||[]).includes(c.id)?' checked':''} onchange="dr()"><span class="mu">주요</span></label></span>`;
+const cbox=(c,sel,ld)=>chip(c,sel,ld,'cs','cl');
 const POV=['1인칭 주인공 시점','1인칭 관찰자 시점','3인칭 관찰자 시점','전지적 작가 시점','2인칭 시점','시점 전환'];
 const pvf=e=>`<fieldset class="wf"><legend>서술 시점 <span class="mu">정하지 않으면 표시되지 않아요</span></legend><div class="two"><label>시점<select id="pv" onchange="dr();pvc()">${['<option value="">표시 안 함</option>'].concat(POV.map(x=>`<option${x===(e.pov||'')?' selected':''}>${x}</option>`)).join('')}</select></label><label id="pvcw" hidden>시점 인물<select id="pvc" onchange="dr()"></select></label></div><p class="mu" id="pvn" style="margin:2px 0 0"></p><div id="psl"></div></fieldset>`;
 let psn=-1;
@@ -864,7 +881,7 @@ const povTxt=e=>{const L=povList(e);if(!e.pov&&!L.length)return '';const who=L.j
 function povMark(d,e){const hrs=[...d.querySelectorAll('hr')];hrs.forEach((h,k)=>{const c=chById((e.psc||{})[k+1]);if(!c)return;
  const p=document.createElement('p');p.className='povl';p.textContent=c.name+' 시점';h.after(p)})}
 const efs=(sel,ld,gs)=>{const mine=myChars(),pick=db.chars.filter(c=>sel.includes(c.id)&&c.owner!==ME),head=[...new Map([...mine,...pick].map(c=>[c.id,c])).values()],rest=db.chars.filter(c=>!head.some(x=>x.id===c.id));
-return `<fieldset class="wf"><legend>이 회차의 등장인물 <span class="mu">다른 사람의 캐릭터도 고를 수 있고, ‘주요’를 체크하면 앞에 모아 보여요</span></legend>${head.length?head.map(c=>cbox(c,sel,ld)).join(''):'<p class="mu">먼저 <a href="#chars" style="text-decoration:underline">캐릭터</a>를 만들어 주세요.</p>'}${rest.length?`<details class="dls" style="margin-top:10px"><summary>다른 사람의 캐릭터 ${rest.length}명 펼치기</summary><div style="margin-top:6px">${rest.map(c=>cbox(c,sel,ld)).join('')}</div></details>`:''}<label>캐릭터로 없는 등장인물 <span class="mu">쉼표로 구분해서 이름만 적어요</span><input id="eg" maxlength="120" value="${esc((gs||[]).join(', '))}" placeholder="예: 담임 선생님, 정체불명의 손님" oninput="dr()"></label></fieldset>`};
+return `<fieldset class="wf"><legend>이 회차의 등장인물 <span class="mu">한 번 누르면 선택, 한 번 더 누르면 ★주요, 한 번 더 누르면 해제돼요</span></legend>${head.length?head.map(c=>cbox(c,sel,ld)).join(''):'<p class="mu">먼저 <a href="#chars" style="text-decoration:underline">캐릭터</a>를 만들어 주세요.</p>'}${rest.length?`<details class="dls" style="margin-top:10px"><summary>다른 사람의 캐릭터 ${rest.length}명 펼치기</summary><div style="margin-top:6px">${rest.map(c=>cbox(c,sel,ld)).join('')}</div></details>`:''}<label>캐릭터로 없는 등장인물 <span class="mu">쉼표로 구분해서 이름만 적어요</span><input id="eg" maxlength="120" value="${esc((gs||[]).join(', '))}" placeholder="예: 담임 선생님, 정체불명의 손님" oninput="dr()"></label></fieldset>`};
 function vCast(sid,eid){const s=find(sid),e=s&&(s.author===ME||isAdm)&&s.eps.find(x=>x.id===eid);if(!e)return vHome();eiData=e.img||'';cx={s:sid,e:eid};bgm0=e.bgm||'';bsc=Object.assign({},e.sc||{});app.innerHTML=`<div class="wrap"><h1>회차 설정</h1><p class="mu">${esc(s.title)} / ${esc(e.title)}</p>${efs(e.cast||[],e.leads,e.guests)}${wfsE(e)}${pvf(e)}${eis()}${bgf()}<div class="acts"><button class="btn" onclick="csave('${sid}','${eid}')">저장하기</button><a class="btn ghost" href="#series-${sid}">취소</a></div><div class="acts" style="margin-top:28px;padding-top:18px;border-top:1px solid var(--line)"><button class="btn ghost" onclick="delE('${sid}','${eid}')">${s.kind==='short'?'작품 삭제':'이 회차 삭제'}</button><span class="mu">달린 댓글까지 지워지고 되돌릴 수 없어요.</span></div></div>`;showE();bsn=-1;bsr();pvSet(e)}
 function delS(id){const s=find(id);if(!s)return;if(s.author!==ME)return admDelS(id);if(!confirm('‘'+s.title+'’을(를) 삭제할까요?\n\n회차 '+s.eps.length+'개와 달린 댓글이 모두 지워지고 되돌릴 수 없어요.'))return;db.series=db.series.filter(x=>x.id!==id);db.subs=db.subs.filter(x=>x!==id);save();toast('작품을 삭제했어요');location.hash='mine'}
 function delE(sid,eid){const s=find(sid);if(!s)return;const e=s.eps.find(x=>x.id===eid);if(!e)return;
@@ -899,7 +916,7 @@ function tal(){db.set.alias=(db.set.alias===false);save();rr()}
 let mn=null,autoC=new Set();
 function syncCast(){const ed=$('#ed');if(!ed)return;const cur=new Set(tids(ed.innerHTML));
  [...autoC].forEach(id=>{if(cur.has(id))return;autoC.delete(id);const b=document.querySelector('[name=cs][value="'+id+'"]');if(b&&b.checked)b.checked=false});
- cur.forEach(id=>{const b=document.querySelector('[name=cs][value="'+id+'"]');if(b&&!b.checked){b.checked=true;autoC.add(id)}})}
+ cur.forEach(id=>{const b=document.querySelector('[name=cs][value="'+id+'"]');if(b&&!b.checked){b.checked=true;autoC.add(id)}});cpaint()}
 const lnk=c=>/^https?:\/\//i.test(c.link||'')?`<a class="btn ghost" href="${esc(c.link)}" target="_blank" rel="noopener noreferrer">콜라주 위키에서 보기</a>`:'';
 const THC={white:'#fff',sepia:'#f1e8d2',dark:'#0e0e0f'};
 const rb=(t,on,svg,cls)=>`<button type="button" class="ic ${cls||''}" title="${t}" aria-label="${t}" onclick="${on}">${svg}</button>`;
