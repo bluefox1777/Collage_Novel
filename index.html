@@ -77,6 +77,17 @@ img.sp{display:block;padding:0;object-fit:cover}
 .zc button{font:inherit;font-size:15px;min-width:42px;height:42px;border-radius:8px;border:1px solid rgba(255,255,255,.35);background:rgba(0,0,0,.45);color:#fff;cursor:pointer}
 .zh{position:absolute;bottom:calc(14px + env(safe-area-inset-bottom,0px));left:0;right:0;text-align:center;color:rgba(255,255,255,.75);font-size:13px}
 .zoomable{cursor:zoom-in}
+.cr{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.9);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:18px;touch-action:none}
+.cr h3{color:#fff;font:600 17px/1.3 "Noto Serif KR",serif;margin:0}
+.cr .fr{position:relative;overflow:hidden;background:#fff;border-radius:10px;box-shadow:0 0 0 2px rgba(255,255,255,.5);cursor:grab;flex:none}
+.cr .fr.rd{border-radius:50%}
+.cr .fr img{position:absolute;left:50%;top:50%;transform-origin:center center;max-width:none;user-select:none;-webkit-user-drag:none;pointer-events:none}
+.cr .sl{display:flex;align-items:center;gap:10px;width:min(320px,86vw);color:#fff;font-size:13px}
+.cr .sl input{flex:1;margin:0}
+.cr .ac{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.cr .ac button{font:inherit;font-size:15px;padding:9px 18px;border-radius:8px;border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.08);color:#fff;cursor:pointer}
+.cr .ac button.go{background:#fff;color:#111;border-color:#fff;font-weight:600}
+.cr p{color:rgba(255,255,255,.7);font-size:13px;margin:0;text-align:center}
 .bell{position:relative;display:inline-flex;align-items:center;padding:2px}
 .bell .nb{position:absolute;top:-4px;right:-7px;min-width:17px;height:17px;padding:0 4px;border-radius:999px;background:#c0392b;color:#fff;font-size:11px;line-height:17px;text-align:center;font-weight:700}
 .al{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}
@@ -451,8 +462,41 @@ ${db.core.length?`<fieldset class="wf"><legend>중요 태그 <span class="mu">�
 <label>소개<textarea id="nd" rows="2" maxlength="200">${esc(s.desc||'')}</textarea></label>
 ${tsel(s)}${wfs(s)}<label>대표 이미지 <span class="mu">선택 사항이에요. 올리지 않으면 표지 없이 표시돼요</span><input type="file" id="cf" accept="image/*" onchange="pickC(this)"></label><div id="cp" class="cp"></div>`;
 function showC(){const c=$('#cp');if(c)c.innerHTML=coverData?`<img class="th lg" src="${coverData}" alt="대표 이미지 미리보기"><button type="button" class="lk" onclick="coverData='';showC()">이미지 지우기</button>`:''}
+let cr=null;
+function crOpen(f,aspect,outW,round,title,cb){const r=new FileReader();
+ r.onerror=()=>toast('파일을 읽을 수 없어요');
+ r.onload=()=>{const im=new Image();im.onerror=()=>toast('이미지를 불러올 수 없어요');
+  im.onload=()=>{const FW=Math.min(300,Math.round(innerWidth*0.72)),FH=Math.round(FW/aspect),fit=Math.max(FW/im.width,FH/im.height),all=Math.min(FW/im.width,FH/im.height);
+   cr={im,FW,FH,fit,all,z:1,x:0,y:0,outW,aspect,cb};
+   const o=document.createElement('div');o.className='cr';o.id='crw';
+   o.innerHTML=`<h3>${esc(title)}</h3><div class="fr${round?' rd':''}" id="crf" style="width:${FW}px;height:${FH}px"><img src="${im.src}" alt="자르기 미리보기" id="cri"></div>
+   <div class="sl"><span>축소</span><input type="range" id="crz" min="30" max="400" value="100" oninput="crZ(this.value)"><span>확대</span><b id="crp" style="min-width:48px;text-align:right">100%</b></div>
+   <div class="ac"><button type="button" onclick="crFit(1)">꽉 채우기</button><button type="button" onclick="crFit(0)">전체 보기</button><button type="button" class="go" onclick="crDone()">적용</button><button type="button" onclick="crClose()">취소</button></div>
+   <p>사진을 끌어서 옮기고, 막대나 두 손가락으로 크기를 맞추세요.</p>`;
+   document.body.appendChild(o);document.body.style.overflow='hidden';
+   const fr=o.querySelector('#crf');let dr=null,pd=0,pz=1;
+   fr.addEventListener('pointerdown',e=>{dr={x:e.clientX-cr.x,y:e.clientY-cr.y};try{fr.setPointerCapture(e.pointerId)}catch(err){}});
+   fr.addEventListener('pointermove',e=>{if(!dr)return;cr.x=e.clientX-dr.x;cr.y=e.clientY-dr.y;crT()});
+   fr.addEventListener('pointerup',()=>{dr=null});fr.addEventListener('pointercancel',()=>{dr=null});
+   fr.addEventListener('wheel',e=>{e.preventDefault();crZ(cr.z*100*(e.deltaY<0?1.1:1/1.1))},{passive:false});
+   fr.addEventListener('touchstart',e=>{if(e.touches.length===2){dr=null;pd=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);pz=cr.z}},{passive:true});
+   fr.addEventListener('touchmove',e=>{if(e.touches.length===2&&pd){e.preventDefault();const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);crZ(pz*d/pd*100)}},{passive:false});
+   fr.addEventListener('touchend',()=>{pd=0});
+   crT()};
+  im.src=r.result};
+ r.readAsDataURL(f)}
+function crT(){if(!cr)return;const i=$('#cri'),s=cr.fit*cr.z;if(i){i.style.width=cr.im.width*s+'px';i.style.height=cr.im.height*s+'px';i.style.transform=`translate(-50%,-50%) translate(${cr.x}px,${cr.y}px)`}
+ const p=$('#crp');if(p)p.textContent=Math.round(cr.z*100)+'%';const z=$('#crz');if(z)z.value=Math.round(cr.z*100)}
+function crZ(v){if(!cr)return;cr.z=Math.min(4,Math.max(.3,(+v||100)/100));crT()}
+function crFit(full){if(!cr)return;cr.z=full?1:cr.all/cr.fit;cr.x=0;cr.y=0;crT()}
+function crClose(){const o=$('#crw');if(o)o.remove();document.body.style.overflow='';cr=null}
+function crDone(){if(!cr)return;const{im,FW,FH,fit,z,x,y,outW,aspect,cb}=cr,r=outW/FW,c=document.createElement('canvas');
+ c.width=outW;c.height=Math.round(outW/aspect);const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);
+ const s=fit*z,w=im.width*s,h=im.height*s;
+ g.imageSmoothingQuality='high';g.drawImage(im,(FW/2+x-w/2)*r,(FH/2+y-h/2)*r,w*r,h*r);
+ const d=c.toDataURL('image/jpeg',.85);crClose();cb(d)}
 function shrink(f,max,q,cb){const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',q))};im.onerror=()=>toast('이미지를 불러올 수 없습니다');im.src=r.result};r.readAsDataURL(f)}
-function pickC(i){const f=i.files[0];i.value='';if(f)shrink(f,480,.82,d=>{coverData=d;showC()})}
+function pickC(i){const f=i.files[0];i.value='';if(f)crOpen(f,3/4,600,0,'대표 이미지 맞추기',d=>{coverData=d;showC()})}
 function rs(){const e=$('#ed');e.focus();if(sr&&e.contains(sr.startContainer)){const s=getSelection();s.removeAllRanges();s.addRange(sr)}}
 function pickI(i){const f=i.files[0];i.value='';if(f)shrink(f,900,.8,d=>{rs();document.execCommand('insertImage',false,d);dr()})}
 function clr(c){rs();document.execCommand('styleWithCSS',false,true);document.execCommand('foreColor',false,c);document.execCommand('styleWithCSS',false,false);dr()}
@@ -519,7 +563,7 @@ function cmx(s,e){const own=s.author===ME,L=csort(e,(e.cm||[]).filter(m=>!(db.se
 function cadd(sid,eid){const s=find(sid),e=s&&s.eps.find(x=>x.id===eid),t=$('#ct').value.trim();if(!e)return;if(!t){toast('댓글 내용을 입력해 주세요');return}const c=myChars().find(x=>x.id===$('#cid').value);(e.cm=e.cm||[]).push({id:uid('m'),mine:1,d:today(),text:t,kind:c?'rp':(s.author===ME?'author':'reader'),name:c?c.name:pn(ME),cid:c?c.id:null,img:c?c.img:''});if(!save()){e.cm.pop();return}vRead(sid,eid)}
 function cdel(sid,eid,mid){const e=find(sid).eps.find(x=>x.id===eid);e.cm=(e.cm||[]).filter(m=>m.id!==mid);save();vRead(sid,eid)}
 function showA(){const c=$('#avp');if(c)c.innerHTML=avData?`<div class="cp">${av(avData,'')}<button type="button" class="lk" onclick="avData='';showA()">사진 지우기</button></div>`:''}
-function pickA(i){const f=i.files[0];i.value='';if(f)shrink(f,160,.85,d=>{avData=d;showA()})}
+function pickA(i){const f=i.files[0];i.value='';if(f)crOpen(f,1,320,1,'프로필 사진 맞추기',d=>{avData=d;showA()})}
 const myChars=()=>db.chars.filter(c=>c.owner===ME||(c.share||[]).includes(ME));
 const chById=id=>db.chars.find(c=>c.id===id);
 const chStyle=id=>{const c=chById(id);return c&&c.color?`color:${esc(c.color)}`:''};
@@ -612,7 +656,7 @@ const eth=e=>IMG.test(e.img||'')?`<img class="eth zoomable" src="${e.img}" alt="
 const eimg=e=>IMG.test(e.img||'')?`<img class="eimg" src="${e.img}" alt="">`:'';
 const eis=()=>`<label>회차 썸네일 <span class="mu">선택 사항이에요. 회차 목록에 작은 이미지로 표시돼요</span><input type="file" id="ef" accept="image/*" onchange="pickE(this)"></label><div class="acts" style="margin-top:8px"><button type="button" class="btn ghost" onclick="pbi()">본문 삽화에서 고르기</button></div><div id="bi" class="cp" style="flex-wrap:wrap;align-items:center"></div><div id="ep" class="cp"></div>`;
 function showE(){const c=$('#ep');if(c)c.innerHTML=IMG.test(eiData||'')?`<img class="eth" src="${eiData}" alt="회차 삽화 미리보기" style="margin-top:0"><button type="button" class="lk" onclick="eiData='';showE();dr()">썸네일 지우기</button>`:''}
-function pickE(i){const f=i.files[0];i.value='';if(f)shrink(f,600,.82,d=>{eiData=d;showE();dr()})}
+function pickE(i){const f=i.files[0];i.value='';if(f)crOpen(f,3/4,480,0,'회차 썸네일 맞추기',d=>{eiData=d;showE();dr()})}
 let cx=null;
 function shrinkSrc(u,max,q,cb){const im=new Image();im.onload=()=>{const k=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',q))};im.src=u}
 function pbi(){const ed=$('#ed');let h=ed?ed.innerHTML:'';if(!ed&&cx){const s=find(cx.s),e=s&&s.eps.find(x=>x.id===cx.e);h=e?(e.html||''):''}const d=document.createElement('div');d.innerHTML=clean(h);const L=[...new Set([...d.querySelectorAll('img')].map(i=>i.getAttribute('src')))],b=$('#bi');if(!L.length){b.innerHTML='<span class="mu">본문에 넣은 삽화가 아직 없어요.</span>';return}b._l=L;b.innerHTML=L.map((u,i)=>`<img class="eth" src="${u}" alt="본문 삽화 ${i+1}" title="이 삽화를 썸네일로" style="margin-top:0;cursor:pointer" onclick="pbs(${i})">`).join('')+'<span class="mu" style="flex-basis:100%">썸네일로 쓸 삽화를 눌러 주세요.</span>'}
@@ -664,7 +708,7 @@ function zoom(src){zclose();zs=1;zx=0;zy=0;const o=document.createElement('div')
  o.addEventListener('touchmove',e=>{if(e.touches.length===2&&zd){e.preventDefault();const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);zset(zp*d/zd)}},{passive:false});
  o.addEventListener('touchend',()=>{zd=null})}
 document.addEventListener('click',e=>{const im=e.target;if(!im||im.tagName!=='IMG'||!im.classList||!im.classList.contains('zoomable'))return;if(im.closest('#ed')||im.closest('a')||im.closest('.cc')||im.closest('.zo'))return;e.preventDefault();zoom(im.currentSrc||im.src)});
-addEventListener('keydown',e=>{if(e.key==='Escape')zclose()});
+addEventListener('keydown',e=>{if(e.key==='Escape'){if($('#crw'))crClose();else zclose()}});
 
 // ----- 알림 -----
 const ntP=()=>Object.assign({eps:true,cm:'all',seen:''},db.set.nt||{});
