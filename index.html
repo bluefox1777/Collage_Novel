@@ -588,6 +588,13 @@ async function fchk(){const bt=$('#fcb');if(bt)bt.disabled=true;
   const dM=mine.filter(x=>x.dl).length,dG=goog.filter(x=>x.dl).length;
   const sys=R.filter(x=>!x.dl&&x.ok).length;
   const now=(FONTS.find(f=>f[1]===db.prefs.font)||['기본'])[0];
+  let css='못 찾음',faces=0,probe='확인 못 함';
+  try{const sh=[...document.styleSheets].find(s=>(s.href||'').indexOf('fonts/fonts.css')>=0);
+   if(sh){css='불러옴';try{faces=[...sh.cssRules].filter(r=>r.cssText&&r.cssText.indexOf('@font-face')===0).length}catch(e){css='불러왔지만 내용을 못 읽음'}}}catch(e){}
+  try{const t0=Date.now(),r=await fetch('fonts/maplestory.woff?v=2',{cache:'no-store'});
+   if(r.ok){const b=await r.blob();probe=`받음 ${Math.round(b.size/1024)}KB · ${Date.now()-t0}ms · ${r.headers.get('content-type')||'형식 없음'}`}
+   else probe=`서버가 거절 (${r.status})`}
+  catch(e){probe='요청이 막힘: '+(e&&e.message||e)}
   let msg;
   if(dM===0&&dG===0)msg='글꼴 파일을 하나도 받지 못하고 있어요. 지금 보이는 글씨는 이 컴퓨터에 이미 깔려 있는 글꼴이에요. ① 시크릿 창에서 열어 보세요 ② 브라우저 캐시를 비워 주세요(Ctrl+Shift+Delete → 전체 기간 → 캐시된 이미지 및 파일) ③ 광고 차단 확장의 ‘원격 폰트 차단’을 꺼 주세요.';
   else if(dM===0)msg='이 사이트에 넣은 글꼴만 안 받아지고 있어요. 새로고침 버튼을 누르거나 캐시를 비워 주세요. 그래도 그대로면 fonts 폴더가 제대로 올라갔는지 봐야 해요.';
@@ -596,6 +603,7 @@ async function fchk(){const bt=$('#fcb');if(bt)bt.disabled=true;
   else msg='글꼴은 모두 잘 받아졌어요. 그런데도 기본 글씨체로 보인다면, 읽기 화면 위쪽의 글꼴 고르는 칸이 ‘명조 (기본)’으로 되어 있는지 확인해 주세요.';
   box.innerHTML=`<p>${esc(msg)}</p><p class="mu" style="margin:6px 0 0">지금 읽기 글꼴: <b>${esc(now)}</b> · 사이트 글꼴 ${dM}/${mine.length} · 구글 글꼴 ${dG}/${goog.length}${sys?` · 내 컴퓨터에 깔린 글꼴로 대신 보이는 것 ${sys}개`:''}</p>
   <div class="fchk">${R.map(x=>`<div><span${x.dl?'':(x.ok?' class="mu"':'')}>${x.dl?'○':(x.ok?'△':'×')}</span><span style="font-family:'${x.fam}',serif">${esc(x.nm)}</span><span class="mu">${x.dl?'':(x.ok?'내 컴퓨터 · ':'')}${x.mine?'사이트':'구글'}</span></div>`).join('')}</div>
+  <p class="mu" style="margin:14px 0 0">글꼴 목록표(fonts.css): <b>${esc(css)}</b> · 글꼴 규칙 ${faces}개<br>글꼴 파일 직접 받아 보기: <b>${esc(probe)}</b></p>
   <p class="mu" style="margin:10px 0 0">○ 내려받음 · △ 못 받았지만 이 컴퓨터에 깔려 있어서 보임 · × 못 씀</p>`}
  catch(e){console.error(e);box.innerHTML='<p class="mu">확인하지 못했어요.</p>'}
  finally{const b2=$('#fcb');if(b2)b2.disabled=false}}
