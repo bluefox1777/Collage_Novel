@@ -74,6 +74,8 @@ h1,h2,h3{font-family:"Noto Serif KR",serif;line-height:1.35;margin:0}
 .mrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
 .mrow span{margin-right:0!important}
 .kb{padding:1px 9px;border:1px solid var(--line);border-radius:999px;font-size:12px}
+.nwb{display:inline-block;margin-left:7px;padding:1px 6px;border-radius:5px;background:var(--ac);color:var(--on);font-size:10px;font-weight:700;letter-spacing:.07em;line-height:1.7;vertical-align:middle;position:relative;top:-1px}
+.ep .nwb{top:0}
 .stb{display:inline-flex;align-items:center;gap:5px;padding:1px 10px;border-radius:999px;border:1px solid currentColor;font-size:12px;font-weight:600}
 .stb::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
 .stb.s0{color:#1e8449}
@@ -477,6 +479,11 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'
 const uid=()=>rid();
 const today=()=>new Date().toISOString().slice(0,10);
 const pub=s=>s.eps.filter(e=>e.st==='공개');
+const NEWD=3;
+const eTm=e=>Date.parse(e.pt||'')||Date.parse((e.d||'')+'T00:00:00')||0;
+const isNew=e=>e.st==='공개'&&Date.now()-eTm(e)<NEWD*86400000;
+const sNew=s=>s.eps.some(isNew);
+const NEWB='<span class="nwb" title="최근 '+NEWD+'일 안에 올라온 회차예요">NEW</span>';
 const find=id=>db.series.find(x=>x.id===id);
 
 // ===== 서버 연결 (Supabase) =====
@@ -733,7 +740,7 @@ const uchip=(id,cls)=>`<span class="uc ${cls||''}" role="link" tabindex="0" titl
 const STC={'연재중':'s0','완결':'s1','휴재':'s2'};
 const stb=v=>`<span class="stb ${STC[v]||'s0'}">${esc(v||'연재중')}</span>`;
 const meta=s=>`<p class="mu mrow">${uchip(s.author)}${s.kind==='short'?`<span class="kb">단편</span>${stb(s.status)}`:`<span class="kb">장편</span>${stb(s.status)}<span>${pub(s).length}화</span>`}</p>${(s.core&&s.core.length)||s.tags.length?`<p class="tags">${(s.core||[]).map(t=>`<b class="ctg">${esc(t)}</b>`).join('')}${s.tags.map(t=>`<span>#${esc(t)}</span>`).join('')}</p>`:''}${wn(s)}`;
-const row=s=>`<a class="row" href="#series-${s.id}">${spine(s)}<div><h3>${esc(s.title)}</h3>${meta(s)}<p class="ds">${esc(s.desc)}</p>${castTxt(s)}</div></a>`;
+const row=s=>`<a class="row" href="#series-${s.id}">${spine(s)}<div><h3>${esc(s.title)}${sNew(s)?NEWB:''}</h3>${meta(s)}<p class="ds">${esc(s.desc)}</p>${castTxt(s)}</div></a>`;
 
 function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),2200)}
 
@@ -788,10 +795,10 @@ let ordD=null;
 function tSub(id){const i=db.subs.indexOf(id);i<0?db.subs.push(id):db.subs.splice(i,1);save();vSeries(id)}
 function vSeries(id){const s=find(id);if(!s)return vHome();if(blk(s)&&!okb.has(s.id))return vBlk(s);setTimeout(()=>{if($('#bgc')&&find(id))bgInit(find(id),{bgm:'',sc:{},cast:[]})},0);
 const own=s.author===ME||isAdm,co=isCo(s),es=co?s.eps:pub(s),sub=db.subs.includes(s.id);
-app.innerHTML=`<div class="wrap"><div class="shw${IMG.test(s.banner||'')?' hasb':''}">${IMG.test(s.banner||'')?`<div class="sbn" style="background-image:url('${s.banner}');--bo:${Math.max(5,Math.min(100,+s.bop||35))/100};--bm:to ${s.bdir==='left'?'left':'right'}"></div>`:''}<div class="sh">${spine(s,1)}<div><h1>${esc(s.title)}</h1>${meta(s)}${s.theme&&db.tracks.find(x=>x.id===s.theme)&&db.set.bgm!==false?`<div class="rset tplay"><span class="mu">테마곡</span><span id="bgc" class="bgc"></span></div>`:''}<p class="pw">${esc(s.desc)}</p>${cast(s)}</div></div></div><div class="shb">
+app.innerHTML=`<div class="wrap"><div class="shw${IMG.test(s.banner||'')?' hasb':''}">${IMG.test(s.banner||'')?`<div class="sbn" style="background-image:url('${s.banner}');--bo:${Math.max(5,Math.min(100,+s.bop||35))/100};--bm:to ${s.bdir==='left'?'left':'right'}"></div>`:''}<div class="sh">${spine(s,1)}<div><h1>${esc(s.title)}${sNew(s)?NEWB:''}</h1>${meta(s)}${s.theme&&db.tracks.find(x=>x.id===s.theme)&&db.set.bgm!==false?`<div class="rset tplay"><span class="mu">테마곡</span><span id="bgc" class="bgc"></span></div>`:''}<p class="pw">${esc(s.desc)}</p>${cast(s)}</div></div></div><div class="shb">
 <div class="acts">${es.length?`<a class="btn" href="#read-${s.id}-${es[0].id}">${s.kind==='short'?'읽기':'첫 화 읽기'}</a>`:''}${canEp(s)?`<a class="btn${es.length?' ghost':''}" href="#write-${s.id}">${s.kind==='short'?'본문 쓰기':(es.length?'새 회차 쓰기':'첫 회차 쓰기')}</a>`:''}<button class="btn ghost" onclick="tSub('${s.id}')">${sub?'구독 중':'구독하기'}</button>${own?`<a class="btn ghost" href="#edit-${s.id}">작품 정보 수정</a>`:''}${co&&s.eps.length>1?`<button class="btn ghost" onclick="ordTog('${s.id}')">${ordS===s.id?'순서 바꾸기 끝내기':'회차 순서 바꾸기'}</button>`:''}</div></div>
 <h2 class="h2">${s.kind==='short'?'본문':`회차 ${es.length}개`}</h2>
-${s.note?`<p class="snote">${SV(ICO.pin)}<span>${esc(s.note)}</span></p>`:''}${ordS===s.id?`<p class="mu" style="margin:0 0 10px">회차를 끌어서 옮기거나 ▲▼ 단추로 자리를 바꿔 주세요. 바꾸면 바로 저장돼요.</p>`:''}<div${ordS===s.id?' id="epl" class="ordm"':''}>${es.map((e,i)=>`<div class="epw"${ordS===s.id?` draggable="true" data-e="${e.id}" ondragstart="ordDS(event,'${e.id}')" ondragover="ordDO(event)" ondrop="ordDrop(event,'${s.id}','${e.id}')" ondragend="ordDE(event)"`:''}>${ordS===s.id?`<div class="ordh"><span class="grip">${SV(ICO.grip)}</span><button class="ebtn" onclick="ordMv('${s.id}','${e.id}',-1)" ${i===0?'disabled':''} aria-label="위로">▲</button><button class="ebtn" onclick="ordMv('${s.id}','${e.id}',1)" ${i===es.length-1?'disabled':''} aria-label="아래로">▼</button></div>`:''}${eth(e)}<div class="epc"><a class="ep" href="#read-${s.id}-${e.id}"><span>${esc(e.title)}</span><span class="mu">${e.st==='공개'?'':'비공개 '}${esc(e.d)}${edTxt(e)?` · ${edTxt(e)}`:''}</span></a>${(e.warns||[]).length?`<p class="warns" style="margin:2px 0 0">${e.warns.map(w=>`<span>${esc(w)}</span>`).join('')}</p>`:''}${povTxt(e)?`<p class="mu" style="margin:2px 0 0">시점 · ${esc(povTxt(e))}</p>`:''}${casts(e,3,0,e.povc,s.id)}${co&&ordS!==s.id?`<div class="eact"><a class="ebtn" href="#rev-${s.id}-${e.id}" title="제목과 본문 고치기">${SV(ICO.pen)}수정</a><a class="ebtn" href="#cast-${s.id}-${e.id}" title="등장인물·썸네일·시점·BGM">${SV(ICO.gear)}회차 설정</a></div>`:''}</div></div>`).join('')||`<p class="mu">${co?(s.kind==='short'?'아직 본문이 없어요. 위의 ‘본문 쓰기’로 시작해 보세요.':'아직 회차가 없어요. 위의 ‘첫 회차 쓰기’로 시작해 보세요.'):'아직 올라온 회차가 없습니다.'}</p>`}</div></div>`}
+${s.note?`<p class="snote">${SV(ICO.pin)}<span>${esc(s.note)}</span></p>`:''}${ordS===s.id?`<p class="mu" style="margin:0 0 10px">회차를 끌어서 옮기거나 ▲▼ 단추로 자리를 바꿔 주세요. 바꾸면 바로 저장돼요.</p>`:''}<div${ordS===s.id?' id="epl" class="ordm"':''}>${es.map((e,i)=>`<div class="epw"${ordS===s.id?` draggable="true" data-e="${e.id}" ondragstart="ordDS(event,'${e.id}')" ondragover="ordDO(event)" ondrop="ordDrop(event,'${s.id}','${e.id}')" ondragend="ordDE(event)"`:''}>${ordS===s.id?`<div class="ordh"><span class="grip">${SV(ICO.grip)}</span><button class="ebtn" onclick="ordMv('${s.id}','${e.id}',-1)" ${i===0?'disabled':''} aria-label="위로">▲</button><button class="ebtn" onclick="ordMv('${s.id}','${e.id}',1)" ${i===es.length-1?'disabled':''} aria-label="아래로">▼</button></div>`:''}${eth(e)}<div class="epc"><a class="ep" href="#read-${s.id}-${e.id}"><span>${esc(e.title)}${isNew(e)?NEWB:''}</span><span class="mu">${e.st==='공개'?'':'비공개 '}${esc(e.d)}${edTxt(e)?` · ${edTxt(e)}`:''}</span></a>${(e.warns||[]).length?`<p class="warns" style="margin:2px 0 0">${e.warns.map(w=>`<span>${esc(w)}</span>`).join('')}</p>`:''}${povTxt(e)?`<p class="mu" style="margin:2px 0 0">시점 · ${esc(povTxt(e))}</p>`:''}${casts(e,3,0,e.povc,s.id)}${co&&ordS!==s.id?`<div class="eact"><a class="ebtn" href="#rev-${s.id}-${e.id}" title="제목과 본문 고치기">${SV(ICO.pen)}수정</a><a class="ebtn" href="#cast-${s.id}-${e.id}" title="등장인물·썸네일·시점·BGM">${SV(ICO.gear)}회차 설정</a></div>`:''}</div></div>`).join('')||`<p class="mu">${co?(s.kind==='short'?'아직 본문이 없어요. 위의 ‘본문 쓰기’로 시작해 보세요.':'아직 회차가 없어요. 위의 ‘첫 회차 쓰기’로 시작해 보세요.'):'아직 올라온 회차가 없습니다.'}</p>`}</div></div>`}
 
 const THN={white:'흰색',sepia:'세피아',dark:'어둡게'};
 function ap(){const r=$('#rd');if(!r)return;const f=db.prefs.font;r.style.fontSize=Math.round(db.prefs.size*fsc(f))+'px';r.style.lineHeight=db.prefs.lh;r.style.fontFamily=f?'"'+f+'", serif':''}
