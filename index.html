@@ -126,7 +126,9 @@ img.sp{display:block;padding:0;object-fit:cover}
 .pvx{margin-top:14px;padding:12px 14px;border:1px dashed var(--line);border-radius:8px}
 .pvx p{margin:6px 0 0;font-size:16px}
 .pvx p.mu{font-size:13px}
-.cpk{display:flex;align-items:center;gap:10px;margin-top:6px}
+.cpk{display:flex;align-items:center;gap:10px;margin-top:6px;flex-wrap:wrap}
+.hxi{width:94px;margin:0!important;padding:5px 8px;font-size:13px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-transform:lowercase}
+.hxi.bad{border-color:#d9534f}
 .cpk input[type=color]{width:42px;height:30px;margin:0;padding:0;border:1px solid var(--line);border-radius:6px;background:none;cursor:pointer}
 .tb{position:sticky;top:var(--hh,54px);z-index:6;background:var(--bg);padding:8px 0;margin:0 0 8px;border-bottom:1px solid var(--line)}
 #sp{max-height:46vh;overflow:auto;align-items:stretch}
@@ -308,8 +310,19 @@ body.sideon{padding-right:248px}
 .rlw{width:min(440px,100%);max-height:80vh;overflow:auto;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:18px}
 .rlh{display:flex;align-items:center;gap:10px;margin-bottom:14px}
 .rlh .ic{flex:none}
-.rlr{padding:11px 0;border-top:1px solid var(--line)}
+.rlgd{margin:0 0 4px;font-size:13px}
+.rlr{padding:13px 0;border-top:1px solid var(--line)}
 .rlr b{font-size:15px}
+.rla{display:flex;align-items:center;gap:10px}
+.rlf{display:flex;flex-wrap:wrap;gap:5px;justify-content:flex-end;flex:1;min-width:0}
+.rlar{flex:none;display:inline-flex;color:var(--ac)}
+.rlar svg{width:22px;height:22px}
+.rlto{flex:none;display:flex;align-items:center;gap:8px;max-width:48%}
+.rlto .av{width:34px;height:34px;font-size:13px}
+.rlto b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rlrel{margin:1px 0 0;font-size:12px;color:var(--mute);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rlb.dim{opacity:.5}
+@media (max-width:420px){.rla{flex-wrap:wrap}.rlf{justify-content:flex-start;flex-basis:100%;order:2}.rlar{order:1;transform:rotate(90deg)}.rlto{order:0;max-width:100%}}
 .rlt{margin:5px 0 0;display:flex;flex-wrap:wrap;gap:6px}
 .rlb{padding:1px 9px;border:1px solid var(--line);border-radius:999px;font-size:12px}
 .rlb.em{border-color:var(--ac);color:var(--ac)}
@@ -321,7 +334,8 @@ body.sideon{padding-right:248px}
 .pnh{display:flex;align-items:center;gap:10px;margin-bottom:10px}
 .pnh b{flex:1;min-width:0;font-size:16px}
 .szr{display:flex;align-items:center;gap:10px}
-.szr input[type=range]{flex:1;min-width:0;accent-color:var(--ac)}
+input[type=range]{accent-color:var(--ac)}
+.szr input[type=range]{flex:1;min-width:0}
 .szr input[type=number]{width:84px;margin:0}
 .szx{margin:16px 0 4px;padding:14px;border:1px solid var(--line);border-radius:8px;text-align:center;line-height:1.6}
 .fxl{display:grid;gap:8px}
@@ -332,11 +346,11 @@ body.sideon{padding-right:248px}
 .fxe{flex:1;min-width:0;font-size:16px;overflow:hidden}
 @media (max-width:480px){.fxr{flex-direction:column;align-items:flex-start;gap:6px}.fxn{width:auto}}
 .rld{margin:7px 0 0;font-size:13.5px;line-height:1.65;overflow-wrap:anywhere}
-.rlq{margin:7px 0 0;font-size:14px;color:var(--mute);overflow-wrap:anywhere}
+.rlq{margin:9px 0 0;font-size:15px;overflow-wrap:anywhere}
 .cc.rel{cursor:pointer}
 .cc.rel svg{width:13px;height:13px;opacity:.6;margin-left:1px}
 body.noscroll{overflow:hidden}
-.bgnt{display:flex;align-items:center;gap:8px;margin:14px 0 0;padding:9px 13px;border:1px solid var(--line);border-radius:8px;background:var(--card);font-size:13px;color:var(--mute)}
+.bgnt{display:flex;align-items:center;gap:8px;margin:14px 0 22px;padding:9px 13px;border:1px solid var(--line);border-radius:8px;background:var(--card);font-size:13px;color:var(--mute)}
 .bgnt svg{flex:none;width:16px;height:16px}
 .bgnt span{flex:1;min-width:0}
 .bgnt .lk{flex:none}
@@ -403,6 +417,12 @@ body.fxoff .fx-glitch::before,body.fxoff .fx-glitch::after{display:none}
 .onr.hid .av{opacity:.7}
 .meta{display:flex;justify-content:space-between;margin-top:8px;font-size:13px;color:var(--mute)}
 .rtop{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px;font-size:14px;color:var(--mute)}
+.rback{display:inline-flex;align-items:center;gap:8px;max-width:100%;padding:5px 14px 5px 7px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);text-decoration:none;font-size:15px;font-weight:600;transition:border-color .12s,background .12s}
+.rback:hover,.rback:focus-visible{border-color:var(--ac);background:var(--bg)}
+.rback svg{flex:none;width:17px;height:17px;color:var(--mute)}
+.rback:hover svg{color:var(--ac)}
+.rbi{flex:none;width:30px;height:40px;object-fit:cover;border-radius:4px}
+.rback span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rset{display:flex;flex-wrap:wrap;gap:6px}
 .rset button{font:inherit;font-size:13px;padding:4px 10px;border:1px solid var(--line);border-radius:5px;background:transparent;color:var(--ink);cursor:pointer}
 .rset button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
@@ -751,7 +771,7 @@ const own=s.author===ME||isAdm,es=own?s.eps:pub(s),sub=db.subs.includes(s.id);
 app.innerHTML=`<div class="wrap"><div class="sh">${spine(s,1)}<div><h1>${esc(s.title)}</h1>${meta(s)}${s.theme&&db.tracks.find(x=>x.id===s.theme)&&db.set.bgm!==false?`<div class="rset tplay"><span class="mu">테마곡</span><span id="bgc" class="bgc"></span></div>`:''}<p>${esc(s.desc)}</p>${cast(s)}</div></div><div class="shb">
 <div class="acts">${es.length?`<a class="btn" href="#read-${s.id}-${es[0].id}">${s.kind==='short'?'읽기':'첫 화 읽기'}</a>`:''}${own&&canEp(s)?`<a class="btn${es.length?' ghost':''}" href="#write-${s.id}">${s.kind==='short'?'본문 쓰기':(es.length?'새 회차 쓰기':'첫 회차 쓰기')}</a>`:''}<button class="btn ghost" onclick="tSub('${s.id}')">${sub?'구독 중':'구독하기'}</button>${own?`<a class="btn ghost" href="#edit-${s.id}">작품 정보 수정</a>${s.eps.length>1?`<button class="btn ghost" onclick="ordTog('${s.id}')">${ordS===s.id?'순서 바꾸기 끝내기':'회차 순서 바꾸기'}</button>`:''}`:''}</div></div>
 <h2 class="h2">${s.kind==='short'?'본문':`회차 ${es.length}개`}</h2>
-${s.note?`<p class="snote">${SV(ICO.pin)}<span>${esc(s.note)}</span></p>`:''}${ordS===s.id?`<p class="mu" style="margin:0 0 10px">회차를 끌어서 옮기거나 ▲▼ 단추로 자리를 바꿔 주세요. 바꾸면 바로 저장돼요.</p>`:''}<div${ordS===s.id?' id="epl" class="ordm"':''}>${es.map((e,i)=>`<div class="epw"${ordS===s.id?` draggable="true" data-e="${e.id}" ondragstart="ordDS(event,'${e.id}')" ondragover="ordDO(event)" ondrop="ordDrop(event,'${s.id}','${e.id}')" ondragend="ordDE(event)"`:''}>${ordS===s.id?`<div class="ordh"><span class="grip">${SV(ICO.grip)}</span><button class="ebtn" onclick="ordMv('${s.id}','${e.id}',-1)" ${i===0?'disabled':''} aria-label="위로">▲</button><button class="ebtn" onclick="ordMv('${s.id}','${e.id}',1)" ${i===es.length-1?'disabled':''} aria-label="아래로">▼</button></div>`:''}${eth(e)}<div class="epc"><a class="ep" href="#read-${s.id}-${e.id}"><span>${esc(e.title)}</span><span class="mu">${e.st==='공개'?'':'비공개 '}${esc(e.d)}${edTxt(e)?` · ${edTxt(e)}`:''}</span></a>${(e.warns||[]).length?`<p class="warns" style="margin:2px 0 0">${e.warns.map(w=>`<span>${esc(w)}</span>`).join('')}</p>`:''}${povTxt(e)?`<p class="mu" style="margin:2px 0 0">시점 · ${esc(povTxt(e))}</p>`:''}${casts(e,0,0,e.povc)}${own&&ordS!==s.id?`<div class="eact"><a class="ebtn" href="#rev-${s.id}-${e.id}" title="제목과 본문 고치기">${SV(ICO.pen)}수정</a><a class="ebtn" href="#cast-${s.id}-${e.id}" title="등장인물·썸네일·시점·BGM">${SV(ICO.gear)}회차 설정</a></div>`:''}</div></div>`).join('')||`<p class="mu">${own?(s.kind==='short'?'아직 본문이 없어요. 위의 ‘본문 쓰기’로 시작해 보세요.':'아직 회차가 없어요. 위의 ‘첫 회차 쓰기’로 시작해 보세요.'):'아직 올라온 회차가 없습니다.'}</p>`}</div></div>`}
+${s.note?`<p class="snote">${SV(ICO.pin)}<span>${esc(s.note)}</span></p>`:''}${ordS===s.id?`<p class="mu" style="margin:0 0 10px">회차를 끌어서 옮기거나 ▲▼ 단추로 자리를 바꿔 주세요. 바꾸면 바로 저장돼요.</p>`:''}<div${ordS===s.id?' id="epl" class="ordm"':''}>${es.map((e,i)=>`<div class="epw"${ordS===s.id?` draggable="true" data-e="${e.id}" ondragstart="ordDS(event,'${e.id}')" ondragover="ordDO(event)" ondrop="ordDrop(event,'${s.id}','${e.id}')" ondragend="ordDE(event)"`:''}>${ordS===s.id?`<div class="ordh"><span class="grip">${SV(ICO.grip)}</span><button class="ebtn" onclick="ordMv('${s.id}','${e.id}',-1)" ${i===0?'disabled':''} aria-label="위로">▲</button><button class="ebtn" onclick="ordMv('${s.id}','${e.id}',1)" ${i===es.length-1?'disabled':''} aria-label="아래로">▼</button></div>`:''}${eth(e)}<div class="epc"><a class="ep" href="#read-${s.id}-${e.id}"><span>${esc(e.title)}</span><span class="mu">${e.st==='공개'?'':'비공개 '}${esc(e.d)}${edTxt(e)?` · ${edTxt(e)}`:''}</span></a>${(e.warns||[]).length?`<p class="warns" style="margin:2px 0 0">${e.warns.map(w=>`<span>${esc(w)}</span>`).join('')}</p>`:''}${povTxt(e)?`<p class="mu" style="margin:2px 0 0">시점 · ${esc(povTxt(e))}</p>`:''}${casts(e,3,0,e.povc,s.id)}${own&&ordS!==s.id?`<div class="eact"><a class="ebtn" href="#rev-${s.id}-${e.id}" title="제목과 본문 고치기">${SV(ICO.pen)}수정</a><a class="ebtn" href="#cast-${s.id}-${e.id}" title="등장인물·썸네일·시점·BGM">${SV(ICO.gear)}회차 설정</a></div>`:''}</div></div>`).join('')||`<p class="mu">${own?(s.kind==='short'?'아직 본문이 없어요. 위의 ‘본문 쓰기’로 시작해 보세요.':'아직 회차가 없어요. 위의 ‘첫 회차 쓰기’로 시작해 보세요.'):'아직 올라온 회차가 없습니다.'}</p>`}</div></div>`}
 
 const THN={white:'흰색',sepia:'세피아',dark:'어둡게'};
 function ap(){const r=$('#rd');if(!r)return;const f=db.prefs.font;r.style.fontSize=Math.round(db.prefs.size*fsc(f))+'px';r.style.lineHeight=db.prefs.lh;r.style.fontFamily=f?'"'+f+'", serif':''}
@@ -760,7 +780,7 @@ function pt(t){db.prefs.th=t;save();$('#rd').className='reader rd-'+t;document.q
 function vRead(sid,eid){relE=null;const s=find(sid);if(!s)return vHome();if(blk(s)&&!okb.has(s.id))return vBlk(s);const e0=s.eps.find(x=>x.id===eid);if(e0&&blkE(s,e0)&&!okb.has(e0.id))return vBlkE(s,e0);
 const es=s.author===ME?s.eps:pub(s),i=es.findIndex(x=>x.id===eid);if(i<0)return vHome();
 const e=es[i],p=db.prefs,pv=es[i-1],nx=es[i+1];relE=e;
-app.innerHTML=`<div class="rtop"><a href="#series-${s.id}">${esc(s.title)}</a><div class="rset">${rb('글자 작게',`pf('size',-1)`,SV(ICO.fdn))}${rb('글자 크게',`pf('size',1)`,SV(ICO.fup))}${rb('줄 간격 바꾸기',`pf('lh',0)`,SV(ICO.lh))}<span id="bgc" class="bgc"></span>${Object.keys(THN).map(t=>`<button data-t="${t}" class="thm ${p.th===t?'on':''}" style="background:${THC[t]}" title="${THN[t]} 배경" aria-label="${THN[t]} 배경" onclick="pt('${t}')"></button>`).join('')}${castE(e).length?`${rb(db.set.alias!==false?'별명으로 보는 중 (누르면 원래 이름)':'원래 이름으로 보는 중 (누르면 별명)',`tal()`,SV(ICO.user)+SV(ICO.swap),db.set.alias!==false?'on':'')}${rb('별명 설정',`$('#nsp').hidden=!$('#nsp').hidden`,SV(ICO.user)+SV(ICO.pen))}`:''}<select class="fs" onchange="pfn(this.value)" aria-label="글꼴">${FONTS.map(f=>`<option value="${f[1]}"${p.font===f[1]?' selected':''}>${f[0]}</option>`).join('')}</select></div></div>
+app.innerHTML=`<div class="rtop"><a class="rback" href="#series-${s.id}" title="‘${esc(s.title)}’ 목차로 돌아가기">${SV(ICO.back)}${IMG.test(s.cover||'')?`<img class="rbi" src="${s.cover}" alt="">`:''}<span>${esc(s.title)}</span></a><div class="rset">${rb('글자 작게',`pf('size',-1)`,SV(ICO.fdn))}${rb('글자 크게',`pf('size',1)`,SV(ICO.fup))}${rb('줄 간격 바꾸기',`pf('lh',0)`,SV(ICO.lh))}<span id="bgc" class="bgc"></span>${Object.keys(THN).map(t=>`<button data-t="${t}" class="thm ${p.th===t?'on':''}" style="background:${THC[t]}" title="${THN[t]} 배경" aria-label="${THN[t]} 배경" onclick="pt('${t}')"></button>`).join('')}${castE(e).length?`${rb(db.set.alias!==false?'별명으로 보는 중 (누르면 원래 이름)':'원래 이름으로 보는 중 (누르면 별명)',`tal()`,SV(ICO.user)+SV(ICO.swap),db.set.alias!==false?'on':'')}${rb('별명 설정',`$('#nsp').hidden=!$('#nsp').hidden`,SV(ICO.user)+SV(ICO.pen))}`:''}<select class="fs" onchange="pfn(this.value)" aria-label="글꼴">${FONTS.map(f=>`<option value="${f[1]}"${p.font===f[1]?' selected':''}>${f[0]}</option>`).join('')}</select></div></div>
 ${nsp2(s,e)}${wnote(s,e)}<p class="bgnt" id="bgnt" hidden></p><div class="rc">${casts(e,2,1,e.povc)}${povTxt(e)?`<p class="mu" style="margin:6px 0 0">시점 · ${esc(povTxt(e))}</p>`:''}</div><article class="reader rd-${p.th}" id="rd"><h2>${esc(e.title)}</h2>${edTxt(e)?`<p class="mu" style="margin:-1.3em 0 1.8em;font-size:.78em">${edTxt(e)}</p>`:''}<div class="bd">${amap2(clean(e.html),e)}</div></article>
 <nav class="pn">${pv?`<a class="btn ghost" href="#read-${s.id}-${pv.id}">이전 화</a>`:'<span></span>'}<a class="btn ghost" href="#series-${s.id}">목차</a>${nx?`<a class="btn" href="#read-${s.id}-${nx.id}">다음 화</a>`:'<span></span>'}</nav>${cmx(s,e)}`;ap();bgInit(s,e)}
 
@@ -922,7 +942,7 @@ const wfsE=e=>`<fieldset class="wf"><legend>이 회차의 주의 요소 <span cl
 const gwE=()=>[...new Set([...[...document.querySelectorAll('[name=ewn]:checked')].map(e=>e.value),...(($('#ewx')&&$('#ewx').value)||'').split(',').map(x=>x.trim().slice(0,12)).filter(Boolean)])].slice(0,10);
 const gw=()=>[...new Set([...[...document.querySelectorAll('[name=wn]:checked')].map(e=>e.value),...$('#wx').value.split(',').map(x=>x.trim().slice(0,12)).filter(Boolean)])].slice(0,10);
 const ICO={bold:`<path d='M6 12h9a4 4 0 0 1 0 8H7a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h7a4 4 0 0 1 0 8'/>`,italic:`<path d='M19 4h-9M14 20H5M15 4 9 20'/>`,underline:`<path d='M6 4v6a6 6 0 0 0 12 0V4M4 20h16'/>`,strike:`<path d='M16 4H9a3 3 0 0 0-2.83 4M14 12a4 4 0 0 1 0 8H6M4 12h16'/>`,h2:`<path d='M4 12h8M4 18V6M12 18V6M21 18h-4c0-4 4-3 4-6 0-1.5-2-2.5-4-1'/>`,p:`<path d='M13 4v16M17 4v16M19 4H9.5a4.5 4.5 0 0 0 0 9H13'/>`,left:`<path d='M21 6H3M15 12H3M17 18H3'/>`,center:`<path d='M21 6H3M17 12H7M19 18H5'/>`,right:`<path d='M21 6H3M21 12H9M21 18H7'/>`,full:`<path d='M3 6h18M3 12h18M3 18h18'/>`,ul:`<path d='M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01'/>`,ol:`<path d='M10 6h11M10 12h11M10 18h11M4 6h1v4M4 10h2M6 18H4c0-1 2-2 2-3s-1-1.5-2-1'/>`,hr:`<path d='M3 12h18M8 6h.01M12 6h.01M16 6h.01M8 18h.01M12 18h.01M16 18h.01'/>`,img:`<rect width='18' height='18' x='3' y='3' rx='2'/><circle cx='9' cy='9' r='2'/><path d='m21 15-3.09-3.09a2 2 0 0 0-2.82 0L6 21'/>`,eraser:`<path d='m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21M22 21H7M5 11l9 9'/>`,pip:`<path d='m2 22 1-1h3l9-9M3 21v-3l9-9M15 6l3.4-3.4a2.1 2.1 0 1 1 3 3L18 9l.4.4a2.1 2.1 0 1 1-3 3l-3.8-3.8a2.1 2.1 0 1 1 3-3l.4.4Z'/>`,plus:`<path d='M5 12h14M12 5v14'/>`,quote:`<path d='M16 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z'/><path d='M5 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z'/>`,link:`<path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'/>`,unlink:`<path d='m18.84 12.25 1.72-1.71a5 5 0 0 0-7.07-7.07l-1.72 1.71M5.17 11.75l-1.71 1.71a5 5 0 0 0 7.07 7.07l1.71-1.71M8 2v3M2 8h3M16 22v-3M22 16h-3'/>`};
-ICO.link2=`<path d='M8 12h8M12 8v8'/>`;ICO.x=ICO.x||`<path d='M6 6l12 12M18 6 6 18'/>`;ICO.hrq=`<path d='M3 12h3.5M10.25 12h3.5M17.5 12H21'/>`;ICO.pin=`<path d='M12 17v5M9 10.76V4h6v6.76l2 3.24H7l2-3.24Z'/>`;ICO.grip=`<path d='M9 5h.01M9 12h.01M9 19h.01M15 5h.01M15 12h.01M15 19h.01'/>`;ICO.swap=`<path d='M8 3 4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4'/>`;ICO.spell=`<path d='m6 16 6-12 6 12M8 12h8'/><path d='m16 20 2 2 4-4'/>`;
+ICO.back=`<path d='M15 6l-6 6 6 6'/>`;ICO.arr=`<path d='M5 12h14M13 6l6 6-6 6'/>`;ICO.link2=`<path d='M8 12h8M12 8v8'/>`;ICO.x=ICO.x||`<path d='M6 6l12 12M18 6 6 18'/>`;ICO.hrq=`<path d='M3 12h3.5M10.25 12h3.5M17.5 12H21'/>`;ICO.pin=`<path d='M12 17v5M9 10.76V4h6v6.76l2 3.24H7l2-3.24Z'/>`;ICO.grip=`<path d='M9 5h.01M9 12h.01M9 19h.01M15 5h.01M15 12h.01M15 19h.01'/>`;ICO.swap=`<path d='M8 3 4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4'/>`;ICO.spell=`<path d='m6 16 6-12 6 12M8 12h8'/><path d='m16 20 2 2 4-4'/>`;
 const TB2=[['굵게','bold','','bold'],['기울임','italic','','italic'],['밑줄','underline','','underline'],['취소선','strikeThrough','','strike'],['소제목','formatBlock','H2','h2'],['본문','formatBlock','P','p'],['왼쪽 정렬','justifyLeft','','left'],['가운데 정렬','justifyCenter','','center'],['오른쪽 정렬','justifyRight','','right'],['양쪽 정렬','justifyFull','','full'],['점 목록','insertUnorderedList','','ul'],['숫자 목록','insertOrderedList','','ol'],['장면 구분','insertHorizontalRule','','hr']];
 function HRQ(){const e=$('#ed');if(!e)return;e.focus();if(sr){const s=getSelection();s.removeAllRanges();s.addRange(sr)}
  document.execCommand('insertHTML',false,'<hr class="q"><p><br></p>');dr()}
@@ -939,7 +959,7 @@ function wfInit(){let o={};try{o=JSON.parse(localStorage.getItem('cn-fold')||'{}
   lg.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();wfTog(lg)}})})}
 const ib=(t,on,svg)=>`<button type="button" class="ic" title="${t}" aria-label="${t}" onclick="${on}">${svg}</button>`;
 const tb1=b=>b[3]==='hr'?ib('장면 구분선 (독자에게 보여요)',`fmt('insertHorizontalRule','')`,SV(ICO.hr))+ib('숨은 장면 구분 (BGM만 바뀌고 독자에게 안 보여요)',`HRQ()`,SV(ICO.hrq)):ib(b[0],`fmt('${b[1]}','${b[2]}')`,SV(ICO[b[3]]));
-function tbar(){return TB2.slice(0,6).map(tb1).join('')+ib('인용',`pnl('qp')`,SV(ICO.quote))+ib('링크 넣기',`pnl('lb');if(!$('#lb').hidden)$('#lu').focus()`,SV(ICO.link))+ib('링크 해제',`fmt('unlink')`,SV(ICO.unlink))+ib('맞춤법 검사',`spc()`,SV(ICO.spell))+TB2.slice(6).map(tb1).join('')+ib('되돌리기',`fmt('undo')`,UNDO)+ib('다시 실행',`fmt('redo')`,REDO)+`<span class="sw">${COL.map(c=>`<button type="button" class="dot" title="글자색" aria-label="글자색 ${c}" style="background:${c}" onclick="clr('${c}')"></button>`).join('')}<input type="color" id="cc" value="#2471a3" title="글자색 직접 선택" aria-label="글자색 직접 선택" onchange="clr(this.value)">${ib('고른 색을 저장',`svc($('#cc').value)`,SV(ICO.plus))}${window.EyeDropper?ib('스포이드로 화면에서 색 고르기',`eye()`,SV(ICO.pip)):''}</span><span class="sw" id="sc"></span><button type="button" class="fs tbb" onclick="fxOpen()">효과</button><button type="button" class="fs tbb" onclick="szOpen()">크기</button><select class="fs" aria-label="글꼴" onchange="fnt(this.value);this.selectedIndex=0"><option value="">글꼴</option>${FONTS.map(f=>`<option value="${f[1]}">${f[0]}</option>`).join('')}</select>`+ib('삽화 넣기',`$('#if').click()`,SV(ICO.img))+ib('서식 지우기',`fmt('removeFormat')`,SV(ICO.eraser))+`<span class="sw ctb" id="ctb"></span><input type="file" id="if" accept="image/*" onchange="pickI(this)">`}
+function tbar(){return TB2.slice(0,6).map(tb1).join('')+ib('인용',`pnl('qp')`,SV(ICO.quote))+ib('링크 넣기',`pnl('lb');if(!$('#lb').hidden)$('#lu').focus()`,SV(ICO.link))+ib('링크 해제',`fmt('unlink')`,SV(ICO.unlink))+ib('맞춤법 검사',`spc()`,SV(ICO.spell))+TB2.slice(6).map(tb1).join('')+ib('되돌리기',`fmt('undo')`,UNDO)+ib('다시 실행',`fmt('redo')`,REDO)+`<span class="sw">${COL.map(c=>`<button type="button" class="dot" title="글자색" aria-label="글자색 ${c}" style="background:${c}" onclick="clr('${c}')"></button>`).join('')}<input type="color" id="cc" value="#2471a3" title="글자색 직접 선택" aria-label="글자색 직접 선택" oninput="hexOut('cc','cch')" onchange="clr(this.value)"><input class="hxi" id="cch" value="#2471a3" maxlength="7" spellcheck="false" title="색상 코드" aria-label="색상 코드" placeholder="#2471a3" oninput="hexIn('cc','cch')" onchange="hexIn('cc','cch',()=>clr($('#cc').value))" onkeydown="if(event.key==='Enter'){event.preventDefault();hexIn('cc','cch',()=>clr($('#cc').value))}">${ib('고른 색을 저장',`svc($('#cc').value)`,SV(ICO.plus))}${window.EyeDropper?ib('스포이드로 화면에서 색 고르기',`eye()`,SV(ICO.pip)):''}</span><span class="sw" id="sc"></span><button type="button" class="fs tbb" onclick="rpOpen()">바꾸기</button><button type="button" class="fs tbb" onclick="fxOpen()">효과</button><button type="button" class="fs tbb" onclick="szOpen()">크기</button><select class="fs" aria-label="글꼴" onchange="fnt(this.value);this.selectedIndex=0"><option value="">글꼴</option>${FONTS.map(f=>`<option value="${f[1]}">${f[0]}</option>`).join('')}</select>`+ib('삽화 넣기',`$('#if').click()`,SV(ICO.img))+ib('서식 지우기',`fmt('removeFormat')`,SV(ICO.eraser))+`<span class="sw ctb" id="ctb"></span><input type="file" id="if" accept="image/*" onchange="pickI(this)">`}
 function svc(c){c=String(c).toLowerCase();if(!/^#[0-9a-f]{6}$/.test(c))return;db.colors=[c,...(db.colors||[]).filter(x=>x!==c)].slice(0,12);save();rsw()}
 function rsw(){const e=$('#sc');if(e)e.innerHTML=(db.colors||[]).map((c,i)=>/^#[0-9a-f]{6}$/.test(c)?`<button type="button" class="dot" title="저장한 색 (클릭: 적용, 우클릭 또는 길게 누르기: 삭제)" aria-label="저장한 색 ${c}" style="background:${c}" onclick="clr('${c}')" oncontextmenu="dc(${i});return false"></button>`:'').join('')}
 function dc(i){db.colors.splice(i,1);save();rsw()}
@@ -949,6 +969,51 @@ function panel(id,title,body){pClose();const o=document.createElement('div');o.c
  o.addEventListener('click',e=>{if(e.target===o)pClose()});
  document.body.appendChild(o);return o}
 function pClose(){document.querySelectorAll('.ov.pov').forEach(x=>x.remove());const o=$('#fxo')||$('#szo');if(o)o.remove()}
+let rpBack=null;
+const rpFind=q=>{const c=db.chars.filter(x=>x.owner===ME||(x.share||[]).includes(ME)).concat(db.chars);
+ const n=q.trim();let hit=c.find(x=>x.name===n);if(hit)return{c:hit,k:'full',t:hit.name};
+ for(const x of c){const p=cparts(x);if(p.first&&p.first===n&&p.first!==x.name)return{c:x,k:'first',t:p.first};
+  if(p.last&&p.last===n&&p.last!==x.name)return{c:x,k:'last',t:p.last}}
+ return null};
+const HEX=/^#?([0-9a-f]{3}|[0-9a-f]{6})$/i;
+const hex6=v=>{const m=HEX.exec(String(v||'').trim());if(!m)return '';const h=m[1];
+ return '#'+(h.length===3?h.split('').map(c=>c+c).join(''):h).toLowerCase()};
+function hexIn(from,to,after){const a=$('#'+from),b=$('#'+to);if(!a||!b)return;
+ const h=hex6(b.value);if(!h){b.classList.add('bad');return}
+ b.classList.remove('bad');b.value=h;a.value=h;if(after)after()}
+function hexOut(from,to){const a=$('#'+from),b=$('#'+to);if(a&&b){b.value=a.value;b.classList.remove('bad')}}
+function rpOpen(){const e=$('#ed');if(!e)return;
+ const o=panel('rpo','단어 한꺼번에 바꾸기',`<p class="mu" style="margin:0 0 12px">본문에 있는 같은 말을 모두 찾아 바꿔요. 바꿀 말 앞에 <b>@</b>를 붙이고 캐릭터 이름을 적으면 등장인물 표시로 바뀌어요.</p>
+ <label>찾을 말<input id="rpf" maxlength="60" placeholder="푸여"></label>
+ <label>바꿀 말<input id="rpt" maxlength="60" placeholder="여우  또는  @여우"></label>
+ <p class="mu" id="rps" style="margin:4px 0 0"></p>
+ <div class="acts"><button class="btn ghost" id="rpu" onclick="rpUndo()" ${rpBack?'':'disabled'}>방금 바꾼 것 되돌리기</button><button class="btn" onclick="rpGo()">모두 바꾸기</button></div>`);
+ o.classList.add('pov');setTimeout(()=>{const f=$('#rpf');if(f)f.focus()},0)}
+function rpGo(){const ed=$('#ed'),f=$('#rpf').value,to=$('#rpt').value;
+ if(!ed||!f){toast('찾을 말을 적어 주세요');return}
+ if(f===to){toast('찾을 말과 바꿀 말이 같아요');return}
+ const at=to.trim().slice(0,1)==='@'?rpFind(to.trim().slice(1)):null;
+ if(to.trim().slice(0,1)==='@'&&!at){toast('그런 이름의 캐릭터를 찾지 못했어요');return}
+ const prev=ed.innerHTML;
+ const W=document.createTreeWalker(ed,NodeFilter.SHOW_TEXT,null),T=[];
+ while(W.nextNode()){const n=W.currentNode;
+  if(n.parentElement&&n.parentElement.closest('.nt'))continue;
+  if(n.nodeValue&&n.nodeValue.indexOf(f)>=0)T.push(n)}
+ let cnt=0;
+ T.forEach(n=>{const parts=n.nodeValue.split(f);if(parts.length<2)return;
+  const frag=document.createDocumentFragment();
+  parts.forEach((seg,i)=>{if(i){cnt++;
+    if(at){const sp=document.createElement('span');sp.className='nt';sp.dataset.c=at.c.id;sp.dataset.k=at.k;
+     sp.setAttribute('contenteditable','false');sp.textContent=at.t;frag.appendChild(sp);
+     frag.appendChild(document.createTextNode('\u200b'))}
+    else if(to)frag.appendChild(document.createTextNode(to))}
+   if(seg)frag.appendChild(document.createTextNode(seg))});
+  n.parentNode.replaceChild(frag,n)});
+ if(!cnt){const st=$('#rps');if(st)st.textContent='‘'+f+'’을(를) 찾지 못했어요.';return}
+ rpBack=prev;ntfix();dr();pClose();
+ toast(cnt+'곳을 바꿨어요'+(at?' (등장인물 표시로)':''))}
+function rpUndo(){const ed=$('#ed');if(!ed||rpBack===null)return;
+ ed.innerHTML=rpBack;rpBack=null;ntfix();dr();pClose();toast('되돌렸어요')}
 function szOpen(){const e=$('#ed');if(!e)return;
  const o=panel('szo','글자 크기',`<p class="mu" style="margin:0 0 12px">드래그한 글자의 크기를 바꿔요. 100%가 보통 크기예요.</p>
  <div class="szr"><input type="range" id="szv" min="50" max="300" step="5" value="120" oninput="szUI()"><input type="number" id="szn" min="50" max="300" step="5" value="120" oninput="szUI(1)"><span>%</span></div>
@@ -1051,24 +1116,36 @@ const castL=s=>sCast(s).cast.map(id=>db.chars.find(c=>c.id===id)).filter(Boolean
 let relE=null;
 const relN=k=>k.slice(0,2)==='g:'?k.slice(2):((chById(k)||{}).name||'');
 const relHas=(e,id)=>!!(e&&e.rel&&e.rel[id]&&Object.keys(e.rel[id]).some(k=>{const v=e.rel[id][k];return v&&(v.e||v.r||v.q||v.d)}));
-function relOpen(id){const e=relE;if(!e)return;const c=chById(id);if(!c){location.hash='char-'+id;return}
+function relOpen(id,sid,eid){let e=relE;
+ if(sid){const s=find(sid);e=s&&s.eps.find(x=>x.id===eid)}
+ if(!e)return;const c=chById(id);if(!c){location.hash='char-'+id;return}
  const m=(e.rel||{})[id]||{},K=Object.keys(m).filter(k=>m[k]&&(m[k].e||m[k].r||m[k].q||m[k].d));
- const rows=K.map(k=>{const v=m[k];return `<div class="rlr"><b>${esc(relN(k)||'?')}</b><p class="rlt">${v.r?`<span class="rlb">${esc(v.r)}</span>`:''}${v.e?`<span class="rlb em">${esc(v.e)}</span>`:''}</p>${v.q?`<p class="rlq">“${esc(v.q)}”</p>`:''}${v.d?`<p class="rld">${esc(v.d)}</p>`:''}</div>`}).join('');
+ const face=k=>{const x=chById(k);return x?av(x.img,x.name):`<span class="av">${esc((relN(k)||'?').slice(0,1))}</span>`};
+ const rows=K.map(k=>{const v=m[k],ems=(v.e||'').split(/[,·]/).map(x=>x.trim()).filter(Boolean);
+  return `<div class="rlr">
+   <div class="rla">
+    <div class="rlf">${ems.length?ems.map(x=>`<span class="rlb em">${esc(x)}</span>`).join(''):'<span class="rlb em dim">—</span>'}</div>
+    <span class="rlar" aria-hidden="true">${SV(ICO.arr)}</span>
+    <div class="rlto">${face(k)}<div style="min-width:0"><b>${esc(relN(k)||'?')}</b>${v.r?`<p class="rlrel">${esc(v.r)}</p>`:''}</div></div>
+   </div>
+   ${v.q?`<p class="rlq" style="${chSay(c.id)}">“${esc(v.q)}”</p>`:''}${v.d?`<p class="rld">${esc(v.d)}</p>`:''}</div>`}).join('');
  const o=document.createElement('div');o.className='ov rlo';o.id='rlo';
- o.innerHTML=`<div class="rlw"><div class="rlh">${av(c.img,c.name)}<div style="flex:1;min-width:0"><b style="${chStyle(c.id)}">${esc(c.name)}</b><p class="mu" style="margin:2px 0 0">이 회차에서의 인물 관계</p></div><button class="ic" aria-label="닫기" onclick="relClose()">${SV(ICO.x)}</button></div>
+ o.innerHTML=`<div class="rlw"><div class="rlh">${av(c.img,c.name)}<div style="flex:1;min-width:0"><b style="${chStyle(c.id)}">${esc(c.name)}</b><p class="mu" style="margin:2px 0 0">${esc(e.title)}에서의 인물 관계</p></div><button class="ic" aria-label="닫기" onclick="relClose()">${SV(ICO.x)}</button></div>
+ ${K.length?`<p class="mu rlgd">${esc(c.name)}이(가) 이 인물들을 어떻게 여기는지예요.</p>`:''}
  ${rows||'<p class="mu">이 회차에 적힌 관계가 없어요.</p>'}<div class="acts" style="margin-top:16px"><a class="btn ghost" href="#char-${c.id}" onclick="relClose()">캐릭터 자세히 보기</a></div></div>`;
  o.addEventListener('click',ev=>{if(ev.target===o)relClose()});
  document.body.appendChild(o);document.body.classList.add('noscroll')}
 function relClose(){const o=$('#rlo');if(o)o.remove();document.body.classList.remove('noscroll')}
-const ccOne=(c,lk,pv,sub)=>{const cl=`cc${c.id===pv?' pov':''}${sub?' sub':''}`,tt=c.id===pv?'시점 인물':(c.quote?`“${c.quote}”`:'');
- if(lk===2)return `<span class="${cl} rel" role="link" tabindex="0" title="${esc(relHas(relE,c.id)?c.name+'의 인물 관계 보기':(tt||c.name))}" onclick="relOpen('${c.id}')" onkeydown="if(event.key==='Enter')relOpen('${c.id}')">${av(c.img,c.name)}<span>${esc(c.name)}</span>${relHas(relE,c.id)?SV(ICO.link2):''}</span>`;
+const ccOne=(c,lk,pv,sub,ctx)=>{const cl=`cc${c.id===pv?' pov':''}${sub?' sub':''}`,tt=c.id===pv?'시점 인물':(c.quote?`“${c.quote}”`:'');
+ if(lk===2||lk===3){const ep=lk===3?(ctx&&ctx.e):relE;const arg=lk===3?`'${c.id}','${ctx&&ctx.s}','${ctx&&ctx.e&&ctx.e.id}'`:`'${c.id}'`;
+  return `<span class="${cl} rel" role="link" tabindex="0" title="${esc(relHas(ep,c.id)?c.name+'의 인물 관계 보기':(tt||c.name))}" onclick="relOpen(${arg})" onkeydown="if(event.key==='Enter')relOpen(${arg})">${av(c.img,c.name)}<span>${esc(c.name)}</span>${relHas(ep,c.id)?SV(ICO.link2):''}</span>`}
  return lk===1?`<a class="${cl}" href="#char-${c.id}"${tt?` title="${esc(tt)}"`:''}>${av(c.img,c.name)}<span>${esc(c.name)}</span></a>`
  :`<span class="${cl}" role="link" tabindex="0"${tt?` title="${esc(tt)}"`:''} onclick="event.preventDefault();event.stopPropagation();location.hash='char-${c.id}'" onkeydown="if(event.key==='Enter')location.hash='char-${c.id}'">${av(c.img,c.name)}<span>${esc(c.name)}</span></span>`};
-const casts=(o,lk,lb,pv)=>{const ids=o.cast||[],lead=o.leads||[],G=(o.guests||[]).filter(Boolean);
+const casts=(o,lk,lb,pv,sid)=>{const ids=o.cast||[],lead=o.leads||[],G=(o.guests||[]).filter(Boolean),ctx=sid?{s:sid,e:o}:null;
  const cs=ids.map(id=>db.chars.find(c=>c.id===id)).filter(Boolean);
  const A=cs.filter(c=>lead.includes(c.id)),B=cs.filter(c=>!lead.includes(c.id));
  if(!cs.length&&!G.length)return '';
- const grp=(L,sub)=>L.map(c=>ccOne(c,lk,pv,sub)).join('');
+ const grp=(L,sub)=>L.map(c=>ccOne(c,lk,pv,sub,ctx)).join('');
  return `<div class="casts">${lb?'<span class="mu">등장인물</span>':''}${A.length&&(B.length||G.length)?'<span class="mu sl">주요</span>':''}${grp(A,0)}${(B.length||G.length)&&A.length?'<span class="mu sl">서브</span>':''}${grp(B,1)}${G.map(n=>`<span class="cc sub gst">${esc(n)}</span>`).join('')}</div>`};
 const cast=s=>casts(sCast(s),1,1);
 const castTxt=s=>casts(sCast(s),0,1);
@@ -1114,6 +1191,8 @@ function pickA(i){const f=i.files[0];i.value='';if(f)crOpen(f,1,320,1,'프로필
 const myChars=()=>db.chars.filter(c=>c.owner===ME||(c.share||[]).includes(ME));
 const chById=id=>db.chars.find(c=>c.id===id);
 const chStyle=id=>{const c=chById(id);return c&&c.color?cvar(c.color):''};
+const chSay=id=>{const c=chById(id);if(!c)return '';
+ return (c.color?cvar(c.color):'')+(c.font&&FONTS.some(f=>f[1]===c.font)?`font-family:'${c.font}',serif;${fsCss(c.font)}`:'')};
 const crow=(c,mine)=>`<div class="row" style="align-items:center">${av(c.img,c.name)}<div style="flex:1;min-width:0"><h3 style="${chStyle(c.id)}">${esc(c.name)}</h3><p class="mu mrow">${uchip(c.owner,'sm')}<span>의 캐릭터${(c.share||[]).length?' · 공유 '+(c.share||[]).map(u=>esc(pn(u))).join(', '):''}</span></p>${c.quote?`<p class="cq sm" style="${c.font?`font-family:'${esc(c.font)}',serif;${fsCss(c.font)}`:''}${cvar(c.tcolor)}">“${esc(c.quote)}”</p>`:''}<div class="acts" style="margin-top:8px"><a class="btn ghost" href="#char-${c.id}">자세히</a>${mine?`<button class="btn ghost" onclick="ced('${c.id}')">수정</button><button class="btn ghost" onclick="cdl('${c.id}')">삭제</button>`:(isAdm?`<button class="btn ghost" onclick="admDelC('${c.id}')">삭제(관리자)</button>`:'')}</div></div></div>`;
 function vChars(){const my=db.chars.filter(c=>c.owner===ME),sh=db.chars.filter(c=>c.owner!==ME&&(c.share||[]).includes(ME)),ot=db.chars.filter(c=>c.owner!==ME&&!(c.share||[]).includes(ME));
 const uOpts=Object.keys(PN).filter(u=>u!==ME);
@@ -1125,8 +1204,8 @@ ${sh.length?`<h2 class="h2" style="margin-top:28px">나에게 공유된 캐릭�
 <h2 class="h2" style="margin-top:32px">${ed?'캐릭터 수정':'새 캐릭터'}</h2><div class="box">
 <label>이름<input id="cn" maxlength="20" oninput="cpv()"></label>
 <label>콜라주 위키 링크 <span class="mu">캐릭터 소개가 적혀 있는 콜라주 위키 주소 (선택)</span><input id="ci" maxlength="300" placeholder="https://"></label>
-<div class="two"><label>퍼스널 색상 <span class="mu">이름에 쓰여요</span><span class="cpk"><input type="color" id="ccl" value="${esc((ed&&ed.color)||'#7f8c8d')}" oninput="cpv()"><button type="button" class="lk" onclick="$('#ccl').value='#7f8c8d';cpv()">기본으로</button></span></label>
-<label>대사 글자색<span class="cpk"><input type="color" id="ctc" value="${esc((ed&&ed.tcolor)||'#7f8c8d')}" oninput="cpv()"><button type="button" class="lk" onclick="$('#ctc').value='#7f8c8d';cpv()">기본으로</button></span></label></div>
+<div class="two"><label>퍼스널 색상 <span class="mu">이름에 쓰여요</span><span class="cpk"><input type="color" id="ccl" value="${esc((ed&&ed.color)||'#7f8c8d')}" oninput="hexOut('ccl','cclh');cpv()"><input class="hxi" id="cclh" value="${esc((ed&&ed.color)||'#7f8c8d')}" maxlength="7" spellcheck="false" aria-label="퍼스널 색상 코드" placeholder="#7f8c8d" oninput="hexIn('ccl','cclh',cpv)"><button type="button" class="lk" onclick="$('#ccl').value='#7f8c8d';hexOut('ccl','cclh');cpv()">기본으로</button></span></label>
+<label>대사 글자색<span class="cpk"><input type="color" id="ctc" value="${esc((ed&&ed.tcolor)||'#7f8c8d')}" oninput="hexOut('ctc','ctch');cpv()"><input class="hxi" id="ctch" value="${esc((ed&&ed.tcolor)||'#7f8c8d')}" maxlength="7" spellcheck="false" aria-label="대사 글자색 코드" placeholder="#7f8c8d" oninput="hexIn('ctc','ctch',cpv)"><button type="button" class="lk" onclick="$('#ctc').value='#7f8c8d';hexOut('ctc','ctch');cpv()">기본으로</button></span></label></div>
 <label>대사 글꼴<select id="cft" onchange="cpv()"><option value="">기본</option>${FONTS.map(f=>`<option value="${f[1]}"${ed&&ed.font===f[1]?' selected':''}>${f[0]}</option>`).join('')}</select></label>
 <label>대표 대사 <span class="mu">캐릭터 페이지와 미리보기에 이 말이 쓰여요</span><input id="cqt" maxlength="60" value="${esc((ed&&ed.quote)||'')}" placeholder="${esc(PVS)}" oninput="cpv()"></label>
 <div class="pvx"><span class="mu">미리보기 <span style="opacity:.8">화면 테마에 맞춰 색이 자동으로 조정돼요</span></span><div class="two"><div class="pvsw lt"><span class="lb">밝은 화면</span><p id="cpv1"></p></div><div class="pvsw dk"><span class="lb">어두운 화면</span><p id="cpv2"></p></div></div></div>
@@ -1567,7 +1646,7 @@ async function verGet(){try{const r=await fetch(location.pathname+'?v='+Date.now
  return r.headers.get('etag')||r.headers.get('last-modified')||null}catch(e){return null}}
 async function verInit(){verTag=await verGet();setInterval(verCheck,180000);addEventListener('focus',verCheck)}
 async function verCheck(){if(verOn||!verTag||document.hidden)return;const v=await verGet();if(!v||v===verTag)return;verOn=true;verShow()}
-const VER='1.21';
+const VER='1.22';
 function verUI(){const f=$('#vr');if(f)f.innerHTML=`콜라주 노블 <b>v${VER}</b> · <a href="#notices">패치노트</a>`}
 function verShow(){if($('#upb'))return;const d=document.createElement('div');d.className='upb';d.id='upb';
  d.innerHTML=`<span>사이트가 새로 바뀌었어요(v${VER} 이후). 새로고침하면 바뀐 내용이 보여요.</span><button type="button" class="go" onclick="location.reload()">새로고침</button><button type="button" onclick="this.parentNode.remove()">나중에</button>`;
