@@ -1523,13 +1523,25 @@ function actTxt(){const p=(location.hash.slice(1)||'home').split('-'),s=p[1]&&fi
 function onJoin(){if(!sb||!ME||ch)return;try{onp=localStorage.getItem('cn-side')!=='0'&&innerWidth>=900}catch(e){onp=innerWidth>=900}
 
  try{ch=sb.channel('site',{config:{presence:{key:ME}}});
-  ch.on('presence',{event:'sync'},()=>{onl=ch.presenceState()||{};onlUI()})
-    .subscribe(st=>{if(st==='SUBSCRIBED')onTrack()})}catch(e){console.error(e);ch=null}}
-function onTrack(){if(!ch)return;const hide=db.set.hide===true;
- try{ch.track(hide?{name:pn(ME),act:actTxt(),at:Date.now(),hid:1}:{name:pn(ME),act:actTxt(),at:Date.now()})}catch(e){}}
-function onLeave(){onl={};const s=$('#side');if(s){s.hidden=true}document.body.classList.remove('sideon');const b=$('#onl');if(b)b.hidden=true;if(!ch)return;try{ch.unsubscribe()}catch(e){}ch=null}
-function onList(){const L=[];Object.keys(onl).forEach(k=>{const v=(onl[k]||[])[0];if(!v||!v.name)return;
- if(v.hid&&!isAdm)return;L.push({id:k,name:v.name,act:v.act||'',hid:v.hid?1:0})});
+  ch.on('presence',{event:'sync'},()=>{onl=ch.presenceState()||{};onSync();onlUI()})
+    .subscribe(st=>{if(st==='SUBSCRIBED'){lastTrk='';onTrack()}})}catch(e){console.error(e);ch=null}
+ clearInterval(onHb);onHb=setInterval(()=>{if(ch){lastTrk='';onTrack()}},90000)}
+const GRACE=25000;let onSeen={},onTi=0,onHb=0,lastTrk='';
+function onSync(){const now=Date.now();
+ Object.keys(onl||{}).forEach(k=>{const v=(onl[k]||[])[0];if(v&&v.name)onSeen[k]={v,t:now}});
+ Object.keys(onSeen).forEach(k=>{if(now-onSeen[k].t>GRACE*2)delete onSeen[k]});
+ clearTimeout(onTi);
+ const soon=Object.keys(onSeen).filter(k=>!(onl&&onl[k])).map(k=>GRACE-(now-onSeen[k].t)).filter(x=>x>0);
+ if(soon.length)onTi=setTimeout(onlUI,Math.min(...soon)+200)}
+function onTrack(){if(!ch)return;const hide=db.set.hide===true,a=actTxt(),n=pn(ME);
+ const sig=n+'|'+a+'|'+(hide?1:0);if(sig===lastTrk)return;lastTrk=sig;
+ try{ch.track(hide?{name:n,act:a,at:Date.now(),hid:1}:{name:n,act:a,at:Date.now()})}catch(e){}}
+function onLeave(){onl={};onSeen={};lastTrk='';clearTimeout(onTi);clearInterval(onHb);const s=$('#side');if(s){s.hidden=true}document.body.classList.remove('sideon');const b=$('#onl');if(b)b.hidden=true;if(!ch)return;try{ch.unsubscribe()}catch(e){}ch=null}
+function onList(){const L=[],now=Date.now(),seen=new Set();
+ const put=(k,v)=>{if(!v||!v.name||seen.has(k))return;seen.add(k);
+  if(v.hid&&!isAdm)return;L.push({id:k,name:v.name,act:v.act||'',hid:v.hid?1:0})};
+ Object.keys(onl||{}).forEach(k=>put(k,(onl[k]||[])[0]));
+ Object.keys(onSeen).forEach(k=>{if(now-onSeen[k].t<GRACE)put(k,onSeen[k].v)});
  return L.sort((a,b)=>a.id===ME?-1:b.id===ME?1:a.name.localeCompare(b.name,'ko'))}
 const uPic=id=>{const p=PR[id];if(p&&IMG.test(p.img||''))return p.img;const c=db.chars.filter(x=>x.owner===id&&IMG.test(x.img||''))[0];return c?c.img:''};
 const onRow=(id,name,act,off,hid)=>{const p=uPic(id);
