@@ -47,6 +47,10 @@ h1,h2,h3{font-family:"Noto Serif KR",serif;line-height:1.35;margin:0}
 .ordh .grip{display:inline-flex;color:var(--mute)}
 .ordh .ebtn{padding:2px 8px}
 .ordh .ebtn[disabled]{opacity:.3;cursor:default}
+.stbar{height:12px;border-radius:999px;background:var(--line);overflow:hidden}
+.stbar i{display:block;height:100%;background:var(--ac)}
+.stt div{display:flex;gap:10px;align-items:baseline;padding:6px 0;border-bottom:1px solid var(--line);font-size:14px}
+.stt div span:nth-child(2){flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cnl{text-decoration:none}
 .cnl:hover b{text-decoration:underline}
 .uc{display:inline-flex;align-items:center;gap:6px;max-width:100%;padding:2px 11px 2px 2px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font-size:13px;line-height:1.5;cursor:pointer;vertical-align:middle;transition:border-color .12s,background .12s}
@@ -319,6 +323,8 @@ body.sideon{padding-right:248px}
 .bd p,.bd div{margin:0 0 1em}
 .bd h2{font-size:1.2em;margin:1.6em 0 .8em}
 .pn{display:flex;justify-content:space-between;align-items:center;max-width:680px;margin:20px auto 0}
+footer #vr{font-size:13px;color:var(--mute)}
+footer #vr a{color:inherit;text-decoration:underline}
 footer{max-width:760px;margin:0 auto;padding:0 20px 36px;font-size:13px;color:var(--mute)}
 .lk{font:inherit;font-size:13px;color:var(--ac);background:none;border:0;padding:0;text-decoration:underline;cursor:pointer}
 #toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:6px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s}
@@ -330,7 +336,7 @@ footer{max-width:760px;margin:0 auto;padding:0 20px 36px;font-size:13px;color:va
 <header><div class="hd"><a class="logo" href="#home">콜라주 노블</a><button type="button" class="onl" id="onl" hidden onclick="pvToggle()"></button><nav><a href="#home">작품</a><a href="#mine">내 작품</a><a href="#chars">캐릭터</a><a href="#music">음원</a><a href="#notices">공지</a><a href="#settings">설정</a><a class="bell" href="#alerts" id="bl" aria-label="알림"></a><span class="hbt"><a class="btn ghost" href="#new">작품 만들기</a><a class="btn" href="#write">글쓰기</a></span></nav></div></header>
 <main id="app"></main>
 <aside class="side" id="side" hidden><div class="sdh"><b id="sdc">온라인</b><button type="button" class="sdx" onclick="sideSet(0)" aria-label="접기">✕</button></div><div id="sdl"></div></aside>
-<footer></footer>
+<footer><span id="vr"></span></footer>
 <div id="toast" role="status"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"></script>
 <script>
@@ -497,7 +503,31 @@ async function pfSave(){const n=$('#nk').value.trim().slice(0,20);if(!n){toast('
  adm(async()=>{if(pfData&&pfData.startsWith('data:')){const u=await upImg(pfData);row.avatar_path=pthI(u)}
   await ok(sb.from('profiles').update(row).eq('id',UID));pfData=''},'프로필을 저장했어요')}
 let pfData='';
-function vSet(){vSet0();$('.wrap').insertAdjacentHTML('beforeend',`<h2 class="h2" style="margin-top:36px">내 프로필</h2><label>닉네임<input id="nk" maxlength="20" value="${esc(pn(ME))}"></label>
+const STLIM=1024;
+async function stList(b){const out=[];let off=0;
+ for(;;){const r=await sb.storage.from(b).list('',{limit:100,offset:off});if(r.error)throw r.error;
+  const L=r.data||[];
+  for(const d of L){if(d.id){out.push({n:d.name,sz:(d.metadata&&d.metadata.size)||0});continue}
+   let o2=0;for(;;){const f=await sb.storage.from(b).list(d.name,{limit:100,offset:o2});if(f.error)throw f.error;
+    const F=f.data||[];F.forEach(x=>{if(x.id)out.push({n:d.name+'/'+x.name,sz:(x.metadata&&x.metadata.size)||0})});
+    if(F.length<100)break;o2+=100}}
+  if(L.length<100)break;off+=100}
+ return out}
+async function stUse(){const b=$('#stb');if(b)b.disabled=true;
+ const box=$('#stx');if(box)box.innerHTML='<p class="mu">세어 보는 중이에요…</p>';
+ try{const [im,au]=await Promise.all([stList('images'),stList('audio')]);
+  const sum=L=>L.reduce((a,x)=>a+x.sz,0),si=sum(im),sa=sum(au),tot=si+sa;
+  const pct=Math.min(100,tot/(STLIM*1048576)*100);
+  const top=[...im.map(x=>({...x,b:'이미지'})),...au.map(x=>({...x,b:'음원'}))].sort((a,c)=>c.sz-a.sz).slice(0,10);
+  box.innerHTML=`<div class="stbar"><i style="width:${pct.toFixed(1)}%"></i></div>
+  <p class="mu" style="margin:8px 0 0">${MB(tot)} / ${STLIM}MB 사용 중 (${pct.toFixed(1)}%) · 파일 ${im.length+au.length}개</p>
+  <p class="mu" style="margin:4px 0 0">이미지 ${MB(si)} (${im.length}개) · 음원 ${MB(sa)} (${au.length}개)</p>
+  ${isAdm?'':'<p class="mu" style="margin:4px 0 0">내가 올린 파일만 세어요.</p>'}
+  ${top.length?`<h3 style="font-size:15px;margin:18px 0 6px">큰 파일부터</h3><div class="stt">${top.map(x=>`<div><span>${esc(x.b)}</span><span class="mu">${esc(x.n.split('/').pop())}</span><b>${MB(x.sz)}</b></div>`).join('')}</div>`:''}`}
+ catch(e){console.error(e);box.innerHTML='<p class="mu">사용량을 읽지 못했어요. 설정(SQL) 업데이트가 아직이라면 먼저 적용해 주세요.</p>'}
+ finally{const b2=$('#stb');if(b2)b2.disabled=false}}
+function vSet(){vSet0();$('.wrap').insertAdjacentHTML('beforeend',`<h2 class="h2" style="margin-top:36px">저장 공간</h2><p class="mu">올린 이미지와 음원이 차지하는 용량이에요. 무료 플랜은 1GB(${STLIM}MB)까지 쓸 수 있어요.</p><div class="acts"><button class="btn ghost" id="stb" onclick="stUse()">사용량 확인</button></div><div id="stx" style="margin-top:12px"></div>
+<h2 class="h2" style="margin-top:36px">내 프로필</h2><label>닉네임<input id="nk" maxlength="20" value="${esc(pn(ME))}"></label>
 <label>한 줄 소개<input id="pbio" maxlength="100" value="${esc((PR[ME]||{}).bio||'')}" placeholder="예: 느린 연재, 해피엔딩 보장"></label>
 <label>링크 <span class="mu">블로그나 콜라주 위키 주소 (선택)</span><input id="plk" maxlength="300" value="${esc((PR[ME]||{}).link||'')}" placeholder="https://"></label>
 <label>프로필 사진<input type="file" id="paf" accept="image/*" onchange="pickP(this)"></label><div id="pfp"></div>
@@ -1040,8 +1070,63 @@ function bgPlay(){if(!bgCur){bgOn=!bgOn;bgUI();return}if(bgOn){bgOn=false;au.pau
 function bgV(v){db.prefs.vol=+v;au.volume=tvol()}
 function bgSv(){save()}
 addEventListener('scroll',()=>{if(bgCtx)bgScroll()},{passive:true});
-function vMusic(){const my=mytr();app.innerHTML=`<div class="wrap"><h1>내 음원</h1><p class="mu">작품에 쓸 BGM을 여기에 올려 두고, 시리즈 테마곡이나 회차·장면 BGM으로 골라 쓰세요. 음원 1개당 ${MAXA}MB까지 올릴 수 있어요.</p><div class="box" style="margin-top:16px"><label>음원 파일<input type="file" id="af" accept="audio/*"></label><label>곡 이름 <span class="mu">비우면 파일 이름을 써요</span><input id="an" maxlength="40"></label><div class="acts"><button class="btn" onclick="aup()">음원 올리기</button></div></div><div>${my.map(t=>`<div class="row" style="align-items:center"><div style="flex:1;min-width:0"><h3 style="font-size:16px">${esc(t.name)}</h3>${AUD.test(t.src)?`<audio controls preload="none" src="${t.src}" style="width:100%;margin-top:6px"></audio>`:''}</div><button class="btn ghost" onclick="adl('${t.id}')">삭제</button></div>`).join('')||'<p class="mu" style="margin:20px 0">아직 올린 음원이 없습니다.</p>'}</div></div>`}
-function aup(){const f=$('#af').files[0];if(!f){toast('음원 파일을 골라 주세요');return}if(!/^audio\//.test(f.type)){toast('오디오 파일만 올릴 수 있어요');return}if(f.size>MAXA*1048576){toast('파일이 너무 커요. '+MAXA+'MB 이하로 줄여 주세요');return}const r=new FileReader();r.onload=()=>{if(!AUD.test(r.result)){toast('이 형식은 사용할 수 없어요');return}const t={id:uid('t'),owner:ME,name:($('#an').value.trim()||f.name.replace(/\.[^.]+$/,'')).slice(0,40),src:r.result};db.tracks.push(t);if(save()){toast('음원을 올렸습니다');vMusic()}else db.tracks.pop()};r.onerror=()=>toast('파일을 읽을 수 없어요');r.readAsDataURL(f)}
+const MB=n=>(n/1048576).toFixed(n<10485760?2:1)+'MB';
+const LAME='https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js';
+let lameP=null;
+function loadLame(){if(lameP)return lameP;
+ lameP=new Promise((res,rej)=>{if(window.lamejs)return res(window.lamejs);
+  const s=document.createElement('script');s.src=LAME;s.async=true;
+  s.onload=()=>window.lamejs&&window.lamejs.Mp3Encoder?res(window.lamejs):rej(new Error('lamejs 없음'));
+  s.onerror=()=>rej(new Error('불러오기 실패'));document.head.appendChild(s)});
+ return lameP}
+const i16=f=>{const o=new Int16Array(f.length);for(let i=0;i<f.length;i++){const s=Math.max(-1,Math.min(1,f[i]));o[i]=s<0?s*0x8000:s*0x7fff}return o};
+async function encMp3(ab,kb,mono){const L=await loadLame();
+ const ch=mono?1:Math.min(2,ab.numberOfChannels),enc=new L.Mp3Encoder(ch,ab.sampleRate,kb);
+ let l,r=null;
+ if(ch===1&&ab.numberOfChannels>1){const a=ab.getChannelData(0),b=ab.getChannelData(1),m=new Float32Array(a.length);
+  for(let i=0;i<a.length;i++)m[i]=(a[i]+b[i])/2;l=i16(m)}
+ else l=i16(ab.getChannelData(0));
+ if(ch===2)r=i16(ab.getChannelData(1));
+ const out=[],N=1152;
+ for(let i=0;i<l.length;i+=N){const d=ch===2?enc.encodeBuffer(l.subarray(i,i+N),r.subarray(i,i+N)):enc.encodeBuffer(l.subarray(i,i+N));
+  if(d&&d.length)out.push(new Uint8Array(d));
+  if((i/N)%400===399)await new Promise(z=>setTimeout(z))}
+ const end=enc.flush();if(end&&end.length)out.push(new Uint8Array(end));
+ return new Blob(out,{type:'audio/mpeg'})}
+const AKB=(sec,mb)=>{const k=Math.floor(mb*8*1048576/Math.max(1,sec)/1000);
+ const S=[320,256,192,160,128,112,96,80,64,56,48];
+ for(const v of S)if(v<=k)return v;return 48};
+async function aShrink(f,mb){const AC=window.AudioContext||window.webkitAudioContext;if(!AC)throw new Error('이 브라우저는 변환을 지원하지 않아요');
+ const ac=new AC({sampleRate:44100});
+ let ab;try{ab=await ac.decodeAudioData(await f.arrayBuffer())}finally{try{ac.close()}catch(e){}}
+ const kb=AKB(ab.duration,mb),mono=kb<=64;
+ const blob=await encMp3(ab,kb,mono);
+ return {blob,kb,mono,sec:ab.duration}}
+function vMusic(){const my=mytr();app.innerHTML=`<div class="wrap"><h1>내 음원</h1><p class="mu">작품에 쓸 BGM을 여기에 올려 두고, 시리즈 테마곡이나 회차·장면 BGM으로 골라 쓰세요. 음원 1개당 ${MAXA}MB까지 올릴 수 있어요.</p><div class="box" style="margin-top:16px"><label>음원 파일<input type="file" id="af" accept="audio/*"></label><label>곡 이름 <span class="mu">비우면 파일 이름을 써요</span><input id="an" maxlength="40"></label>
+<label class="ck"><input type="checkbox" id="acp" checked>올릴 때 용량 줄이기 <span class="mu">곡 길이에 맞춰 3MB 안쪽이 되도록 MP3로 다시 만들어요</span></label>
+<div class="acts"><button class="btn" id="aub" onclick="aup()">음원 올리기</button></div><p class="mu" id="ast" style="margin:8px 0 0"></p></div><div>${my.map(t=>`<div class="row" style="align-items:center"><div style="flex:1;min-width:0"><h3 style="font-size:16px">${esc(t.name)}</h3>${AUD.test(t.src)?`<audio controls preload="none" src="${t.src}" style="width:100%;margin-top:6px"></audio>`:''}</div><button class="btn ghost" onclick="adl('${t.id}')">삭제</button></div>`).join('')||'<p class="mu" style="margin:20px 0">아직 올린 음원이 없습니다.</p>'}</div></div>`}
+const ATGT=3;
+const ast=m=>{const e=$('#ast');if(e)e.textContent=m};
+async function aup(){const f=$('#af').files[0];if(!f){toast('음원 파일을 골라 주세요');return}
+ if(!/^audio\//.test(f.type)){toast('오디오 파일만 올릴 수 있어요');return}
+ const nm=($('#an').value.trim()||f.name.replace(/\.[^.]+$/,'')).slice(0,40);
+ const btn=$('#aub');if(btn)btn.disabled=true;
+ try{
+  let blob=f,msg='';
+  if($('#acp')&&$('#acp').checked&&f.size>ATGT*1048576){
+   ast('용량을 줄이는 중이에요. 곡 길이에 따라 몇십 초 걸릴 수 있어요…');
+   try{const r=await aShrink(f,ATGT);
+    if(r.blob.size<f.size){blob=r.blob;msg=` (${MB(f.size)} → ${MB(blob.size)}, ${r.kb}kbps${r.mono?' 모노':''})`}
+    else msg=' (이미 충분히 작아서 원본 그대로 올렸어요)'}
+   catch(e){console.error(e);msg=' (용량 줄이기에 실패해서 원본 그대로 올렸어요)'}}
+  if(blob.size>MAXA*1048576){ast('');toast('파일이 너무 커요. '+MAXA+'MB 이하로 줄여 주세요');return}
+  ast('올리는 중이에요…');
+  const src=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(new Error('읽기 실패'));r.readAsDataURL(blob)});
+  if(!AUD.test(src)){ast('');toast('이 형식은 사용할 수 없어요');return}
+  const t={id:uid('t'),owner:ME,name:nm,src};db.tracks.push(t);
+  if(save()){toast('음원을 올렸습니다'+msg);vMusic()}else db.tracks.pop()}
+ catch(e){console.error(e);toast('파일을 읽을 수 없어요')}
+ finally{const b2=$('#aub');if(b2)b2.disabled=false}}
 function adl(id){db.tracks=db.tracks.filter(t=>t.id!==id);db.series.forEach(s=>{if(s.theme===id)s.theme='';s.eps.forEach(e=>{if(e.bgm===id)e.bgm='';if(e.sc)Object.keys(e.sc).forEach(k=>{if(e.sc[k]===id)delete e.sc[k]})})});save();vMusic()}
 ICO.bell=`<path d='M10.3 21a1.94 1.94 0 0 0 3.4 0'/><path d='M4 17h16a2 2 0 0 1-2-2V9a6 6 0 1 0-12 0v6a2 2 0 0 1-2 2'/>`;ICO.plusc=`<path d='M12 5v14M5 12h14'/>`;ICO.minus=`<path d='M5 12h14'/>`;
 // ----- 이미지 확대 보기 -----
@@ -1201,12 +1286,14 @@ async function verGet(){try{const r=await fetch(location.pathname+'?v='+Date.now
  return r.headers.get('etag')||r.headers.get('last-modified')||null}catch(e){return null}}
 async function verInit(){verTag=await verGet();setInterval(verCheck,180000);addEventListener('focus',verCheck)}
 async function verCheck(){if(verOn||!verTag||document.hidden)return;const v=await verGet();if(!v||v===verTag)return;verOn=true;verShow()}
+const VER='1.18';
+function verUI(){const f=$('#vr');if(f)f.innerHTML=`콜라주 노블 <b>v${VER}</b> · <a href="#notices">패치노트</a>`}
 function verShow(){if($('#upb'))return;const d=document.createElement('div');d.className='upb';d.id='upb';
- d.innerHTML=`<span>사이트가 새로 바뀌었어요. 새로고침하면 바뀐 내용이 보여요.</span><button type="button" class="go" onclick="location.reload()">새로고침</button><button type="button" onclick="this.parentNode.remove()">나중에</button>`;
+ d.innerHTML=`<span>사이트가 새로 바뀌었어요(v${VER} 이후). 새로고침하면 바뀐 내용이 보여요.</span><button type="button" class="go" onclick="location.reload()">새로고침</button><button type="button" onclick="this.parentNode.remove()">나중에</button>`;
  document.body.insertBefore(d,document.body.firstChild);hh()}
 function route(){if(!ME){vAuth();return}const p=(location.hash.slice(1)||'home').split('-');if(p[0]!=='read'&&p[0]!=='series')bgStop();if(p[0]!=='rev')rev=null;if(p[0]!=='read')rcid=null;if(p[0]!=='notice'&&p[0]!=='notices')nedit=null;pvClose();
 const m={series:()=>{if(ordS&&ordS!==p[1])ordS=null;vSeries(p[1])},read:()=>vRead(p[1],p[2]),write:()=>vWrite(p[1],p[2]),rev:()=>vRev(p[1],p[2]),edit:()=>vEdit(p[1]),new:()=>vNew(p[1]),chars:()=>{ceid=null;avData='';vChars()},char:()=>{if(chc!==p[1]){chc=p[1];chp=1}vChar(p[1])},user:()=>vUser(p[1]),cast:()=>vCast(p[1],p[2]),settings:vSet,music:vMusic,alerts:vAlerts,notices:vNotices,notice:()=>vNotice(p[1]),mine:vMine};
-(Object.prototype.hasOwnProperty.call(m,p[0])?m[p[0]]:vHome)();bellUI();hh();onJoin();onTrack();window.scrollTo(0,0);if(p[0]==='home'||p[0]==='series')stale()}
+(Object.prototype.hasOwnProperty.call(m,p[0])?m[p[0]]:vHome)();bellUI();verUI();hh();onJoin();onTrack();window.scrollTo(0,0);if(p[0]==='home'||p[0]==='series')stale()}
 addEventListener('hashchange',route);
 boot();
 </script>
