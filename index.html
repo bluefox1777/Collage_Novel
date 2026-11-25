@@ -76,6 +76,8 @@ h1,h2,h3{font-family:"Noto Serif KR",serif;line-height:1.35;margin:0}
 .mrow span{margin-right:0!important}
 .kb{padding:1px 9px;border:1px solid var(--line);border-radius:999px;font-size:12px}
 .cmh{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.rpto{display:inline-flex;align-items:center;gap:3px;font-size:12px;color:var(--mute);border:1px solid var(--line);border-radius:999px;padding:0 8px 0 6px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rpto svg{width:12px;height:12px;flex:none}
 .rpa{flex:none;display:inline-flex;align-items:flex-start;margin-top:7px;color:var(--mute);opacity:.6}
 .rpa svg{width:17px;height:17px}
 .cib{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;padding:0;border:1px solid transparent;border-radius:7px;background:transparent;color:var(--mute);cursor:pointer}
@@ -1616,20 +1618,22 @@ const inCast=(e,cid)=>!!cid&&(e.cast||[]).includes(cid);
 const cord=(e,m)=>m.kind==='rp'?(inCast(e,m.cid)?0:1):2;
 const csort=(e,L)=>L.map((m,i)=>[cord(e,m),i,m]).sort((a,b)=>a[0]-b[0]||a[1]-b[1]).map(x=>x[2]);
 let rcid=null,chc=null;
-function cmTree(e,L){const by={};L.forEach(m=>{const p=(m.parent&&L.some(x=>x.id===m.parent))?m.parent:'root';(by[p]=by[p]||[]).push(m)});
- const cnt=m=>{let k=0;(by[m.id]||[]).forEach(x=>{k+=1+cnt(x)});return k};
- const walk=(m,d)=>{const k=cnt(m),row=[{m,d,k}];
-  if(k&&cmOpen[m.id]===false)return row;
-  return row.concat(((by[m.id]||[]).slice().sort((a,b)=>(a.ts||0)-(b.ts||0))).flatMap(x=>walk(x,Math.min(d+1,3))))};
- return csort(e,by.root||[]).flatMap(m=>walk(m,0))}
+function cmTree(e,L){const by={},mp={};L.forEach(m=>{mp[m.id]=m});
+ L.forEach(m=>{const p=(m.parent&&mp[m.parent])?m.parent:'root';(by[p]=by[p]||[]).push(m)});
+ // 답글의 답글도 한 단계 안쪽에 시간순으로 나란히 둔다 (유튜브처럼)
+ const sub=m=>(by[m.id]||[]).flatMap(x=>[x].concat(sub(x)));
+ return csort(e,by.root||[]).flatMap(m=>{
+  const ds=sub(m).sort((a,b)=>(a.ts||0)-(b.ts||0)),row=[{m,d:0,k:ds.length}];
+  if(ds.length&&cmOpen[m.id]===false)return row;
+  return row.concat(ds.map(x=>({m:x,d:1,k:0,to:x.parent===m.id?'':((mp[x.parent]||{}).name||'')})))})}
 const cmNm=m=>{const c=m.cid&&chById(m.cid);const n=`<b style="${chStyle(m.cid)}">${esc(m.name)}</b>`;
  return c?`<a class="cnl" href="#char-${m.cid}" title="${esc(c.name)} 정보 보기">${n}</a>`:n};
 const cmWho=m=>{if(!isAdm||!m.au||m.kind!=='rp'||!m.cid)return '';
  const c=chById(m.cid);if(!c||!(c.share||[]).length)return '';
  return `<a class="bd2 who" href="#user-${m.au}" title="이 RP 댓글을 쓴 사람">${esc(pn(m.au))}</a>`};
 const cmCan=m=>!!m.mine||isAdm;
-const cm1=(s,e,m,kids)=>{const open=cmOpen[m.id]!==false;
- return `<div class="cm${m.mine?' me':''}">${m.parent?`<span class="rpa" title="윗 댓글에 달린 답글">${SV(ICO.upto)}</span>`:''}${av(m.img,m.name)}<div style="flex:1;min-width:0"><div class="cmh">${cmNm(m)}${m.kind==='rp'&&inCast(e,m.cid)?'<span class="bd2 cs">등장인물</span>':''}${m.kind==='author'?'<span class="bd2 au">작가</span>':m.kind==='rp'?'<span class="bd2 rp">RP</span>':''}${cmWho(m)}${m.kind==='rp'?'':`<span class="mu"> ${esc(m.d)}</span>`}</div>${ceid2===m.id?`<div class="cme"><textarea id="cmet" rows="3" maxlength="500">${esc(m.text)}</textarea><div class="acts"><button class="btn" onclick="csave2('${s.id}','${e.id}','${m.id}')">저장</button><button class="btn ghost" onclick="cedit(null)">취소</button></div></div>`:`<p class="cmt${m.kind==='rp'&&m.cid?' rpt':''}" style="margin:4px 0 0;overflow-wrap:anywhere;${m.kind==='rp'&&m.cid?dgStyle(chById(m.cid)||{}):''}">${esc(m.text).replace(/\n/g,'<br>')}</p>
+const cm1=(s,e,m,kids,to)=>{const open=cmOpen[m.id]!==false;
+ return `<div class="cm${m.mine?' me':''}">${m.parent?`<span class="rpa" title="${to?esc(to)+'님에게 단 답글':'윗 댓글에 단 답글'}">${SV(ICO.upto)}</span>`:''}${av(m.img,m.name)}<div style="flex:1;min-width:0"><div class="cmh">${cmNm(m)}${m.kind==='rp'&&inCast(e,m.cid)?'<span class="bd2 cs">등장인물</span>':''}${m.kind==='author'?'<span class="bd2 au">작가</span>':m.kind==='rp'?'<span class="bd2 rp">RP</span>':''}${cmWho(m)}${to?`<span class="rpto" title="이 댓글에 답했어요">${SV(ICO.reply)}${esc(to)}</span>`:''}${m.kind==='rp'?'':`<span class="mu"> ${esc(m.d)}</span>`}</div>${ceid2===m.id?`<div class="cme"><textarea id="cmet" rows="3" maxlength="500">${esc(m.text)}</textarea><div class="acts"><button class="btn" onclick="csave2('${s.id}','${e.id}','${m.id}')">저장</button><button class="btn ghost" onclick="cedit(null)">취소</button></div></div>`:`<p class="cmt${m.kind==='rp'&&m.cid?' rpt':''}" style="margin:4px 0 0;overflow-wrap:anywhere;${m.kind==='rp'&&m.cid?dgStyle(chById(m.cid)||{}):''}">${esc(m.text).replace(/\n/g,'<br>')}</p>
 <div class="cmb">${kids?`<button type="button" class="cmto${open?' on':''}" onclick="cmTog('${m.id}')" aria-expanded="${open}">${SV(ICO.dn)}<span>답글 ${kids}개</span></button>`:''}<span class="cbsp"></span><button type="button" class="cib" title="답글 달기" aria-label="답글 달기" onclick="crep('${s.id}','${e.id}','${m.id}')">${SV(ICO.reply)}</button>${cmCan(m)?`<button type="button" class="cib" title="수정" aria-label="수정" onclick="cedit('${m.id}')">${SV(ICO.pen)}</button><button type="button" class="cib del" title="삭제" aria-label="삭제" onclick="cdel('${s.id}','${e.id}','${m.id}')">${SV(ICO.trash)}</button>`:''}</div>`}</div></div>`};
 let ceid2=null,cmOpen={};
 function cedit(id){ceid2=id;const r=rdNow();if(r)vRead(r[0],r[1]);
@@ -1651,7 +1655,7 @@ const cfrm=(s,e,to,rpOnly)=>{const own=s.author===ME,mc=myChars(),rp=rpOnly===1,
  return `<div class="cmf${to?' rep':''}">${to?`<p class="mu" style="margin:0 0 6px">${esc(to)}님에게 답글 <button class="lk" onclick="crep('${s.id}','${e.id}',null)">취소</button>${rp?'<br>RP 댓글이라 캐릭터로만 답글을 달 수 있어요':''}${us?'<br>작가·독자 댓글이라 내 이름으로만 답글을 달 수 있어요':''}</p>`:''}<label>작성 신분<select id="cid">${opts}</select></label><textarea id="ct" rows="3" maxlength="500" placeholder="${to?'답글을 남겨 보세요':'댓글을 남겨 보세요'}"></textarea><div class="acts"><button class="btn" onclick="cadd('${s.id}','${e.id}')">${to?'답글 등록':'댓글 등록'}</button></div></div>`};
 function cmx(s,e){const L=(e.cm||[]).filter(m=>!(db.set.noRp&&m.kind==='rp')),T=cmTree(e,L),rp=rcid&&L.find(m=>m.id===rcid);
  if(rcid&&!rp)rcid=null;
- return `<section class="cms"><h2 class="h2">댓글 ${L.length}개</h2>${rcid?'':cfrm(s,e,null)}<div>${T.map(x=>`<div class="cmw" style="margin-left:${x.d*20}px">${cm1(s,e,x.m,x.k)}${rcid===x.m.id?cfrm(s,e,x.m.name,x.m.kind==='rp'?1:0):''}</div>`).join('')||'<p class="mu">첫 댓글을 남겨 보세요.</p>'}</div></section>`}
+ return `<section class="cms"><h2 class="h2">댓글 ${L.length}개</h2>${rcid?'':cfrm(s,e,null)}<div>${T.map(x=>`<div class="cmw" style="margin-left:${x.d*28}px">${cm1(s,e,x.m,x.k,x.to)}${rcid===x.m.id?cfrm(s,e,x.m.name,x.m.kind==='rp'?1:0):''}</div>`).join('')||'<p class="mu">첫 댓글을 남겨 보세요.</p>'}</div></section>`}
 function crep(sid,eid,id){rcid=id;vRead(sid,eid);
  const f=$('.cmf.rep');if(f)f.scrollIntoView({block:'center'});const x=$('#ct');if(x)x.focus()}
 function cadd(sid,eid){const s=find(sid),e=s&&s.eps.find(x=>x.id===eid),t=$('#ct').value.trim();if(!e)return;if(!t){toast('댓글 내용을 입력해 주세요');return}const c=myChars().find(x=>x.id===$('#cid').value);
@@ -2206,7 +2210,7 @@ async function verGet(){try{const r=await fetch(location.pathname+'?v='+Date.now
  return r.headers.get('etag')||r.headers.get('last-modified')||null}catch(e){return null}}
 async function verInit(){verTag=await verGet();setInterval(verCheck,180000);addEventListener('focus',verCheck)}
 async function verCheck(){if(verOn||!verTag||document.hidden)return;const v=await verGet();if(!v||v===verTag)return;verOn=true;verShow()}
-const VER='1.24';
+const VER='1.25';
 function verUI(){const f=$('#vr');if(f)f.innerHTML=`콜라주 노블 <b>v${VER}</b> · <a href="#notices">패치노트</a>`}
 function verShow(){if($('#upb'))return;const d=document.createElement('div');d.className='upb';d.id='upb';
  d.innerHTML=`<span>사이트가 새로 바뀌었어요(v${VER} 이후). 새로고침하면 바뀐 내용이 보여요.</span><button type="button" class="go" onclick="location.reload()">새로고침</button><button type="button" onclick="this.parentNode.remove()">나중에</button>`;
