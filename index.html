@@ -36,6 +36,19 @@ h1,h2,h3{font-family:"Noto Serif KR",serif;line-height:1.35;margin:0}
 .pgb:disabled{opacity:.35;cursor:default}
 .pgd{align-self:center;color:var(--mute)}
 .ulink{text-decoration:underline;cursor:pointer}
+.chcm{display:grid;gap:10px}
+.chc{display:block;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:inherit;text-decoration:none}
+.chc:hover{border-color:var(--ac)}
+.chc .ct{margin:0;overflow-wrap:anywhere}
+.ordm .epw{cursor:grab;border:1px dashed var(--line);border-radius:10px;padding:8px;margin-bottom:8px;background:var(--card)}
+.ordm .epw.drag{opacity:.4}
+.ordm .epw.over{border-color:var(--ac);border-style:solid}
+.ordh{display:flex;align-items:center;gap:4px;flex:none}
+.ordh .grip{display:inline-flex;color:var(--mute)}
+.ordh .ebtn{padding:2px 8px}
+.ordh .ebtn[disabled]{opacity:.3;cursor:default}
+.cnl{text-decoration:none}
+.cnl:hover b{text-decoration:underline}
 .uc{display:inline-flex;align-items:center;gap:6px;max-width:100%;padding:2px 11px 2px 2px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font-size:13px;line-height:1.5;cursor:pointer;vertical-align:middle;transition:border-color .12s,background .12s}
 .uc:hover,.uc:focus-visible{border-color:var(--ac);background:var(--bg)}
 .uc>*{margin:0!important}
@@ -222,6 +235,7 @@ body.sideon{padding-right:248px}
 .bd2{display:inline-block;margin-left:8px;padding:0 8px;border-radius:999px;font-size:11px;border:1px solid currentColor}
 .bd2.au{color:var(--ac)}
 .bd2.rp{color:#8a5cc2}
+.bd2.nn{color:var(--ac)}
 .casts{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
 .cc{display:inline-flex;align-items:center;gap:6px;padding:3px 12px 3px 4px;border:1px solid var(--line);border-radius:999px;font-size:14px}
 .cc .av{width:26px;height:26px;font-size:12px}
@@ -349,7 +363,7 @@ db=emptyDb();
 
 // ----- 표 한 줄로 바꾸는 함수들 (서버에 보낼 모양) -----
 const rowS=s=>({id:s.id,owner:s.author===ME?UID:s.author,title:s.title,kind:s.kind||'long',status:s.status||'연재중',description:s.desc||'',tags:s.tags||[],core_tags:s.core||[],cast_ids:s.cast||[],leads:s.leads||[],guests:s.guests||[],warns:s.warns||[],cover_path:s.cover?pthI(s.cover):null,theme_track:s.theme||null});
-const rowE=(e,i,sid)=>({id:e.id,series_id:sid,position:i,title:e.title,html:e.html||'',status:e.st||'공개',thumb_path:e.img?pthI(e.img):null,cast_ids:e.cast||[],leads:e.leads||[],guests:e.guests||[],warns:e.warns||[],bgm:e.bgm||'',scenes:e.sc||{},edit_count:e.rev||0,pov:e.pov||'',pov_char:e.povc||null,pov_scenes:e.psc||{}});
+const rowE=(e,i,sid)=>({id:e.id,series_id:sid,position:i,title:e.title,html:e.html||'',status:e.st||'공개',thumb_path:e.img?pthI(e.img):null,cast_ids:e.cast||[],leads:e.leads||[],guests:e.guests||[],warns:e.warns||[],bgm:e.bgm||'',scenes:e.sc||{},edit_count:e.rev||0,edited_at:e.ed||null,pov:e.pov||'',pov_char:e.povc||null,pov_scenes:e.psc||{}});
 const rowC=c=>({id:c.id,owner:c.owner===ME?UID:c.owner,name:c.name,wiki_link:c.link||'',avatar_path:c.img?pthI(c.img):null,shared_with:c.share||[],font:c.font||'',color:c.color||'',text_color:c.tcolor||'',split_name:c.split!==false,quote:c.quote||''});
 const rowD=d=>({id:d.id,owner:UID,target:d.sid||'',title:d.title||'',html:d.html||'',cast_ids:d.cast||[],leads:d.leads||[],guests:d.guests||[],warns:d.warns||[],thumb_path:d.img||null,bgm:d.bgm||'',scenes:d.sc||{},pov:d.pov||'',pov_char:d.povc||null,pov_scenes:d.psc||{}});
 const rowU=()=>({user_id:UID,alias_on:db.set.alias!==false,hide_rp:!!db.set.noRp,block_warns:db.set.block||[],bgm_on:db.set.bgm!==false,hide_online:db.set.hide===true,volume:db.prefs.vol==null?70:db.prefs.vol,reader:{size:db.prefs.size,lh:db.prefs.lh,th:db.prefs.th,font:db.prefs.font||null,colors:db.colors||[]},aliases:db.prefs.alias||{},notif:db.set.nt||{}});
@@ -372,7 +386,7 @@ async function loadAll(){
  const [pr,se,ep,ch,tr,cm,sub,dr,us,ct,nc]=R.map(r=>r.data);
  PN={};PR={};pr.forEach(p=>{const k=nid(p.id);PN[k]=p.nickname;PR[k]={name:p.nickname,img:urlI(p.avatar_path),bio:p.bio||'',link:p.link||''};if(k===ME)isAdm=!!p.is_admin});
  const D=emptyDb(),u=us||{},rd=u.reader||{};
- D.set={alias:u.alias_on!==false,bgm:u.bgm_on!==false,noRp:!!u.hide_rp,hide:!!u.hide_online,block:u.block_warns||[],nt:Object.assign({eps:true,cm:'all',seen:''},u.notif||{})};
+ D.set={alias:u.alias_on!==false,bgm:u.bgm_on!==false,noRp:!!u.hide_rp,hide:!!u.hide_online,block:u.block_warns||[],nt:Object.assign({eps:true,cm:'all',rep:true,seen:'',clr:''},u.notif||{})};
  D.core=(ct||[]).map(x=>({id:nid(x.id),name:x.name,pos:x.position}));
  D.notices=(nc||[]).map(x=>({id:nid(x.id),cat:x.category,title:x.title,body:x.body||'',pin:!!x.pinned,author:x.author?nid(x.author):'',ts:Date.parse(x.created_at),up:Date.parse(x.updated_at)})).sort((a,b)=>(b.pin-a.pin)||(b.ts-a.ts));
  D.prefs={size:rd.size||18,lh:rd.lh||1.9,th:rd.th||'white',font:rd.font||undefined,vol:u.volume==null?70:u.volume,alias:u.aliases||{}};
@@ -381,7 +395,7 @@ async function loadAll(){
  D.chars=ch.map(c=>({id:nid(c.id),owner:nid(c.owner),name:c.name,link:c.wiki_link||'',img:urlI(c.avatar_path),share:(c.shared_with||[]).map(nid),font:c.font||'',color:c.color||'',tcolor:c.text_color||'',split:c.split_name!==false,quote:c.quote||''}));
  D.tracks=tr.map(t=>({id:nid(t.id),owner:nid(t.owner),name:t.name,path:t.path,src:urlA(t.path)}));
  const cmBy={};cm.forEach(c=>{const k=nid(c.episode_id);(cmBy[k]=cmBy[k]||[]).push({id:nid(c.id),kind:c.kind,name:c.display_name,img:urlI(c.avatar_path),text:c.body,d:c.created_at.slice(0,10),ts:Date.parse(c.created_at),mine:nid(c.author)===ME?1:0,cid:c.character_id?nid(c.character_id):null,parent:c.parent?nid(c.parent):null})});
- const epBy={};ep.forEach(e=>{const k=nid(e.series_id);(epBy[k]=epBy[k]||[]).push({id:nid(e.id),title:e.title,st:e.status,d:e.created_at.slice(0,10),html:e.html,img:urlI(e.thumb_path),cast:(e.cast_ids||[]).map(nid),leads:(e.leads||[]).map(nid),guests:e.guests||[],warns:e.warns||[],bgm:nid(e.bgm)||'',sc:e.scenes||{},rev:e.edit_count||0,pov:e.pov||'',povc:e.pov_char?nid(e.pov_char):'',psc:e.pov_scenes||{},ts:Date.parse(e.created_at),cm:cmBy[nid(e.id)]||[]})});
+ const epBy={};ep.forEach(e=>{const k=nid(e.series_id);(epBy[k]=epBy[k]||[]).push({id:nid(e.id),title:e.title,st:e.status,d:e.created_at.slice(0,10),html:e.html,img:urlI(e.thumb_path),cast:(e.cast_ids||[]).map(nid),leads:(e.leads||[]).map(nid),guests:e.guests||[],warns:e.warns||[],bgm:nid(e.bgm)||'',sc:e.scenes||{},rev:e.edit_count||0,ed:e.edited_at||'',pov:e.pov||'',povc:e.pov_char?nid(e.pov_char):'',psc:e.pov_scenes||{},ts:Date.parse(e.created_at),cm:cmBy[nid(e.id)]||[]})});
  D.series=se.map(s=>({id:nid(s.id),title:s.title,author:nid(s.owner),kind:s.kind,status:s.status,desc:s.description,tags:s.tags||[],core:s.core_tags||[],cast:(s.cast_ids||[]).map(nid),leads:(s.leads||[]).map(nid),guests:s.guests||[],warns:s.warns||[],cover:urlI(s.cover_path),theme:s.theme_track?nid(s.theme_track):'',eps:epBy[nid(s.id)]||[]}));
  D.drafts=dr.map(d=>({id:nid(d.id),sid:d.target,title:d.title,html:d.html,cast:(d.cast_ids||[]).map(nid),leads:(d.leads||[]).map(nid),guests:d.guests||[],warns:d.warns||[],img:d.thumb_path||'',bgm:nid(d.bgm)||'',sc:d.scenes||{},pov:d.pov||'',povc:d.pov_char?nid(d.pov_char):'',psc:d.pov_scenes||{},ts:Date.parse(d.updated_at)}));
  db=D;snap=mkSnap();lastLoad=Date.now();setTimeout(fsInit,0)}
@@ -552,13 +566,30 @@ app.innerHTML=`
 <div id="hl"></div><nav class="pg" id="pg"></nav>`;
 hList()}
 
+let ordS=null;
+function ordTog(id){ordS=ordS===id?null:id;vSeries(id)}
+function ordMv(sid,eid,d){const s=find(sid);if(!s)return;const i=s.eps.findIndex(x=>x.id===eid),j=i+d;
+ if(i<0||j<0||j>=s.eps.length)return;const [x]=s.eps.splice(i,1);s.eps.splice(j,0,x);
+ if(!save())return;vSeries(sid)}
+function ordDS(ev,id){ordD=id;ev.dataTransfer.effectAllowed='move';try{ev.dataTransfer.setData('text/plain',id)}catch(e){}
+ const w=ev.target.closest('.epw');if(w)setTimeout(()=>w.classList.add('drag'),0)}
+function ordDO(ev){ev.preventDefault();ev.dataTransfer.dropEffect='move';
+ const w=ev.target.closest&&ev.target.closest('.epw');if(!w||w.classList.contains('over'))return;
+ document.querySelectorAll('.epw.over').forEach(x=>x.classList.remove('over'));w.classList.add('over')}
+function ordDE(){document.querySelectorAll('.epw.drag,.epw.over').forEach(x=>x.classList.remove('drag','over'))}
+function ordDrop(ev,sid,eid){ev.preventDefault();ordDE();const s=find(sid),from=ordD;ordD=null;
+ if(!s||!from||from===eid)return;
+ const i=s.eps.findIndex(x=>x.id===from),j=s.eps.findIndex(x=>x.id===eid);
+ if(i<0||j<0)return;const [x]=s.eps.splice(i,1);s.eps.splice(j,0,x);
+ if(!save())return;toast('순서를 바꿨어요');vSeries(sid)}
+let ordD=null;
 function tSub(id){const i=db.subs.indexOf(id);i<0?db.subs.push(id):db.subs.splice(i,1);save();vSeries(id)}
 function vSeries(id){const s=find(id);if(!s)return vHome();if(blk(s)&&!okb.has(s.id))return vBlk(s);setTimeout(()=>{if($('#bgc')&&find(id))bgInit(find(id),{bgm:'',sc:{},cast:[]})},0);
 const own=s.author===ME||isAdm,es=own?s.eps:pub(s),sub=db.subs.includes(s.id);
 app.innerHTML=`<div class="wrap"><div class="sh">${spine(s,1)}<div><h1>${esc(s.title)}</h1>${meta(s)}${s.theme&&db.tracks.find(x=>x.id===s.theme)&&db.set.bgm!==false?`<div class="rset tplay"><span class="mu">테마곡</span><span id="bgc" class="bgc"></span></div>`:''}<p>${esc(s.desc)}</p>${cast(s)}</div></div><div class="shb">
-<div class="acts">${es.length?`<a class="btn" href="#read-${s.id}-${es[0].id}">${s.kind==='short'?'읽기':'첫 화 읽기'}</a>`:''}${own&&canEp(s)?`<a class="btn${es.length?' ghost':''}" href="#write-${s.id}">${s.kind==='short'?'본문 쓰기':(es.length?'새 회차 쓰기':'첫 회차 쓰기')}</a>`:''}<button class="btn ghost" onclick="tSub('${s.id}')">${sub?'구독 중':'구독하기'}</button>${own?`<a class="btn ghost" href="#edit-${s.id}">작품 정보 수정</a>`:''}</div></div>
+<div class="acts">${es.length?`<a class="btn" href="#read-${s.id}-${es[0].id}">${s.kind==='short'?'읽기':'첫 화 읽기'}</a>`:''}${own&&canEp(s)?`<a class="btn${es.length?' ghost':''}" href="#write-${s.id}">${s.kind==='short'?'본문 쓰기':(es.length?'새 회차 쓰기':'첫 회차 쓰기')}</a>`:''}<button class="btn ghost" onclick="tSub('${s.id}')">${sub?'구독 중':'구독하기'}</button>${own?`<a class="btn ghost" href="#edit-${s.id}">작품 정보 수정</a>${s.eps.length>1?`<button class="btn ghost" onclick="ordTog('${s.id}')">${ordS===s.id?'순서 바꾸기 끝내기':'회차 순서 바꾸기'}</button>`:''}`:''}</div></div>
 <h2 class="h2">${s.kind==='short'?'본문':`회차 ${es.length}개`}</h2>
-<div>${es.map(e=>`<div class="epw">${eth(e)}<div class="epc"><a class="ep" href="#read-${s.id}-${e.id}"><span>${esc(e.title)}</span><span class="mu">${e.st==='공개'?'':'비공개 '}${esc(e.d)}${e.rev?` · 수정 ${e.rev}회`:''}</span></a>${(e.warns||[]).length?`<p class="warns" style="margin:2px 0 0">${e.warns.map(w=>`<span>${esc(w)}</span>`).join('')}</p>`:''}${povTxt(e)?`<p class="mu" style="margin:2px 0 0">시점 · ${esc(povTxt(e))}</p>`:''}${casts(e,0,0,e.povc)}${own?`<div class="eact"><a class="ebtn" href="#rev-${s.id}-${e.id}" title="제목과 본문 고치기">${SV(ICO.pen)}수정</a><a class="ebtn" href="#cast-${s.id}-${e.id}" title="등장인물·썸네일·시점·BGM">${SV(ICO.gear)}회차 설정</a></div>`:''}</div></div>`).join('')||`<p class="mu">${own?(s.kind==='short'?'아직 본문이 없어요. 위의 ‘본문 쓰기’로 시작해 보세요.':'아직 회차가 없어요. 위의 ‘첫 회차 쓰기’로 시작해 보세요.'):'아직 올라온 회차가 없습니다.'}</p>`}</div></div>`}
+${ordS===s.id?`<p class="mu" style="margin:0 0 10px">회차를 끌어서 옮기거나 ▲▼ 단추로 자리를 바꿔 주세요. 바꾸면 바로 저장돼요.</p>`:''}<div${ordS===s.id?' id="epl" class="ordm"':''}>${es.map((e,i)=>`<div class="epw"${ordS===s.id?` draggable="true" data-e="${e.id}" ondragstart="ordDS(event,'${e.id}')" ondragover="ordDO(event)" ondrop="ordDrop(event,'${s.id}','${e.id}')" ondragend="ordDE(event)"`:''}>${ordS===s.id?`<div class="ordh"><span class="grip">${SV(ICO.grip)}</span><button class="ebtn" onclick="ordMv('${s.id}','${e.id}',-1)" ${i===0?'disabled':''} aria-label="위로">▲</button><button class="ebtn" onclick="ordMv('${s.id}','${e.id}',1)" ${i===es.length-1?'disabled':''} aria-label="아래로">▼</button></div>`:''}${eth(e)}<div class="epc"><a class="ep" href="#read-${s.id}-${e.id}"><span>${esc(e.title)}</span><span class="mu">${e.st==='공개'?'':'비공개 '}${esc(e.d)}${edTxt(e)?` · ${edTxt(e)}`:''}</span></a>${(e.warns||[]).length?`<p class="warns" style="margin:2px 0 0">${e.warns.map(w=>`<span>${esc(w)}</span>`).join('')}</p>`:''}${povTxt(e)?`<p class="mu" style="margin:2px 0 0">시점 · ${esc(povTxt(e))}</p>`:''}${casts(e,0,0,e.povc)}${own&&ordS!==s.id?`<div class="eact"><a class="ebtn" href="#rev-${s.id}-${e.id}" title="제목과 본문 고치기">${SV(ICO.pen)}수정</a><a class="ebtn" href="#cast-${s.id}-${e.id}" title="등장인물·썸네일·시점·BGM">${SV(ICO.gear)}회차 설정</a></div>`:''}</div></div>`).join('')||`<p class="mu">${own?(s.kind==='short'?'아직 본문이 없어요. 위의 ‘본문 쓰기’로 시작해 보세요.':'아직 회차가 없어요. 위의 ‘첫 회차 쓰기’로 시작해 보세요.'):'아직 올라온 회차가 없습니다.'}</p>`}</div></div>`}
 
 const THN={white:'흰색',sepia:'세피아',dark:'어둡게'};
 function ap(){const r=$('#rd');if(!r)return;const f=db.prefs.font;r.style.fontSize=Math.round(db.prefs.size*fsc(f))+'px';r.style.lineHeight=db.prefs.lh;r.style.fontFamily=f?'"'+f+'", serif':''}
@@ -568,7 +599,7 @@ function vRead(sid,eid){const s=find(sid);if(!s)return vHome();if(blk(s)&&!okb.h
 const es=s.author===ME?s.eps:pub(s),i=es.findIndex(x=>x.id===eid);if(i<0)return vHome();
 const e=es[i],p=db.prefs,pv=es[i-1],nx=es[i+1];
 app.innerHTML=`<div class="rtop"><a href="#series-${s.id}">${esc(s.title)}</a><div class="rset">${rb('글자 작게',`pf('size',-1)`,SV(ICO.fdn))}${rb('글자 크게',`pf('size',1)`,SV(ICO.fup))}${rb('줄 간격 바꾸기',`pf('lh',0)`,SV(ICO.lh))}<span id="bgc" class="bgc"></span>${Object.keys(THN).map(t=>`<button data-t="${t}" class="thm ${p.th===t?'on':''}" style="background:${THC[t]}" title="${THN[t]} 배경" aria-label="${THN[t]} 배경" onclick="pt('${t}')"></button>`).join('')}${castE(e).length?`${rb(db.set.alias!==false?'별명으로 보는 중 (누르면 원래 이름)':'원래 이름으로 보는 중 (누르면 별명)',`tal()`,SV(ICO.user)+SV(ICO.swap),db.set.alias!==false?'on':'')}${rb('별명 설정',`$('#nsp').hidden=!$('#nsp').hidden`,SV(ICO.user)+SV(ICO.pen))}`:''}<select class="fs" onchange="pfn(this.value)" aria-label="글꼴">${FONTS.map(f=>`<option value="${f[1]}"${p.font===f[1]?' selected':''}>${f[0]}</option>`).join('')}</select></div></div>
-${nsp2(s,e)}${wnote(s,e)}<div class="rc">${casts(e,1,1,e.povc)}${povTxt(e)?`<p class="mu" style="margin:6px 0 0">시점 · ${esc(povTxt(e))}</p>`:''}</div><article class="reader rd-${p.th}" id="rd"><h2>${esc(e.title)}</h2>${e.rev?`<p class="mu" style="margin:-1.3em 0 1.8em;font-size:.78em">수정 ${e.rev}회</p>`:''}<div class="bd">${amap2(clean(e.html),e)}</div></article>
+${nsp2(s,e)}${wnote(s,e)}<div class="rc">${casts(e,1,1,e.povc)}${povTxt(e)?`<p class="mu" style="margin:6px 0 0">시점 · ${esc(povTxt(e))}</p>`:''}</div><article class="reader rd-${p.th}" id="rd"><h2>${esc(e.title)}</h2>${edTxt(e)?`<p class="mu" style="margin:-1.3em 0 1.8em;font-size:.78em">${edTxt(e)}</p>`:''}<div class="bd">${amap2(clean(e.html),e)}</div></article>
 <nav class="pn">${pv?`<a class="btn ghost" href="#read-${s.id}-${pv.id}">이전 화</a>`:'<span></span>'}<a class="btn ghost" href="#series-${s.id}">목차</a>${nx?`<a class="btn" href="#read-${s.id}-${nx.id}">다음 화</a>`:'<span></span>'}</nav>${cmx(s,e)}`;ap();bgInit(s,e)}
 
 function nwT(){const sel=$('#ws');if(!sel)return;if(sel.value==='__new'){location.hash='new';return}
@@ -597,7 +628,7 @@ function pasteTxt(e){const dt=e.clipboardData||e.dataTransfer;if(!dt)return;cons
  e.preventDefault();document.execCommand('insertHTML',false,esc(s).replace(/\r\n|\r|\n/g,'<br>'));dr()}
 function vRev(sid,eid){const s=find(sid),e=s&&(s.author===ME||isAdm)&&s.eps.find(x=>x.id===eid);if(!e)return vHome();
 rev={s:sid,e:eid};cd=null;bgm0=e.bgm||'';bsc=Object.assign({},e.sc||{});
-app.innerHTML=`<div class="wrap"><h1>글 수정</h1><p class="mu">${esc(s.title)}${s.kind==='short'?'':' / '+esc(e.title)} · ${esc(e.d)} 발행${e.rev?` · 수정 ${e.rev}회`:''}</p>
+app.innerHTML=`<div class="wrap"><h1>글 수정</h1><p class="mu">${esc(s.title)}${s.kind==='short'?'':' / '+esc(e.title)} · ${esc(e.d)} 발행${edTxt(e)?` · ${edTxt(e)}`:''}</p>
 ${edBody(e)}
 <div class="acts"><select id="wst" aria-label="공개 설정"><option${e.st==='비공개'?'':' selected'}>공개</option><option${e.st==='비공개'?' selected':''}>비공개</option></select><button class="btn ghost" onclick="pvOpen()">미리보기</button><button class="btn" onclick="saveRev()">수정 완료</button><a class="btn ghost" href="#series-${sid}">취소</a></div></div>`;
 edInit(e);pvSet(e);if(s.kind==='short'&&$('#wtl'))$('#wtl').hidden=true}
@@ -615,7 +646,7 @@ const t=$('#wt').value.trim(),html=clean(dlgify($('#ed').innerHTML)),st=$('#wst'
 if(!t||!$('#ed').textContent.trim()){toast('회차 제목과 본문을 입력해 주세요');return}
 const ch=e.title!==t||e.html!==html;
 e.title=t;e.html=html;e.st=st;e.img=eiData;e.bgm=bgm0;e.sc=cleanSc(bsc,html);e.pov=gpv().pov;e.povc=gpv().povc;e.psc=gpsc(html);e.warns=gwE();e.cast=[...new Set([...gc(),...tids(html)])];e.leads=gl();e.guests=gg();
-if(ch)e.rev=(e.rev||0)+1;if(s.kind==='short')s.title=t;
+if(ch)e.ed=new Date().toISOString();if(s.kind==='short')s.title=t;
 const sid=s.id,own=s.author===ME;rev=null;eiData='';bgm0='';bsc={};clearTimeout(tm);
 if(!own){location.hash='series-'+sid;adm(()=>pushE(s,e),'수정했습니다');return}
 if(save()){toast(ch?'수정했습니다':'저장했습니다');location.hash='series-'+sid}}
@@ -723,7 +754,7 @@ const wfsE=e=>`<fieldset class="wf"><legend>이 회차의 주의 요소 <span cl
 const gwE=()=>[...new Set([...[...document.querySelectorAll('[name=ewn]:checked')].map(e=>e.value),...(($('#ewx')&&$('#ewx').value)||'').split(',').map(x=>x.trim().slice(0,12)).filter(Boolean)])].slice(0,10);
 const gw=()=>[...new Set([...[...document.querySelectorAll('[name=wn]:checked')].map(e=>e.value),...$('#wx').value.split(',').map(x=>x.trim().slice(0,12)).filter(Boolean)])].slice(0,10);
 const ICO={bold:`<path d='M6 12h9a4 4 0 0 1 0 8H7a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h7a4 4 0 0 1 0 8'/>`,italic:`<path d='M19 4h-9M14 20H5M15 4 9 20'/>`,underline:`<path d='M6 4v6a6 6 0 0 0 12 0V4M4 20h16'/>`,strike:`<path d='M16 4H9a3 3 0 0 0-2.83 4M14 12a4 4 0 0 1 0 8H6M4 12h16'/>`,h2:`<path d='M4 12h8M4 18V6M12 18V6M21 18h-4c0-4 4-3 4-6 0-1.5-2-2.5-4-1'/>`,p:`<path d='M13 4v16M17 4v16M19 4H9.5a4.5 4.5 0 0 0 0 9H13'/>`,left:`<path d='M21 6H3M15 12H3M17 18H3'/>`,center:`<path d='M21 6H3M17 12H7M19 18H5'/>`,right:`<path d='M21 6H3M21 12H9M21 18H7'/>`,full:`<path d='M3 6h18M3 12h18M3 18h18'/>`,ul:`<path d='M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01'/>`,ol:`<path d='M10 6h11M10 12h11M10 18h11M4 6h1v4M4 10h2M6 18H4c0-1 2-2 2-3s-1-1.5-2-1'/>`,hr:`<path d='M3 12h18M8 6h.01M12 6h.01M16 6h.01M8 18h.01M12 18h.01M16 18h.01'/>`,img:`<rect width='18' height='18' x='3' y='3' rx='2'/><circle cx='9' cy='9' r='2'/><path d='m21 15-3.09-3.09a2 2 0 0 0-2.82 0L6 21'/>`,eraser:`<path d='m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21M22 21H7M5 11l9 9'/>`,pip:`<path d='m2 22 1-1h3l9-9M3 21v-3l9-9M15 6l3.4-3.4a2.1 2.1 0 1 1 3 3L18 9l.4.4a2.1 2.1 0 1 1-3 3l-3.8-3.8a2.1 2.1 0 1 1 3-3l.4.4Z'/>`,plus:`<path d='M5 12h14M12 5v14'/>`,quote:`<path d='M16 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z'/><path d='M5 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z'/>`,link:`<path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'/>`,unlink:`<path d='m18.84 12.25 1.72-1.71a5 5 0 0 0-7.07-7.07l-1.72 1.71M5.17 11.75l-1.71 1.71a5 5 0 0 0 7.07 7.07l1.71-1.71M8 2v3M2 8h3M16 22v-3M22 16h-3'/>`};
-ICO.swap=`<path d='M8 3 4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4'/>`;ICO.spell=`<path d='m6 16 6-12 6 12M8 12h8'/><path d='m16 20 2 2 4-4'/>`;
+ICO.grip=`<path d='M9 5h.01M9 12h.01M9 19h.01M15 5h.01M15 12h.01M15 19h.01'/>`;ICO.swap=`<path d='M8 3 4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4'/>`;ICO.spell=`<path d='m6 16 6-12 6 12M8 12h8'/><path d='m16 20 2 2 4-4'/>`;
 const TB2=[['굵게','bold','','bold'],['기울임','italic','','italic'],['밑줄','underline','','underline'],['취소선','strikeThrough','','strike'],['소제목','formatBlock','H2','h2'],['본문','formatBlock','P','p'],['왼쪽 정렬','justifyLeft','','left'],['가운데 정렬','justifyCenter','','center'],['오른쪽 정렬','justifyRight','','right'],['양쪽 정렬','justifyFull','','full'],['점 목록','insertUnorderedList','','ul'],['숫자 목록','insertOrderedList','','ol'],['장면 구분','insertHorizontalRule','','hr']];
 const ib=(t,on,svg)=>`<button type="button" class="ic" title="${t}" aria-label="${t}" onclick="${on}">${svg}</button>`;
 const tb1=b=>ib(b[0],`fmt('${b[1]}','${b[2]}')`,SV(ICO[b[3]]));
@@ -810,19 +841,26 @@ function vBlk(s){const hit=(s.warns||[]).filter(w=>db.set.block.includes(w));app
 const inCast=(e,cid)=>!!cid&&(e.cast||[]).includes(cid);
 const cord=(e,m)=>m.kind==='rp'?(inCast(e,m.cid)?0:1):2;
 const csort=(e,L)=>L.map((m,i)=>[cord(e,m),i,m]).sort((a,b)=>a[0]-b[0]||a[1]-b[1]).map(x=>x[2]);
-let rcid=null;
+let rcid=null,chc=null;
 function cmTree(e,L){const by={};L.forEach(m=>{const p=(m.parent&&L.some(x=>x.id===m.parent))?m.parent:'root';(by[p]=by[p]||[]).push(m)});
  const walk=(m,d)=>[{m,d}].concat(((by[m.id]||[]).slice().sort((a,b)=>(a.ts||0)-(b.ts||0))).flatMap(x=>walk(x,Math.min(d+1,3))));
  return csort(e,by.root||[]).flatMap(m=>walk(m,0))}
-const cm1=(s,e,m)=>`<div class="cm">${av(m.img,m.name)}<div style="flex:1;min-width:0"><div><b style="${chStyle(m.cid)}">${esc(m.name)}</b>${m.kind==='rp'&&inCast(e,m.cid)?'<span class="bd2 cs">등장인물</span>':''}${m.kind==='author'?'<span class="bd2 au">작가</span>':m.kind==='rp'?'<span class="bd2 rp">RP</span>':''}<span class="mu"> ${esc(m.d)}</span></div><p style="margin:4px 0 0;overflow-wrap:anywhere">${esc(m.text).replace(/\n/g,'<br>')}</p><div class="cmb"><button class="lk" onclick="crep('${s.id}','${e.id}','${m.id}')">답글</button>${m.mine?`<button class="lk" onclick="cdel('${s.id}','${e.id}','${m.id}')">삭제</button>`:''}</div></div></div>`;
-const cfrm=(s,e,to)=>{const own=s.author===ME,mc=myChars();
- return `<div class="cmf${to?' rep':''}">${to?`<p class="mu" style="margin:0 0 6px">${esc(to)}님에게 답글 <button class="lk" onclick="crep('${s.id}','${e.id}',null)">취소</button></p>`:''}<label>작성 신분<select id="cid"><option value="me">${own?'작가(나)':'독자(나)'}</option>${mc.map(c=>`<option value="${c.id}">캐릭터 RP: ${esc(c.name)}</option>`).join('')}</select></label><textarea id="ct" rows="3" maxlength="500" placeholder="${to?'답글을 남겨 보세요':'댓글을 남겨 보세요'}"></textarea><div class="acts"><button class="btn" onclick="cadd('${s.id}','${e.id}')">${to?'답글 등록':'댓글 등록'}</button></div></div>`};
+const cmNm=m=>{const c=m.cid&&chById(m.cid);const n=`<b style="${chStyle(m.cid)}">${esc(m.name)}</b>`;
+ return c?`<a class="cnl" href="#char-${m.cid}" title="${esc(c.name)} 정보 보기">${n}</a>`:n};
+const cm1=(s,e,m)=>`<div class="cm">${av(m.img,m.name)}<div style="flex:1;min-width:0"><div>${cmNm(m)}${m.kind==='rp'&&inCast(e,m.cid)?'<span class="bd2 cs">등장인물</span>':''}${m.kind==='author'?'<span class="bd2 au">작가</span>':m.kind==='rp'?'<span class="bd2 rp">RP</span>':''}${m.kind==='rp'?'':`<span class="mu"> ${esc(m.d)}</span>`}</div><p style="margin:4px 0 0;overflow-wrap:anywhere">${esc(m.text).replace(/\n/g,'<br>')}</p><div class="cmb"><button class="lk" onclick="crep('${s.id}','${e.id}','${m.id}')">답글</button>${m.mine?`<button class="lk" onclick="cdel('${s.id}','${e.id}','${m.id}')">삭제</button>`:''}</div></div></div>`;
+const cfrm=(s,e,to,rpOnly)=>{const own=s.author===ME,mc=myChars(),rp=rpOnly===1,us=rpOnly===0;
+ const opts=(us?'':mc.map(c=>`<option value="${c.id}">캐릭터 RP: ${esc(c.name)}</option>`).join(''))+(rp?'':`<option value="me">${own?'작가(나)':'독자(나)'}</option>`);
+ if(rp&&!mc.length)return `<div class="cmf rep"><p class="mu" style="margin:0 0 6px">${esc(to)}님에게 답글 <button class="lk" onclick="crep('${s.id}','${e.id}',null)">취소</button></p><p class="mu">RP 댓글에는 캐릭터로만 답글을 달 수 있어요. 쓸 수 있는 캐릭터가 없네요.</p></div>`;
+ return `<div class="cmf${to?' rep':''}">${to?`<p class="mu" style="margin:0 0 6px">${esc(to)}님에게 답글 <button class="lk" onclick="crep('${s.id}','${e.id}',null)">취소</button>${rp?'<br>RP 댓글이라 캐릭터로만 답글을 달 수 있어요':''}${us?'<br>작가·독자 댓글이라 내 이름으로만 답글을 달 수 있어요':''}</p>`:''}<label>작성 신분<select id="cid">${opts}</select></label><textarea id="ct" rows="3" maxlength="500" placeholder="${to?'답글을 남겨 보세요':'댓글을 남겨 보세요'}"></textarea><div class="acts"><button class="btn" onclick="cadd('${s.id}','${e.id}')">${to?'답글 등록':'댓글 등록'}</button></div></div>`};
 function cmx(s,e){const L=(e.cm||[]).filter(m=>!(db.set.noRp&&m.kind==='rp')),T=cmTree(e,L),rp=rcid&&L.find(m=>m.id===rcid);
  if(rcid&&!rp)rcid=null;
- return `<section class="cms"><h2 class="h2">댓글 ${L.length}개</h2>${rcid?'':cfrm(s,e,null)}<div>${T.map(x=>`<div class="cmw" style="margin-left:${x.d*20}px">${cm1(s,e,x.m)}${rcid===x.m.id?cfrm(s,e,x.m.name):''}</div>`).join('')||'<p class="mu">첫 댓글을 남겨 보세요.</p>'}</div></section>`}
+ return `<section class="cms"><h2 class="h2">댓글 ${L.length}개</h2>${rcid?'':cfrm(s,e,null)}<div>${T.map(x=>`<div class="cmw" style="margin-left:${x.d*20}px">${cm1(s,e,x.m)}${rcid===x.m.id?cfrm(s,e,x.m.name,x.m.kind==='rp'?1:0):''}</div>`).join('')||'<p class="mu">첫 댓글을 남겨 보세요.</p>'}</div></section>`}
 function crep(sid,eid,id){rcid=id;vRead(sid,eid);
  const f=$('.cmf.rep');if(f)f.scrollIntoView({block:'center'});const x=$('#ct');if(x)x.focus()}
-function cadd(sid,eid){const s=find(sid),e=s&&s.eps.find(x=>x.id===eid),t=$('#ct').value.trim();if(!e)return;if(!t){toast('댓글 내용을 입력해 주세요');return}const c=myChars().find(x=>x.id===$('#cid').value);(e.cm=e.cm||[]).push({id:uid('m'),mine:1,d:today(),ts:Date.now(),text:t,parent:rcid||null,kind:c?'rp':(s.author===ME?'author':'reader'),name:c?c.name:pn(ME),cid:c?c.id:null,img:c?c.img:(uPic(ME)||'')});if(!save()){e.cm.pop();return}rcid=null;vRead(sid,eid)}
+function cadd(sid,eid){const s=find(sid),e=s&&s.eps.find(x=>x.id===eid),t=$('#ct').value.trim();if(!e)return;if(!t){toast('댓글 내용을 입력해 주세요');return}const c=myChars().find(x=>x.id===$('#cid').value);
+ const pm=rcid&&(e.cm||[]).find(x=>x.id===rcid);
+ if(pm&&pm.kind==='rp'&&!c){toast('RP 댓글에는 캐릭터로만 답글을 달 수 있어요');return}
+ if(pm&&pm.kind!=='rp'&&c){toast('작가·독자 댓글에는 내 이름으로만 답글을 달 수 있어요');return}(e.cm=e.cm||[]).push({id:uid('m'),mine:1,d:today(),ts:Date.now(),text:t,parent:rcid||null,kind:c?'rp':(s.author===ME?'author':'reader'),name:c?c.name:pn(ME),cid:c?c.id:null,img:c?c.img:(uPic(ME)||'')});if(!save()){e.cm.pop();return}rcid=null;vRead(sid,eid)}
 function cdel(sid,eid,mid){const e=find(sid).eps.find(x=>x.id===eid),L=e.cm||[];
  const kill=new Set([mid]);let n=1;while(n){n=0;L.forEach(m=>{if(m.parent&&kill.has(m.parent)&&!kill.has(m.id)){kill.add(m.id);n++}})}
  if(kill.size>1&&!confirm('이 댓글에 달린 답글 '+(kill.size-1)+'개도 함께 지워져요. 삭제할까요?'))return;
@@ -866,13 +904,20 @@ function csv(){const n=$('#cn').value.trim(),my=db.chars.filter(c=>c.owner===ME)
 function cdl(id){const c=db.chars.find(x=>x.id===id&&x.owner===ME);if(!c)return;
 if(!confirm('캐릭터 ‘'+c.name+'’을(를) 삭제할까요?\n\n작품의 등장인물 목록에서도 빠지고 되돌릴 수 없어요.\n이 캐릭터로 쓴 RP 댓글은 그대로 남아요.'))return;
 db.chars=db.chars.filter(x=>x.id!==id);db.series.forEach(s=>s.eps.forEach(e=>{e.cast=(e.cast||[]).filter(x=>x!==id)}));save();toast('캐릭터를 삭제했어요');ceid=null;avData='';vChars()}
-function vChar(id){const c=db.chars.find(x=>x.id===id);if(!c)return vHome();const L=db.series.filter(s=>castL(s).some(c=>c.id===id)&&!blk(s));app.innerHTML=`<div class="wrap"><div class="sh">${av(c.img,c.name).replace('class="av"','class="av lgav"')}<div><h1 style="${chStyle(c.id)}">${esc(c.name)}</h1><p class="mu mrow">${uchip(c.owner)}<span>의 캐릭터${(c.share||[]).length?' · RP 공유: '+(c.share||[]).map(u=>esc(pn(u))).join(', '):''}</span></p>${c.quote||c.font||c.tcolor?`<p class="cq" style="${c.font?`font-family:'${esc(c.font)}',serif;${fsCss(c.font)}`:''}${cvar(c.tcolor)}">“${esc(c.quote||PVS)}”</p>`:''}${lnk(c)?`<div class="acts">${lnk(c)}</div>`:''}</div></div><div class="box" style="margin:0 0 24px"><label>이 캐릭터의 내 별명 <span class="mu">내 화면의 소설에서만 이 이름으로 보여요</span><input id="al" maxlength="20" value="${esc((db.prefs.alias||{})[c.id]||'')}"></label><div class="acts"><button class="btn" onclick="asv('${c.id}')">별명 저장</button></div></div><h2 class="h2">등장하는 작품 ${L.length}개</h2><div>${L.map(row).join('')||'<p class="mu">아직 이 캐릭터가 등장하는 작품이 없습니다.</p>'}</div></div>`}
+function vChar(id){const c=db.chars.find(x=>x.id===id);if(!c)return vHome();const L=db.series.filter(s=>castL(s).some(c=>c.id===id)&&!blk(s));app.innerHTML=`<div class="wrap"><div class="sh">${av(c.img,c.name).replace('class="av"','class="av lgav"')}<div><h1 style="${chStyle(c.id)}">${esc(c.name)}</h1><p class="mu mrow">${uchip(c.owner)}<span>의 캐릭터${(c.share||[]).length?' · RP 공유: '+(c.share||[]).map(u=>esc(pn(u))).join(', '):''}</span></p>${c.quote||c.font||c.tcolor?`<p class="cq" style="${c.font?`font-family:'${esc(c.font)}',serif;${fsCss(c.font)}`:''}${cvar(c.tcolor)}">“${esc(c.quote||PVS)}”</p>`:''}${lnk(c)?`<div class="acts">${lnk(c)}</div>`:''}</div></div><div class="box" style="margin:0 0 24px"><label>이 캐릭터의 내 별명 <span class="mu">내 화면의 소설에서만 이 이름으로 보여요</span><input id="al" maxlength="20" value="${esc((db.prefs.alias||{})[c.id]||'')}"></label><div class="acts"><button class="btn" onclick="asv('${c.id}')">별명 저장</button></div></div><h2 class="h2">등장하는 작품 ${L.length}개</h2><div>${L.map(row).join('')||'<p class="mu">아직 이 캐릭터가 등장하는 작품이 없습니다.</p>'}</div>${chCmx(id)}</div>`}
+function chCm(id){const o=[];db.series.forEach(s=>{if(blk(s))return;pub(s).forEach(e=>(e.cm||[]).forEach(m=>{if(m.cid===id)o.push({s,e,m})}))});
+ return o.sort((a,b)=>(b.m.ts||0)-(a.m.ts||0))}
+const CHP=12;let chp=1;
+function chCmx(id){const A=chCm(id),n=A.length,pg=Math.max(1,Math.ceil(n/CHP));if(chp>pg)chp=pg;
+ const L=A.slice((chp-1)*CHP,chp*CHP);
+ return `<h2 class="h2" style="margin-top:34px">이 캐릭터가 남긴 댓글 ${n}개</h2>${n?`<div class="chcm">${L.map(x=>`<a class="chc" href="#read-${x.s.id}-${x.e.id}"><p class="ct">${esc(x.m.text).replace(/\n/g,'<br>')}</p><p class="mu" style="margin:6px 0 0">${esc(x.s.title)} · ${esc(x.e.title)}</p></a>`).join('')}</div>${pg>1?`<div class="pg">${Array.from({length:pg},(_,i)=>`<button class="pb${i+1===chp?' on':''}" onclick="chp=${i+1};vChar('${id}')">${i+1}</button>`).join('')}</div>`:''}`:'<p class="mu">아직 이 캐릭터로 남긴 댓글이 없습니다.</p>'}`}
 function vSet0(){const st=db.set;app.innerHTML=`<div class="wrap"><h1>보기 설정</h1><label class="ck" style="margin-top:20px"><input type="checkbox" id="sal"${st.alias===false?'':' checked'} onchange="sset()">별명으로 보기</label><p class="mu">내가 정한 캐릭터 별명으로 소설 속 이름이 보여요. 끄면 원래 이름으로 돌아가요.</p><label class="ck" style="margin-top:20px"><input type="checkbox" id="sbg"${st.bgm===false?'':' checked'} onchange="sset()">배경음악(BGM) 재생</label><p class="mu">끄면 읽기 화면에서 BGM 재생 버튼이 사라져요. 켜 두어도 자동으로 재생되지는 않아요.</p><label>기본 음량<input type="range" id="svol" min="0" max="100" value="${db.prefs.vol==null?70:db.prefs.vol}" oninput="bgV(this.value)" onchange="bgSv()"></label><label class="ck" style="margin-top:20px"><input type="checkbox" id="snr"${st.noRp?' checked':''} onchange="sset()">RP 댓글 숨기기</label><p class="mu">캐릭터로 쓴 RP 댓글이 댓글 목록에 보이지 않아요.</p><h2 class="h2" style="margin-top:28px">이런 작품은 보지 않을래요</h2><p class="mu">선택한 주의 요소가 있는 작품은 목록에서 숨겨져요.</p><div>${WN.map(w=>`<label class="ck"><input type="checkbox" name="bl" value="${w}"${st.block.includes(w)?' checked':''} onchange="sset()">${w}</label>`).join('')}</div><label>직접 입력 <span class="mu">쉼표로 구분</span><input id="blx" maxlength="80" value="${esc(st.block.filter(w=>!WN.includes(w)).join(', '))}" onchange="sset()"></label>
 <label class="ck" style="margin-top:20px"><input type="checkbox" id="shd"${st.hide===true?'':' checked'} onchange="sset()">접속 중인 것 보여 주기</label><p class="mu">끄면 다른 사람에게 내 접속과 활동이 보이지 않아요. 대신 나도 다른 사람이 뭘 하는지는 볼 수 있어요.</p>
 <h2 class="h2" style="margin-top:32px">알림</h2><p class="mu">알림은 머리말의 종 모양에 쌓여요.</p>
 <label class="ck"><input type="checkbox" id="nte"${ntP().eps!==false?' checked':''} onchange="sset()">구독한 작품에 새 회차가 올라오면 알림</label>
+<label class="ck"><input type="checkbox" id="ntr"${ntP().rep!==false?' checked':''} onchange="sset()">내 댓글에 답글이 달리면 알림 <span class="mu">내가 내 댓글에 단 답글은 알리지 않아요</span></label>
 <label>내 작품에 달린 댓글 알림<select id="ntc" onchange="sset()">${[['all','모든 댓글'],['rp','RP 댓글만'],['normal','RP가 아닌 댓글만'],['none','받지 않기']].map(o=>`<option value="${o[0]}"${ntP().cm===o[0]?' selected':''}>${o[1]}</option>`).join('')}</select></label></div>`}
-function sset0(){const nt=Object.assign(ntP(),{eps:$('#nte').checked,cm:$('#ntc').value});db.set={nt,hide:!$('#shd').checked,alias:$('#sal').checked,bgm:$('#sbg').checked,noRp:$('#snr').checked,block:[...new Set([...[...document.querySelectorAll('[name=bl]:checked')].map(e=>e.value),...$('#blx').value.split(',').map(x=>x.trim().slice(0,12)).filter(Boolean)])].slice(0,20)};save();toast('설정을 저장했습니다')}
+function sset0(){const nt=Object.assign(ntP(),{eps:$('#nte').checked,cm:$('#ntc').value,rep:$('#ntr').checked});db.set={nt,hide:!$('#shd').checked,alias:$('#sal').checked,bgm:$('#sbg').checked,noRp:$('#snr').checked,block:[...new Set([...[...document.querySelectorAll('[name=bl]:checked')].map(e=>e.value),...$('#blx').value.split(',').map(x=>x.trim().slice(0,12)).filter(Boolean)])].slice(0,20)};save();toast('설정을 저장했습니다')}
 function sset(){sset0();onTrack();onlUI()}
 function dl(){const e=$('#dl');if(!e)return;const L=db.drafts||[],o=e.querySelector('details'),op=o&&o.open;e.innerHTML=`<details class="dls"${op?' open':''}><summary>임시 저장한 글 ${L.length}개</summary>${L.map(x=>`<div class="dr"><span>${esc(x.title||'제목 없음')} <span class="mu">${new Date(x.ts).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}</span></span><span><a class="lk" href="#write-x-${x.id}">열기</a> <button class="lk" onclick="ddr('${x.id}')">삭제</button></span></div>`).join('')}<div style="margin-top:10px"><button type="button" class="btn ghost" onclick="nw()">새 글 쓰기</button></div></details>`}
 function nw(){cd=null;if(location.hash==='#write')vWrite();else location.hash='write'}
@@ -1020,21 +1065,32 @@ document.addEventListener('click',e=>{const im=e.target;if(!im||im.tagName!=='IM
 addEventListener('keydown',e=>{if(e.key==='Escape'){if($('#crw'))crClose();else if($('#pvw'))pvClose();else zclose()}});
 
 // ----- 알림 -----
-const ntP=()=>Object.assign({eps:true,cm:'all',seen:''},db.set.nt||{});
-function nitems(){const n=ntP(),t0=Date.parse(n.seen||0)||0,out=[];
- if(n.eps!==false)db.series.forEach(s=>{if(s.author===ME||!db.subs.includes(s.id)||blk(s))return;pub(s).forEach(e=>{if((e.ts||0)>t0)out.push({ts:e.ts,t:`${s.title} · ${e.title}`,sub:'구독한 작품에 새 회차가 올라왔어요',href:`#read-${s.id}-${e.id}`})})});
- (db.notices||[]).forEach(x=>{if(x.ts>t0)out.push({ts:x.ts,t:x.title,sub:'새 공지사항 · '+x.cat,href:`#notice-${x.id}`})});
- if(n.cm!=='none')db.series.filter(s=>s.author===ME).forEach(s=>s.eps.forEach(e=>(e.cm||[]).forEach(m=>{if(m.mine||(m.ts||0)<=t0)return;if(n.cm==='rp'&&m.kind!=='rp')return;if(n.cm==='normal'&&m.kind==='rp')return;
-  out.push({ts:m.ts,t:`${m.name}: ${m.text.slice(0,50)}`,sub:`${s.title} · ${e.title}에 새 댓글`,href:`#read-${s.id}-${e.id}`,img:m.img,name:m.name})})));
- return out.sort((a,b)=>b.ts-a.ts).slice(0,60)}
+const ntP=()=>Object.assign({eps:true,cm:'all',rep:true,seen:'',clr:''},db.set.nt||{});
+const nTs=v=>v?(Date.parse(v)||0):0;
+function nitems(){const n=ntP(),t0=nTs(n.seen),c0=nTs(n.clr),out=[],seen=new Set();
+ const add=o=>{if((o.ts||0)<=c0)return;if(seen.has(o.k))return;seen.add(o.k);o.nw=(o.ts||0)>t0;out.push(o)};
+ if(n.eps!==false)db.series.forEach(s=>{if(s.author===ME||!db.subs.includes(s.id)||blk(s))return;pub(s).forEach(e=>add({k:'e'+e.id,ts:e.ts,t:`${s.title} · ${e.title}`,sub:'구독한 작품에 새 회차가 올라왔어요',href:`#read-${s.id}-${e.id}`}))});
+ (db.notices||[]).forEach(x=>add({k:'n'+x.id,ts:x.ts,t:x.title,sub:'새 공지사항 · '+x.cat,href:`#notice-${x.id}`}));
+ if(n.rep!==false)db.series.forEach(s=>{if(blk(s))return;s.eps.forEach(e=>{const L=e.cm||[];L.forEach(m=>{if(m.mine||!m.parent)return;
+  const pm=L.find(x=>x.id===m.parent);if(!pm||!pm.mine)return;
+  add({k:'m'+m.id,ts:m.ts,t:`${m.name}: ${m.text.slice(0,50)}`,sub:`내 댓글에 답글 · ${s.title} · ${e.title}`,href:`#read-${s.id}-${e.id}`,img:m.img,name:m.name})})})});
+ if(n.cm!=='none')db.series.filter(s=>s.author===ME).forEach(s=>s.eps.forEach(e=>(e.cm||[]).forEach(m=>{if(m.mine)return;if(n.cm==='rp'&&m.kind!=='rp')return;if(n.cm==='normal'&&m.kind==='rp')return;
+  add({k:'m'+m.id,ts:m.ts,t:`${m.name}: ${m.text.slice(0,50)}`,sub:`${s.title} · ${e.title}에 새 댓글`,href:`#read-${s.id}-${e.id}`,img:m.img,name:m.name})})));
+ return out.sort((a,b)=>b.ts-a.ts).slice(0,200)}
+const nUnread=()=>nitems().filter(x=>x.nw).length;
 function hh(){const h=document.querySelector('header');if(h)document.documentElement.style.setProperty('--hh',h.getBoundingClientRect().height+'px')}
 addEventListener('resize',hh);
-function bellUI(){const b=$('#bl');if(!b||!b.classList)return;const k=ME?nitems().length:0;b.innerHTML=SV(ICO.bell)+(k?`<span class="nb">${k>99?'99+':k}</span>`:'')}
+function bellUI(){const b=$('#bl');if(!b||!b.classList)return;const k=ME?nUnread():0;b.innerHTML=SV(ICO.bell)+(k?`<span class="nb">${k>99?'99+':k}</span>`:'')}
+const edTxt=e=>{if(!e||!e.ed)return '';const d=new Date(e.ed);if(isNaN(d))return '';
+ return '마지막 수정 '+d.toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric'})};
 const ago=ts=>{const m=Math.floor((Date.now()-ts)/60000);return m<1?'방금':m<60?m+'분 전':m<1440?Math.floor(m/60)+'시간 전':new Date(ts).toLocaleDateString('ko-KR',{month:'numeric',day:'numeric'})};
-function vAlerts(){const L=nitems();
- app.innerHTML=`<div class="wrap"><h1>알림</h1><p class="mu">구독한 작품의 새 회차와 내 작품에 달린 댓글을 모아서 보여줘요. <a href="#settings" style="text-decoration:underline">알림 설정</a></p>
- <div style="margin-top:14px">${L.map(x=>`<a class="al nw" href="${x.href}">${x.name?av(x.img,x.name):`<span class="av">${SV(ICO.bell)}</span>`}<div style="flex:1;min-width:0"><div>${esc(x.t)}</div><p class="mu" style="margin:2px 0 0">${esc(x.sub)} · ${ago(x.ts)}</p></div></a>`).join('')||'<p class="mu" style="margin:20px 0">새 알림이 없어요.</p>'}</div></div>`;
+function vAlerts(){const L=nitems(),k=L.filter(x=>x.nw).length;
+ app.innerHTML=`<div class="wrap"><h1>알림</h1><p class="mu">구독한 작품의 새 회차, 내 작품에 달린 댓글, 내 댓글에 달린 답글을 모아서 보여줘요. 확인한 뒤에도 기록은 그대로 남아요. <a href="#settings" style="text-decoration:underline">알림 설정</a></p>
+ <div class="acts" style="margin:14px 0 0"><span class="mu">${L.length}개${k?` · 새 알림 ${k}개`:''}</span>${L.length?`<button class="btn ghost" onclick="nClr()">기록 지우기</button>`:''}</div>
+ <div style="margin-top:14px">${L.map(x=>`<a class="al${x.nw?' nw':''}" href="${x.href}">${x.name?av(x.img,x.name):`<span class="av">${SV(ICO.bell)}</span>`}<div style="flex:1;min-width:0"><div>${esc(x.t)}${x.nw?'<span class="bd2 nn">새 알림</span>':''}</div><p class="mu" style="margin:2px 0 0">${esc(x.sub)} · ${ago(x.ts)}</p></div></a>`).join('')||'<p class="mu" style="margin:20px 0">아직 알림이 없어요.</p>'}</div></div>`;
  db.set.nt=Object.assign(ntP(),{seen:new Date().toISOString()});save();setTimeout(bellUI,0)}
+function nClr(){if(!confirm('지금까지의 알림 기록을 모두 지울까요?\n\n앞으로 오는 알림은 다시 쌓여요.'))return;
+ db.set.nt=Object.assign(ntP(),{clr:new Date().toISOString(),seen:new Date().toISOString()});save();toast('알림 기록을 지웠어요');vAlerts()}
 
 // ----- 관리자 -----
 async function adm(fn,msg){try{clearTimeout(syncT);syncT=0;await syncQ;await fn();await loadAll();toast(msg);route()}catch(e){console.error(e);toast('실패했어요: '+((e&&e.message)||e))}}
@@ -1057,13 +1113,13 @@ function ctDel(id){const c=db.core.find(x=>x.id===id);if(!c||!isAdm)return;if(!c
  adm(async()=>{await ok(sb.from('core_tags').delete().eq('id',id));await ctFix(c.name,'')},'태그를 지웠어요')}
 // ----- 독자 화면 미리보기 -----
 function pvClose(){const o=$('#pvw');if(o)o.remove();document.body.style.overflow=''}
-function pvOpen(){if(!$('#ed'))return;const p=db.prefs,e={title:$('#wt').value.trim()||'(제목 없음)',html:clean(dlgify($('#ed').innerHTML)),cast:gc(),img:'',rev:rev?((find(rev.s).eps.find(x=>x.id===rev.e)||{}).rev||0)+1:0,cm:[]};
+function pvOpen(){if(!$('#ed'))return;const p=db.prefs,e={title:$('#wt').value.trim()||'(제목 없음)',html:clean(dlgify($('#ed').innerHTML)),cast:gc(),img:'',ed:'',cm:[]};
  const warns=gwE();
  const o=document.createElement('div');o.className='pv';o.id='pvw';
  o.innerHTML=`<div class="pvb"><b>독자 화면 미리보기</b><span class="mu" style="flex:1">실제로 발행하면 이렇게 보여요</span><button type="button" class="btn ghost" onclick="pvClose()">닫기</button></div>
  <main style="max-width:760px;margin:0 auto;padding:16px 20px 0">${warns.length?`<div class="wnote"><b>주의</b> 이 작품에는 ${warns.map(w=>esc(w)).join(', ')} 요소가 포함되어 있습니다.</div>`:''}
  <div class="rc">${casts(e,0,1,e.povc)}${povTxt(e)?`<p class="mu" style="margin:6px 0 0">시점 · ${esc(povTxt(e))}</p>`:''}</div>
- <article class="reader rd-${p.th}" style="font-size:${p.size}px;line-height:${p.lh};${p.font?`font-family:'${esc(p.font)}',serif;${fsCss(p.font)}`:''}"><h2>${esc(e.title)}</h2>${e.rev?`<p class="mu" style="margin:-1.3em 0 1.8em;font-size:.78em">수정 ${e.rev}회</p>`:''}<div class="bd">${amap2(e.html,e)}</div></article>
+ <article class="reader rd-${p.th}" style="font-size:${p.size}px;line-height:${p.lh};${p.font?`font-family:'${esc(p.font)}',serif;${fsCss(p.font)}`:''}"><h2>${esc(e.title)}</h2><div class="bd">${amap2(e.html,e)}</div></article>
  <p class="mu" style="max-width:680px;margin:18px auto 0">글자 크기·줄 간격·배경색은 독자가 각자 고를 수 있어요. 지금은 내 읽기 설정으로 보여 주고 있어요.</p></main>`;
  document.body.appendChild(o);document.body.style.overflow='hidden';o.scrollTop=0}
 
@@ -1149,7 +1205,7 @@ function verShow(){if($('#upb'))return;const d=document.createElement('div');d.c
  d.innerHTML=`<span>사이트가 새로 바뀌었어요. 새로고침하면 바뀐 내용이 보여요.</span><button type="button" class="go" onclick="location.reload()">새로고침</button><button type="button" onclick="this.parentNode.remove()">나중에</button>`;
  document.body.insertBefore(d,document.body.firstChild);hh()}
 function route(){if(!ME){vAuth();return}const p=(location.hash.slice(1)||'home').split('-');if(p[0]!=='read'&&p[0]!=='series')bgStop();if(p[0]!=='rev')rev=null;if(p[0]!=='read')rcid=null;if(p[0]!=='notice'&&p[0]!=='notices')nedit=null;pvClose();
-const m={series:()=>vSeries(p[1]),read:()=>vRead(p[1],p[2]),write:()=>vWrite(p[1],p[2]),rev:()=>vRev(p[1],p[2]),edit:()=>vEdit(p[1]),new:()=>vNew(p[1]),chars:()=>{ceid=null;avData='';vChars()},char:()=>vChar(p[1]),user:()=>vUser(p[1]),cast:()=>vCast(p[1],p[2]),settings:vSet,music:vMusic,alerts:vAlerts,notices:vNotices,notice:()=>vNotice(p[1]),mine:vMine};
+const m={series:()=>{if(ordS&&ordS!==p[1])ordS=null;vSeries(p[1])},read:()=>vRead(p[1],p[2]),write:()=>vWrite(p[1],p[2]),rev:()=>vRev(p[1],p[2]),edit:()=>vEdit(p[1]),new:()=>vNew(p[1]),chars:()=>{ceid=null;avData='';vChars()},char:()=>{if(chc!==p[1]){chc=p[1];chp=1}vChar(p[1])},user:()=>vUser(p[1]),cast:()=>vCast(p[1],p[2]),settings:vSet,music:vMusic,alerts:vAlerts,notices:vNotices,notice:()=>vNotice(p[1]),mine:vMine};
 (Object.prototype.hasOwnProperty.call(m,p[0])?m[p[0]]:vHome)();bellUI();hh();onJoin();onTrack();window.scrollTo(0,0);if(p[0]==='home'||p[0]==='series')stale()}
 addEventListener('hashchange',route);
 boot();
