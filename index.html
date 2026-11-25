@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>콜라주 노블</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%96%3C/text%3E%3C/svg%3E">
-<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="fonts/fonts.css?v=2">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@400;600;700&family=Nanum+Myeongjo&family=Nanum+Gothic&family=Gowun+Batang&family=Gowun+Dodum&family=Nanum+Pen+Script&family=Black+Han+Sans&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box}
@@ -580,19 +580,23 @@ const fontOk=fam=>{const c=document.createElement('canvas').getContext('2d'),s='
 async function fchk(){const bt=$('#fcb');if(bt)bt.disabled=true;
  const box=$('#fcx');if(box)box.innerHTML='<p class="mu">확인 중이에요…</p>';
  try{
-  await Promise.all(FONTS.map(f=>document.fonts.load('16px "'+f[1]+'"','한글가나다').catch(()=>{})));
-  const R=FONTS.map(f=>({nm:f[0],fam:f[1],mine:WEBF.includes(f[1]),ok:fontOk(f[1])}));
+  const R=[];
+  for(const f of FONTS){let dl=0;
+   try{const r=await document.fonts.load('16px "'+f[1]+'"','한글가나다');dl=(r&&r.length)?1:0}catch(e){}
+   R.push({nm:f[0],fam:f[1],mine:WEBF.includes(f[1]),dl,ok:fontOk(f[1])})}
   const mine=R.filter(x=>x.mine),goog=R.filter(x=>!x.mine);
-  const okM=mine.filter(x=>x.ok).length,okG=goog.filter(x=>x.ok).length;
+  const dM=mine.filter(x=>x.dl).length,dG=goog.filter(x=>x.dl).length;
+  const sys=R.filter(x=>!x.dl&&x.ok).length;
   const now=(FONTS.find(f=>f[1]===db.prefs.font)||['기본'])[0];
   let msg;
-  if(okM===0&&okG===0)msg='글꼴을 하나도 못 받고 있어요. 광고·폰트 차단 확장이나 데이터 절약 모드가 켜져 있는지, 시크릿 창에서는 제대로 보이는지 확인해 주세요.';
-  else if(okM===0)msg='이 사이트에 넣은 글꼴만 안 받아지고 있어요. 새로고침 버튼을 눌러 저장된 옛 파일을 비워 주세요. 그래도 그대로면 fonts 폴더가 제대로 올라갔는지 봐야 해요.';
-  else if(okG===0)msg='구글에서 받아 오는 글꼴만 안 들어오고 있어요. 기본 글씨체(명조·고딕·나눔·고운)가 여기에 들어가요. 네트워크가 구글 글꼴을 막고 있을 수 있으니, 다른 망이나 시크릿 창에서 열어 보세요. 아래에서 ○ 표시된 글꼴을 고르면 당장은 쓸 수 있어요.';
-  else if(okM<mine.length||okG<goog.length)msg='일부 글꼴만 못 받았어요. 새로고침 버튼을 한 번 눌러 주세요. 아래에서 × 표시된 글꼴이 안 들어온 것들이에요.';
+  if(dM===0&&dG===0)msg='글꼴 파일을 하나도 받지 못하고 있어요. 지금 보이는 글씨는 이 컴퓨터에 이미 깔려 있는 글꼴이에요. ① 시크릿 창에서 열어 보세요 ② 브라우저 캐시를 비워 주세요(Ctrl+Shift+Delete → 전체 기간 → 캐시된 이미지 및 파일) ③ 광고 차단 확장의 ‘원격 폰트 차단’을 꺼 주세요.';
+  else if(dM===0)msg='이 사이트에 넣은 글꼴만 안 받아지고 있어요. 새로고침 버튼을 누르거나 캐시를 비워 주세요. 그래도 그대로면 fonts 폴더가 제대로 올라갔는지 봐야 해요.';
+  else if(dG===0)msg='구글에서 받아 오는 글꼴만 안 들어오고 있어요. 기본 글씨체(명조·고딕·나눔·고운)가 여기에 들어가요. 아래에서 ○ 표시된 글꼴을 고르면 당장은 쓸 수 있어요.';
+  else if(dM<mine.length||dG<goog.length)msg='일부 글꼴만 못 받았어요. 새로고침 버튼을 한 번 눌러 주세요. 아래에서 × 표시된 글꼴이 안 들어온 것들이에요.';
   else msg='글꼴은 모두 잘 받아졌어요. 그런데도 기본 글씨체로 보인다면, 읽기 화면 위쪽의 글꼴 고르는 칸이 ‘명조 (기본)’으로 되어 있는지 확인해 주세요.';
-  box.innerHTML=`<p>${esc(msg)}</p><p class="mu" style="margin:6px 0 0">지금 읽기 글꼴: <b>${esc(now)}</b> · 사이트 글꼴 ${okM}/${mine.length} · 구글 글꼴 ${okG}/${goog.length}</p>
-  <div class="fchk">${R.map(x=>`<div><span>${x.ok?'○':'×'}</span><span style="font-family:'${x.fam}',serif">${esc(x.nm)}</span><span class="mu">${x.mine?'사이트':'구글'}</span></div>`).join('')}</div>`}
+  box.innerHTML=`<p>${esc(msg)}</p><p class="mu" style="margin:6px 0 0">지금 읽기 글꼴: <b>${esc(now)}</b> · 사이트 글꼴 ${dM}/${mine.length} · 구글 글꼴 ${dG}/${goog.length}${sys?` · 내 컴퓨터에 깔린 글꼴로 대신 보이는 것 ${sys}개`:''}</p>
+  <div class="fchk">${R.map(x=>`<div><span${x.dl?'':(x.ok?' class="mu"':'')}>${x.dl?'○':(x.ok?'△':'×')}</span><span style="font-family:'${x.fam}',serif">${esc(x.nm)}</span><span class="mu">${x.dl?'':(x.ok?'내 컴퓨터 · ':'')}${x.mine?'사이트':'구글'}</span></div>`).join('')}</div>
+  <p class="mu" style="margin:10px 0 0">○ 내려받음 · △ 못 받았지만 이 컴퓨터에 깔려 있어서 보임 · × 못 씀</p>`}
  catch(e){console.error(e);box.innerHTML='<p class="mu">확인하지 못했어요.</p>'}
  finally{const b2=$('#fcb');if(b2)b2.disabled=false}}
 const STLIM=1024;
