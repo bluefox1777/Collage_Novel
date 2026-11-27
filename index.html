@@ -21,7 +21,14 @@ header{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var
 body.rview>header{display:none}
 .hd{max-width:760px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:8px 12px;flex-wrap:wrap}
 .logo{font:700 21px "Noto Serif KR",serif;letter-spacing:0;white-space:nowrap}
-.hd nav{display:flex;align-items:center;gap:18px;font-size:15px}
+.hd nav{display:flex;align-items:center;gap:3px;font-size:15px}
+.hd nav>a[data-nv]{position:relative;display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:999px;color:var(--mute);text-decoration:none;line-height:1.2;transition:color .14s,background .14s}
+.hd nav>a[data-nv] .nvi{display:inline-flex}
+.hd nav>a[data-nv] svg{width:17px;height:17px}
+.hd nav>a[data-nv]:hover{color:var(--ink);background:var(--card)}
+.hd nav>a[data-nv].on{color:var(--ac);background:color-mix(in srgb,var(--ac) 13%,transparent);font-weight:700}
+.hd nav>a[data-nv].on::after{content:"";position:absolute;left:50%;bottom:-9px;width:16px;height:2px;margin-left:-8px;border-radius:2px;background:var(--ac)}
+.bell{margin-left:5px}
 .hbt{display:inline-flex;align-items:center;gap:8px}
 .hbt .btn{padding:7px 14px;font-size:14px}
 main{max-width:760px;margin:0 auto;padding:28px 20px 48px}
@@ -272,7 +279,7 @@ body.sideon{padding-right:248px}
 .qb{border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);padding:6px 12px;cursor:pointer;font:inherit;font-size:14px}
 .qb blockquote{margin:0!important;font-size:14px}
 .ed blockquote,.bd blockquote{margin:1.2em 0}
-.hd nav{flex-wrap:wrap;justify-content:flex-end;gap:6px 16px}
+.hd nav{flex-wrap:wrap;justify-content:flex-end;gap:4px}
 .pn2 .ck input{flex:none;width:auto}
 .ed img{cursor:pointer}
 .ed img.sel{outline:3px solid var(--ac);outline-offset:2px}
@@ -468,6 +475,13 @@ input[type=range]{accent-color:var(--ac)}
 .rlq{margin:9px 0 0;font-size:15px;overflow-wrap:anywhere}
 .cc.rel{cursor:pointer}
 .cc.rel svg{width:13px;height:13px;opacity:.6;margin-left:1px}
+.cc.hasrel{border-color:var(--ac);background:color-mix(in srgb,var(--ac) 11%,transparent)}
+.cc.hasrel:hover,.cc.hasrel:focus-visible{background:color-mix(in srgb,var(--ac) 20%,transparent)}
+.relb{display:inline-flex;align-items:center;gap:3px;margin-left:3px;padding:1px 7px 1px 5px;border-radius:999px;background:var(--ac);color:var(--on);font-size:11px;font-weight:700;letter-spacing:-.01em}
+.cc.hasrel .relb svg{width:11px;height:11px;opacity:1;margin:0}
+.relg{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:8px 0 0;font-size:12.5px;color:var(--mute)}
+.relg b{display:inline-flex;align-items:center;gap:3px;padding:1px 7px 1px 5px;border-radius:999px;background:var(--ac);color:var(--on);font-size:11px;font-weight:700}
+.relg b svg{width:11px;height:11px}
 body.noscroll{overflow:hidden}
 .bgnt{position:fixed;left:50%;transform:translateX(-50%);bottom:max(20px,env(safe-area-inset-bottom,0px));z-index:46;
  display:flex;align-items:center;gap:10px;width:max-content;max-width:min(520px,calc(100vw - 100px));
@@ -640,10 +654,15 @@ body.ruih .rbar{transform:translateY(-100%);opacity:0}
 .rsp{max-width:1080px;margin:0 auto;padding:0 14px 10px}
 .rfab{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:max(20px,env(safe-area-inset-bottom,0px));z-index:44;display:flex;flex-direction:column;gap:10px;transition:transform .32s ease,opacity .32s ease}
 body.ruih .rfab{transform:translateX(90px);opacity:0}
-.fbb{width:46px;height:46px;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:50%;background:var(--bg);color:var(--ink);cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.14)}
+
+.fbb{width:56px;height:56px;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:50%;background:var(--bg);color:var(--ink);cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.14)}
 .fbb:hover{border-color:var(--ac);color:var(--ac)}
-.fbb svg{width:20px;height:20px}
-@media (max-width:620px){.rbb span{display:none}.rbb{padding:7px 8px}.rbt{display:none}.fbb{width:42px;height:42px}}
+.fbb svg{width:25px;height:25px}
+.fbb.fbe{width:56px;height:56px;flex-direction:column;gap:1px;text-decoration:none;font-size:10.5px;font-weight:700;letter-spacing:-.02em;border-color:var(--ac);color:var(--ac)}
+.fbb.fbe svg{width:19px;height:19px}
+.rfab{align-items:flex-end}
+@media (max-width:760px){.hd nav>a[data-nv]{flex-direction:column;gap:2px;padding:5px 8px;font-size:11.5px}.hd nav>a[data-nv] svg{width:19px;height:19px}.hd nav>a[data-nv].on::after{bottom:-7px}}
+@media (max-width:620px){.rbb span{display:none}.rbb{padding:7px 8px}.rbt{display:none}.fbb{width:50px;height:50px}.fbb svg{width:23px;height:23px}.fbb.fbe{width:50px;height:50px;font-size:10px}}
 .rback{display:inline-flex;align-items:center;gap:8px;max-width:100%;padding:5px 14px 5px 7px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);text-decoration:none;font-size:15px;font-weight:600;transition:border-color .12s,background .12s}
 .rback:hover,.rback:focus-visible{border-color:var(--ac);background:var(--bg)}
 .rback svg{flex:none;width:17px;height:17px;color:var(--mute)}
@@ -668,11 +687,11 @@ footer{max-width:760px;margin:0 auto;padding:0 20px 36px;font-size:13px;color:va
 .lk{font:inherit;font-size:13px;color:var(--ac);background:none;border:0;padding:0;text-decoration:underline;cursor:pointer}
 #toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:6px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s}
 #toast.on{opacity:1}
-@media (max-width:480px){.logo{font-size:17px;white-space:nowrap}.hd{gap:8px}.hd nav{font-size:14px;gap:4px 11px}.hbt{gap:6px}.hbt .btn{padding:6px 10px;font-size:13px}.sh{flex-direction:column;align-items:flex-start}.shw.hasb{padding:16px;margin:0 -16px 16px}.two{grid-template-columns:1fr}.hd nav{gap:12px}}
+@media (max-width:480px){.logo{font-size:17px;white-space:nowrap}.hd{gap:8px}.hd nav{font-size:14px;gap:2px}.hd nav>a[data-nv]{padding:5px 7px;font-size:11px}.hbt{gap:6px}.hbt .btn{padding:6px 10px;font-size:13px}.sh{flex-direction:column;align-items:flex-start}.shw.hasb{padding:16px;margin:0 -16px 16px}.two{grid-template-columns:1fr}.hd nav{gap:2px}}
 </style>
 </head>
 <body>
-<header><div class="hd"><a class="logo" href="#home">라이브러리 오브 콜라주</a><button type="button" class="onl" id="onl" hidden onclick="pvToggle()"></button><nav><a href="#home">작품</a><a href="#mine">내 작품</a><a href="#chars">캐릭터</a><a href="#music">음원</a><a href="#notices">공지</a><a href="#settings">설정</a><a class="bell" href="#alerts" id="bl" aria-label="알림"></a><span class="hbt"><a class="btn ghost" href="#new">작품 만들기</a><a class="btn" href="#write">글쓰기</a></span></nav></div></header>
+<header><div class="hd"><a class="logo" href="#home">라이브러리 오브 콜라주</a><button type="button" class="onl" id="onl" hidden onclick="pvToggle()"></button><nav><a href="#home" data-nv="home"><span class="nvi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d='M4 5.5A1.5 1.5 0 0 1 5.5 4H9v16H5.5A1.5 1.5 0 0 1 4 18.5z'/><path d='M9 4h4.5A1.5 1.5 0 0 1 15 5.5v13A1.5 1.5 0 0 1 13.5 20H9z'/><path d='m16.6 6.2 2.6-.7a1 1 0 0 1 1.2.7l2.3 9.6'/></svg></span><span class="nvt">작품</span></a><a href="#mine" data-nv="mine"><span class="nvi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d='M12 20h8'/><path d='M16.5 3.6a2 2 0 0 1 2.9 2.8L7.8 18.1 4 19l.9-3.8z'/></svg></span><span class="nvt">내 작품</span></a><a href="#chars" data-nv="chars"><span class="nvi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx='12' cy='8' r='3.6'/><path d='M5 20a7 7 0 0 1 14 0'/></svg></span><span class="nvt">캐릭터</span></a><a href="#music" data-nv="music"><span class="nvi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx='7' cy='17.5' r='2.8'/><circle cx='18' cy='15.5' r='2.5'/><path d='M9.8 17.5V7l10.7-2.6v11.1'/></svg></span><span class="nvt">음원</span></a><a href="#notices" data-nv="notices"><span class="nvi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d='M3.5 10v4a1.5 1.5 0 0 0 1.5 1.5h2L13 20V4L7 8.5H5A1.5 1.5 0 0 0 3.5 10z'/><path d='M17 9.2a4 4 0 0 1 0 5.6'/><path d='M19.6 6.4a8 8 0 0 1 0 11.2'/></svg></span><span class="nvt">공지</span></a><a href="#settings" data-nv="settings"><span class="nvi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx='12' cy='12' r='3'/><path d='M19.4 14.5a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1v.3a2 2 0 1 1-4 0v-.2a1.6 1.6 0 0 0-2.8-1.1l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0-1.1-2.7h-.3a2 2 0 1 1 0-4h.2a1.6 1.6 0 0 0 1.1-2.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3h.1A1.6 1.6 0 0 0 10.2 3v-.3a2 2 0 1 1 4 0v.2a1.6 1.6 0 0 0 2.7 1.1l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0 1.1 2.7h.3a2 2 0 1 1 0 4h-.2a1.6 1.6 0 0 0-1.5 1z'/></svg></span><span class="nvt">설정</span></a><a class="bell" href="#alerts" id="bl" aria-label="알림"></a><span class="hbt"><a class="btn ghost" href="#new">작품 만들기</a><a class="btn" href="#write">글쓰기</a></span></nav></div></header>
 <main id="app"></main>
 <aside class="side" id="side" hidden><div class="sdh"><b id="sdc">온라인</b><button type="button" class="sdx" onclick="sideSet(0)" aria-label="접기">✕</button></div><div id="sdl"></div></aside>
 <footer><p class="ftw">부디 당신의 소설을 찾으실 수 있기를.</p><span id="vr"></span></footer>
@@ -1058,8 +1077,16 @@ function ap(){const r=$('#rd');if(!r)return;const f=db.prefs.font;r.style.fontSi
 function pf(k,d){const p=db.prefs;if(k==='size')p.size=Math.min(28,Math.max(14,p.size+d));else{const L=[1.7,1.9,2.2];p.lh=L[(L.indexOf(p.lh)+1)%3]}save();ap()}
 function rsTog(){const p=$('#rsp'),b=$('#rsb');if(!p)return;p.hidden=!p.hidden;
  if(b){b.setAttribute('aria-expanded',p.hidden?'false':'true');b.classList.toggle('on',!p.hidden)}ruiShow()}
-function rScroll(d){const h=Math.max(240,Math.round(innerHeight*.85));
- try{window.scrollBy({top:h*d,behavior:'smooth'})}catch(e){window.scrollBy(0,h*d)}ruiShow()}
+const rGo=y=>{const m=Math.max(0,document.documentElement.scrollHeight-innerHeight),t=Math.max(0,Math.min(m,Math.round(y)));
+ try{window.scrollTo({top:t,behavior:'smooth'})}catch(e){window.scrollTo(0,t)}};
+// 소설 글의 맨 위 / 맨 아래로. 이미 그 자리면 페이지 맨 위 / 맨 아래(댓글)로 간다.
+function rScroll(d){const a=$('#rd');ruiShow();
+ if(!a){rGo(d<0?0:document.documentElement.scrollHeight);return}
+ const bar=document.querySelector('.rbar'),off=(bar?bar.getBoundingClientRect().height:0)+14;
+ const an=document.querySelector('.anote'),end=an||a;
+ if(d<0){const y=a.getBoundingClientRect().top+scrollY-off;rGo(scrollY<=y+6?0:y)}
+ else{const y=end.getBoundingClientRect().bottom+scrollY-innerHeight+24;
+  rGo(scrollY>=y-6?document.documentElement.scrollHeight:y)}}
 let ruiT=0,ruiY=0;
 function ruiShow(){document.body.classList.remove('ruih');clearTimeout(ruiT)}
 function ruiScroll(){if(!document.getElementById('rbar')){document.body.classList.remove('ruih');return}
@@ -1081,9 +1108,9 @@ ${pv?`<a class="rbb" href="#read-${s.id}-${pv.id}">${SV(ICO.back)}<span>이전�
 <a class="rbb" href="#series-${s.id}">${SV(ICO.list)}<span>목록</span></a>
 ${nx?`<a class="rbb" href="#read-${s.id}-${nx.id}"><span>다음화</span>${SV(ICO.arr)}</a>`:`<span class="rbb" aria-disabled="true"><span>다음화</span>${SV(ICO.arr)}</span>`}
 </nav></div><div class="rsp" id="rsp" hidden><div class="rset">${rb('글자 작게',`pf('size',-1)`,SV(ICO.fdn))}${rb('글자 크게',`pf('size',1)`,SV(ICO.fup))}${rb('줄 간격 바꾸기',`pf('lh',0)`,SV(ICO.lh))}<span id="bgc" class="bgc"></span>${Object.keys(THN).map(t=>`<button data-t="${t}" class="thm ${p.th===t?'on':''}" style="background:${THC[t]}" title="${THN[t]} 배경" aria-label="${THN[t]} 배경" onclick="pt('${t}')"></button>`).join('')}${castE(e).length?`${rb(db.set.alias!==false?'별명으로 보는 중 (누르면 원래 이름)':'원래 이름으로 보는 중 (누르면 별명)',`tal()`,SV(ICO.user)+SV(ICO.swap),db.set.alias!==false?'on':'')}${rb('별명 설정',`$('#nsp').hidden=!$('#nsp').hidden`,SV(ICO.user)+SV(ICO.pen))}`:''}<button type="button" class="fs tbb fbt" id="rfb" onclick="fpOpen(this,db.prefs.font||'',f=>pfn(f),1)" title="읽기 글꼴 고르기">${SV(ICO.aa)}<span>${esc(fname(p.font))}</span></button></div></div>
-</div><div class="rbsp"></div>${nsp2(s,e)}${wnote(s,e)}<p class="bgnt" id="bgnt" hidden></p><div class="rc">${casts(e,2,1,e.povc)}${povTxt(e)?`<p class="mu" style="margin:6px 0 0">시점 · ${esc(povTxt(e))}</p>`:''}</div><article class="reader rd-${p.th}" id="rd"><h2>${esc(e.title)}</h2>${edTxt(e)?`<p class="mu" style="margin:-1.3em 0 1.8em;font-size:.78em">${edTxt(e)}</p>`:''}<div class="bd">${amap2(clean(e.html),e)}</div></article>
+</div><div class="rbsp"></div>${nsp2(s,e)}${wnote(s,e)}<p class="bgnt" id="bgnt" hidden></p><div class="rc">${casts(e,2,1,e.povc)}${povTxt(e)?`<p class="mu" style="margin:6px 0 0">시점 · ${esc(povTxt(e))}</p>`:''}${(e.cast||[]).some(id=>relHas(e,id))?`<p class="relg"><b>${SV(ICO.rel2)}관계</b><span>가 붙은 인물을 누르면, 그 인물이 다른 인물을 어떻게 여기는지 볼 수 있어요.</span></p>`:''}</div><article class="reader rd-${p.th}" id="rd"><h2>${esc(e.title)}</h2>${edTxt(e)?`<p class="mu" style="margin:-1.3em 0 1.8em;font-size:.78em">${edTxt(e)}</p>`:''}<div class="bd">${amap2(clean(e.html),e)}</div></article>
 ${anote(s,e)}<nav class="pn">${pv?`<a class="btn ghost" href="#read-${s.id}-${pv.id}">이전 화</a>`:'<span></span>'}<a class="btn ghost" href="#series-${s.id}">목차</a>${nx?`<a class="btn" href="#read-${s.id}-${nx.id}">다음 화</a>`:'<span></span>'}</nav>${cmx(s,e)}
-<div class="rfab" id="rfab"><button type="button" class="fbb" onclick="rScroll(-1)" title="위로" aria-label="위로">${SV(ICO.up)}</button><button type="button" class="fbb" onclick="rScroll(1)" title="아래로" aria-label="아래로">${SV(ICO.dn)}</button></div>`;ap();bgInit(s,e)}
+<div class="rfab" id="rfab">${canEp(s)?`<a class="fbb fbe" href="#rev-${s.id}-${e.id}" title="이 회차의 제목과 본문 고치기" aria-label="글 수정">${SV(ICO.pen)}<span>수정</span></a><a class="fbb fbe" href="#cast-${s.id}-${e.id}" title="등장인물·썸네일·시점·BGM" aria-label="회차 설정">${SV(ICO.gear)}<span>회차</span></a>`:''}<button type="button" class="fbb" onclick="rScroll(-1)" title="글 맨 위로" aria-label="글 맨 위로">${SV(ICO.up)}</button><button type="button" class="fbb" onclick="rScroll(1)" title="글 맨 아래로" aria-label="글 맨 아래로">${SV(ICO.dn)}</button></div>`;ap();bgInit(s,e)}
 
 function nwT(){const sel=$('#ws');if(!sel)return;if(sel.value==='__new'){location.hash='new';return}
  const s=find(sel.value),sh=s&&s.kind==='short',L=$('#wtl');if(!L)return;
@@ -1690,9 +1717,9 @@ function relOpen(id,sid,eid){let e=relE;
  o.addEventListener('click',ev=>{if(ev.target===o)relClose()});
  document.body.appendChild(o);document.body.classList.add('noscroll')}
 function relClose(){const o=$('#rlo');if(o)o.remove();document.body.classList.remove('noscroll')}
-const ccOne=(c,lk,pv,sub,ctx)=>{const cl=`cc${c.id===pv?' pov':''}${sub?' sub':''}`,tt=c.id===pv?'시점 인물':(c.quote?`“${c.quote}”`:'');
+const ccOne=(c,lk,pv,sub,ctx)=>{const cl=`cc${c.id===pv?' pov':''}${sub?' sub':''}${(lk===2||lk===3)&&relHas(lk===3?(ctx&&ctx.e):relE,c.id)?' hasrel':''}`,tt=c.id===pv?'시점 인물':(c.quote?`“${c.quote}”`:'');
  if(lk===2||lk===3){const ep=lk===3?(ctx&&ctx.e):relE;const arg=lk===3?`'${c.id}','${ctx&&ctx.s}','${ctx&&ctx.e&&ctx.e.id}'`:`'${c.id}'`;
-  return `<span class="${cl} rel" role="link" tabindex="0" title="${esc(relHas(ep,c.id)?c.name+'의 인물 관계 보기':(tt||c.name))}" onclick="relOpen(${arg})" onkeydown="if(event.key==='Enter')relOpen(${arg})">${av(c.img,c.name)}<span>${esc(c.name)}</span>${relHas(ep,c.id)?SV(ICO.link2):''}</span>`}
+  return `<span class="${cl} rel" role="link" tabindex="0" title="${esc(relHas(ep,c.id)?c.name+'의 인물 관계 보기':(tt||c.name))}" onclick="relOpen(${arg})" onkeydown="if(event.key==='Enter')relOpen(${arg})">${av(c.img,c.name)}<span>${esc(c.name)}</span>${relHas(ep,c.id)?`<span class="relb">${SV(ICO.rel2)}관계</span>`:''}</span>`}
  return lk===1?`<a class="${cl}" href="#char-${c.id}"${tt?` title="${esc(tt)}"`:''}>${av(c.img,c.name)}<span>${esc(c.name)}</span></a>`
  :`<span class="${cl}" role="link" tabindex="0"${tt?` title="${esc(tt)}"`:''} onclick="event.preventDefault();event.stopPropagation();location.hash='char-${c.id}'" onkeydown="if(event.key==='Enter')location.hash='char-${c.id}'">${av(c.img,c.name)}<span>${esc(c.name)}</span></span>`};
 const casts=(o,lk,lb,pv,sid)=>{const ids=o.cast||[],lead=o.leads||[],G=(o.guests||[]).filter(Boolean),ctx=sid?{s:sid,e:o}:null;
@@ -1826,10 +1853,11 @@ function vSet0(){const st=db.set;app.innerHTML=`<div class="wrap"><h1>보기 설
 <h2 class="h2" style="margin-top:32px">알림</h2><p class="mu">알림은 머리말의 종 모양에 쌓여요.</p>
 <label class="ck"><input type="checkbox" id="nte"${ntP().eps!==false?' checked':''} onchange="sset()">구독한 작품에 새 회차가 올라오면 알림</label>
 <label class="ck"><input type="checkbox" id="ntn"${ntP().snote!==false?' checked':''} onchange="sset()">구독한 작품에 작품 공지가 올라오면 알림</label>
+<label class="ck"><input type="checkbox" id="ntm"${ntP().mych!==false?' checked':''} onchange="sset()">내 캐릭터가 나오는 회차에 RP 댓글이 올라오면 알림 <span class="mu">등장인물로 넣어 둔 내 캐릭터가 있는 회차예요. 내가 쓴 RP 댓글은 빼고요</span></label>
 <label class="ck"><input type="checkbox" id="ntp"${ntP().rpc!==false?' checked':''} onchange="sset()">함께 쓰는 캐릭터로 RP 댓글이 올라오면 알림 <span class="mu">RP 함께 쓰기로 같이 쓰는 캐릭터에 한해서예요</span></label>
 <label class="ck"><input type="checkbox" id="ntr"${ntP().rep!==false?' checked':''} onchange="sset()">내 댓글에 답글이 달리면 알림 <span class="mu">내가 내 댓글에 단 답글은 알리지 않아요</span></label>
 <label>내 작품에 달린 댓글 알림<select id="ntc" onchange="sset()">${[['all','모든 댓글'],['rp','RP 댓글만'],['normal','RP가 아닌 댓글만'],['none','받지 않기']].map(o=>`<option value="${o[0]}"${ntP().cm===o[0]?' selected':''}>${o[1]}</option>`).join('')}</select></label></div>`}
-function sset0(){const nt=Object.assign(ntP(),{eps:$('#nte').checked,snote:$('#ntn')?$('#ntn').checked:true,cm:$('#ntc').value,rep:$('#ntr').checked,rpc:$('#ntp')?$('#ntp').checked:true});
+function sset0(){const nt=Object.assign(ntP(),{eps:$('#nte').checked,snote:$('#ntn')?$('#ntn').checked:true,cm:$('#ntc').value,rep:$('#ntr').checked,rpc:$('#ntp')?$('#ntp').checked:true,mych:$('#ntm')?$('#ntm').checked:true});
  db.prefs.fxOff=$('#sfx')?$('#sfx').checked:!!db.prefs.fxOff;document.body.classList.toggle('fxoff',!!db.prefs.fxOff);
  db.prefs.bgAuto=$('#sba')?$('#sba').checked:!!db.prefs.bgAuto;
  db.prefs.wpOff=$('#swp')?!$('#swp').checked:!!db.prefs.wpOff;
@@ -2133,7 +2161,7 @@ async function aup(){const f=$('#af').files[0];if(!f){toast('음원 파일을 �
  catch(e){console.error(e);toast('파일을 읽을 수 없어요')}
  finally{const b2=$('#aub');if(b2)b2.disabled=false}}
 function adl(id){db.tracks=db.tracks.filter(t=>t.id!==id);db.series.forEach(s=>{if(s.theme===id)s.theme='';s.eps.forEach(e=>{if(e.bgm===id)e.bgm='';if(e.sc)Object.keys(e.sc).forEach(k=>{if(e.sc[k]===id)delete e.sc[k]})})});save();vMusic()}
-ICO.bell=`<path d='M10.3 21a1.94 1.94 0 0 0 3.4 0'/><path d='M4 17h16a2 2 0 0 1-2-2V9a6 6 0 1 0-12 0v6a2 2 0 0 1-2 2'/>`;ICO.plusc=`<path d='M12 5v14M5 12h14'/>`;ICO.minus=`<path d='M5 12h14'/>`;
+ICO.bell=`<path d='M10.3 21a1.94 1.94 0 0 0 3.4 0'/><path d='M4 17h16a2 2 0 0 1-2-2V9a6 6 0 1 0-12 0v6a2 2 0 0 1-2 2'/>`;ICO.plusc=`<path d='M12 5v14M5 12h14'/>`;ICO.rel2=`<circle cx='6' cy='7.5' r='2.6'/><circle cx='18' cy='16.5' r='2.6'/><path d='M8.4 8.9 15.6 15.1'/>`;ICO.minus=`<path d='M5 12h14'/>`;
 // ----- 이미지 확대 보기 -----
 let zs=1,zx=0,zy=0,zd=null,zp=0;
 function zt(){const i=document.querySelector('.zo img');if(i)i.style.transform=`translate(${zx}px,${zy}px) scale(${zs})`}
@@ -2155,7 +2183,7 @@ document.addEventListener('click',e=>{const im=e.target;if(!im||im.tagName!=='IM
 addEventListener('keydown',e=>{if(e.key==='Escape'){if($('#crw'))crClose();else if($('#pvw'))pvClose();else zclose()}});
 
 // ----- 알림 -----
-const ntP=()=>Object.assign({eps:true,snote:true,cm:'all',rep:true,rpc:true,seen:'',clr:''},db.set.nt||{});
+const ntP=()=>Object.assign({eps:true,snote:true,cm:'all',rep:true,rpc:true,mych:true,seen:'',clr:''},db.set.nt||{});
 const nTs=v=>v?(Date.parse(v)||0):0;
 function nitems(){const n=ntP(),t0=nTs(n.seen),c0=nTs(n.clr),out=[],seen=new Set();
  const add=o=>{if((o.ts||0)<=c0)return;if(seen.has(o.k))return;seen.add(o.k);o.nw=(o.ts||0)>t0;out.push(o)};
@@ -2174,10 +2202,22 @@ function nitems(){const n=ntP(),t0=nTs(n.seen),c0=nTs(n.clr),out=[],seen=new Set
   add({k:'rc'+m.id,ts:m.ts,t:`${m.name}: ${m.text.slice(0,50)}`,sub:`함께 쓰는 캐릭터로 RP 댓글이 올라왔어요 · ${s.title} · ${e.title}`,href:`#read-${s.id}-${e.id}`,img:m.img,name:m.name})}))});
  if(n.cm!=='none')db.series.filter(s=>s.author===ME).forEach(s=>s.eps.forEach(e=>(e.cm||[]).forEach(m=>{if(m.mine)return;if(n.cm==='rp'&&m.kind!=='rp')return;if(n.cm==='normal'&&m.kind==='rp')return;
   add({k:'m'+m.id,ts:m.ts,t:`${m.name}: ${m.text.slice(0,50)}`,sub:`${s.title} · ${e.title}에 새 댓글`,href:`#read-${s.id}-${e.id}`,img:m.img,name:m.name})})));
+ // 내 캐릭터가 등장인물로 들어간 회차에 RP 댓글이 올라오면
+ // (같은 댓글로 이미 알림이 갔으면 겹쳐 보내지 않는다)
+ if(n.mych!==false){const mine=new Set(db.chars.filter(c=>c.owner===ME).map(c=>c.id));
+  if(mine.size)db.series.forEach(s=>{if(blk(s))return;s.eps.forEach(e=>{
+   const on=(e.cast||[]).filter(id=>mine.has(id));if(!on.length)return;
+   (e.cm||[]).forEach(m=>{if(m.mine||m.kind!=='rp')return;if(m.cid&&mine.has(m.cid))return;
+    if(seen.has('rc'+m.id))return;
+    add({k:'m'+m.id,ts:m.ts,t:`${m.name}: ${m.text.slice(0,50)}`,sub:`내 캐릭터(${on.map(id=>(chById(id)||{}).name).filter(Boolean).join(', ')})가 나오는 회차에 RP 댓글 · ${s.title} · ${e.title}`,href:`#read-${s.id}-${e.id}`,img:m.img,name:m.name})})})})}
  return out.sort((a,b)=>b.ts-a.ts).slice(0,200)}
 const nUnread=()=>nitems().filter(x=>x.nw).length;
 function hh(){const h=document.querySelector('header');if(h)document.documentElement.style.setProperty('--hh',h.getBoundingClientRect().height+'px')}
 addEventListener('resize',hh);
+const NVM={home:'home',series:'home',read:'home',mine:'mine',write:'mine',rev:'mine',edit:'mine',cast:'mine',new:'mine',chars:'chars',char:'chars',music:'music',notices:'notices',notice:'notices',settings:'settings'};
+function navUI(){const k=NVM[(location.hash.slice(1)||'home').split('-')[0]]||'';
+ document.querySelectorAll('.hd nav>a[data-nv]').forEach(a=>{const on=a.dataset.nv===k;a.classList.toggle('on',on);
+  if(on)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')})}
 function bellUI(){const b=$('#bl');if(!b||!b.classList)return;const k=ME?nUnread():0;b.innerHTML=SV(ICO.bell)+(k?`<span class="nb">${k>99?'99+':k}</span>`:'')}
 const edTxt=e=>{if(!e||!e.ed)return '';const d=new Date(e.ed);if(isNaN(d))return '';
  return '마지막 수정 '+d.toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric'})};
@@ -2255,10 +2295,13 @@ function nDel(id){if(!isAdm)return;const n=(db.notices||[]).find(x=>x.id===id);i
 let ch=null,onp=false,onl={},actT=0;
 function actTxt(){const p=(location.hash.slice(1)||'home').split('-'),s=p[1]&&find(p[1]);
  switch(p[0]){
-  case 'read':{const e=s&&s.eps.find(x=>x.id===p[2]);return s&&(!blk(s))&&e&&e.st==='공개'?`‘${s.title}’ 읽는 중`:'소설 읽는 중'}
-  case 'series':return s&&!blk(s)?`‘${s.title}’ 보는 중`:'작품 보는 중';
-  case 'write':case 'rev':return '소설 작성 중';
-  case 'edit':case 'cast':return '작품 손보는 중';case 'notice':return '공지 보는 중';
+  case 'read':{const e=s&&s.eps.find(x=>x.id===p[2]);
+   if(s&&s.priv)return '비공개 작품 읽는 중';
+   if(s&&!blk(s)&&e&&e.st!=='공개')return '비공개 회차 읽는 중';
+   return s&&(!blk(s))&&e&&e.st==='공개'?`‘${s.title}’ 읽는 중`:'소설 읽는 중'}
+  case 'series':return s&&s.priv?'비공개 작품 보는 중':(s&&!blk(s)?`‘${s.title}’ 보는 중`:'작품 보는 중');
+  case 'write':case 'rev':return s&&s.priv?'비공개 작품 쓰는 중':'소설 작성 중';
+  case 'edit':case 'cast':return s&&s.priv?'비공개 작품 손보는 중':'작품 손보는 중';case 'notice':return '공지 보는 중';
   case 'chars':return '캐릭터 작성 중';case 'char':return '캐릭터 보는 중';
   case 'music':return '음원 정리 중';
   case 'notices':return '공지 보는 중';
@@ -2320,7 +2363,7 @@ function verShow(){if($('#upb'))return;const d=document.createElement('div');d.c
  document.body.insertBefore(d,document.body.firstChild);hh()}
 function route(){if(!ME){vAuth();return}wpClose();document.body.classList.remove('rview','ruih');ruiY=0;clearTimeout(ruiT);const p=(location.hash.slice(1)||'home').split('-');if(p[0]!=='read'&&p[0]!=='series')bgStop();if(p[0]!=='rev')rev=null;if(p[0]!=='read'){rcid=null;wpLast=''}if(p[0]!=='notice'&&p[0]!=='notices')nedit=null;pvClose();
 const m={series:()=>{if(ordS&&ordS!==p[1])ordS=null;vSeries(p[1])},read:()=>vRead(p[1],p[2]),write:()=>vWrite(p[1],p[2]),rev:()=>vRev(p[1],p[2]),edit:()=>vEdit(p[1]),new:()=>vNew(p[1]),chars:()=>{ceid=null;avData='';vChars()},char:()=>{if(chc!==p[1]){chc=p[1];chp=1}vChar(p[1])},user:()=>vUser(p[1]),cast:()=>vCast(p[1],p[2]),settings:vSet,music:vMusic,alerts:vAlerts,notices:vNotices,notice:()=>vNotice(p[1]),mine:vMine};
-(Object.prototype.hasOwnProperty.call(m,p[0])?m[p[0]]:vHome)();bellUI();verUI();wfInit();fxWatch();document.body.classList.toggle('fxoff',!!db.prefs.fxOff);hh();onJoin();onTrack();window.scrollTo(0,0);if(p[0]==='home'||p[0]==='series')stale()}
+(Object.prototype.hasOwnProperty.call(m,p[0])?m[p[0]]:vHome)();bellUI();navUI();verUI();wfInit();fxWatch();document.body.classList.toggle('fxoff',!!db.prefs.fxOff);hh();onJoin();onTrack();window.scrollTo(0,0);if(p[0]==='home'||p[0]==='series')stale()}
 addEventListener('hashchange',route);
 boot();
 </script>
