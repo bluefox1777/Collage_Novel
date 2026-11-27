@@ -1104,18 +1104,6 @@ function ruiScroll(){if(!document.getElementById('rbar')){document.body.classLis
 addEventListener('scroll',ruiScroll,{passive:true});
 addEventListener('click',()=>{if(document.getElementById('rbar'))ruiShow()},true);
 function pt(t){db.prefs.th=t;save();$('#rd').className='reader rd-'+t;document.querySelectorAll('[data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t===t))}
-// ⚠ 임시 진단용 — 원인을 찾으면 지웁니다. 글쓴이와 관리자에게만 보입니다
-function dgDiag(s,e){if(!canEp(s)&&!isAdm)return '';
- const raw=String(e.html||''),n=x=>(raw.match(x)||[]).length;
- return `<details class="diag" style="margin:30px 0;padding:12px 14px;border:1px dashed var(--line);border-radius:10px">
-<summary style="cursor:pointer;color:var(--mute)">\u{1F527} 진단 (임시)</summary>
-<p class="mu" style="margin:10px 0 6px">문단 ${n(/<p[\s>]/gi)} · 줄바꿈표 ${n(/<br/gi)} · 줄바꿈글자 ${n(/\n/g)} · 빈문단 ${n(/<p>(<br\s*\/?>)?<\/p>/gi)} · 대사 ${n(/class="dg/g)} · 길이 ${raw.length}</p>
-<textarea id="dgraw" rows="10" readonly style="width:100%;font-family:monospace;font-size:12px;line-height:1.5" onclick="this.select()">${esc(raw)}</textarea>
-<div class="acts" style="margin-top:8px"><button type="button" class="btn ghost" onclick="dgCopy()">복사하기</button></div></details>`}
-function dgCopy(){const t=$('#dgraw');if(!t)return;t.focus();t.select();
- const done=()=>toast('복사했어요. 그대로 붙여넣어 주세요');
- try{navigator.clipboard.writeText(t.value).then(done,()=>{document.execCommand('copy');done()})}
- catch(x){try{document.execCommand('copy');done()}catch(y){toast('직접 드래그해서 복사해 주세요')}}}
 function vRead(sid,eid){relE=null;const s=find(sid);if(!s)return vHome();if(blk(s)&&!okb.has(s.id))return vBlk(s);const e0=s.eps.find(x=>x.id===eid);if(e0&&blkE(s,e0)&&!okb.has(e0.id))return vBlkE(s,e0);
 const es=isCo(s)?s.eps:pub(s),i=es.findIndex(x=>x.id===eid);if(i<0)return vHome();
 const e=es[i],p=db.prefs,pv=es[i-1],nx=es[i+1];relE=e;if(!coW(s))rdMark(e.id);
@@ -1128,7 +1116,7 @@ ${pv?`<a class="rbb" href="#read-${s.id}-${pv.id}">${SV(ICO.back)}<span>이전�
 ${nx?`<a class="rbb" href="#read-${s.id}-${nx.id}"><span>다음화</span>${SV(ICO.arr)}</a>`:`<span class="rbb" aria-disabled="true"><span>다음화</span>${SV(ICO.arr)}</span>`}
 </nav></div><div class="rsp" id="rsp" hidden><div class="rset">${rb('글자 작게',`pf('size',-1)`,SV(ICO.fdn))}${rb('글자 크게',`pf('size',1)`,SV(ICO.fup))}${rb('줄 간격 바꾸기',`pf('lh',0)`,SV(ICO.lh))}<span id="bgc" class="bgc"></span>${Object.keys(THN).map(t=>`<button data-t="${t}" class="thm ${p.th===t?'on':''}" style="background:${THC[t]}" title="${THN[t]} 배경" aria-label="${THN[t]} 배경" onclick="pt('${t}')"></button>`).join('')}${castE(e).length?`${rb(db.set.alias!==false?'별명으로 보는 중 (누르면 원래 이름)':'원래 이름으로 보는 중 (누르면 별명)',`tal()`,SV(ICO.user)+SV(ICO.swap),db.set.alias!==false?'on':'')}${rb('별명 설정',`$('#nsp').hidden=!$('#nsp').hidden`,SV(ICO.user)+SV(ICO.pen))}`:''}<button type="button" class="fs tbb fbt" id="rfb" onclick="fpOpen(this,db.prefs.font||'',f=>pfn(f),1)" title="읽기 글꼴 고르기">${SV(ICO.aa)}<span>${esc(fname(p.font))}</span></button></div></div>
 </div><div class="rbsp"></div>${nsp2(s,e)}${wnote(s,e)}<p class="bgnt" id="bgnt" hidden></p><div class="rc">${casts(e,2,1,e.povc)}${povTxt(e)?`<p class="mu" style="margin:6px 0 0">시점 · ${esc(povTxt(e))}</p>`:''}${(e.cast||[]).some(id=>relHas(e,id))?`<p class="relg"><b>${SV(ICO.rel2)}관계</b><span>가 붙은 인물을 누르면, 그 인물이 다른 인물을 어떻게 여기는지 볼 수 있어요.</span></p>`:''}</div><article class="reader rd-${p.th}" id="rd"><h2>${esc(e.title)}</h2>${edTxt(e)?`<p class="mu" style="margin:-1.3em 0 1.8em;font-size:.78em">${edTxt(e)}</p>`:''}<div class="bd">${amap2(clean(e.html),e)}</div></article>
-${anote(s,e)}${dgDiag(s,e)}<nav class="pn">${pv?`<a class="btn ghost" href="#read-${s.id}-${pv.id}">이전 화</a>`:'<span></span>'}<a class="btn ghost" href="#series-${s.id}">목차</a>${nx?`<a class="btn" href="#read-${s.id}-${nx.id}">다음 화</a>`:'<span></span>'}</nav>${cmx(s,e)}
+${anote(s,e)}<nav class="pn">${pv?`<a class="btn ghost" href="#read-${s.id}-${pv.id}">이전 화</a>`:'<span></span>'}<a class="btn ghost" href="#series-${s.id}">목차</a>${nx?`<a class="btn" href="#read-${s.id}-${nx.id}">다음 화</a>`:'<span></span>'}</nav>${cmx(s,e)}
 <div class="rfab" id="rfab">${canEp(s)?`<a class="fbb fbe" href="#rev-${s.id}-${e.id}" title="이 회차의 제목과 본문 고치기" aria-label="글 수정">${SV(ICO.pen)}<span>수정</span></a><a class="fbb fbe" href="#cast-${s.id}-${e.id}" title="등장인물·썸네일·시점·BGM" aria-label="회차 설정">${SV(ICO.gear)}<span>회차</span></a>`:''}<button type="button" class="fbb" onclick="rScroll(-1)" title="글 맨 위로" aria-label="글 맨 위로">${SV(ICO.up)}</button><button type="button" class="fbb" onclick="rScroll(1)" title="글 맨 아래로" aria-label="글 맨 아래로">${SV(ICO.dn)}</button></div>`;ap();bgInit(s,e)}
 
 function nwT(){const sel=$('#ws');if(!sel)return;if(sel.value==='__new'){location.hash='new';return}
@@ -1749,10 +1737,24 @@ function nlFix(root){
   for(let k=1;k<Math.floor(cnt/2);k++){const em=bl.cloneNode(false);em.removeAttribute('id');em.appendChild(document.createElement('br'));at.after(em);at=em}
   at.after(nb);
   [bl,nb].forEach(x=>x.querySelectorAll('.dg').forEach(y=>{if(!y.textContent.replace(/[\s​]/g,''))y.remove()}))}}
-function styleDlg(root){if(!root)return;nlFix(root);root.querySelectorAll('.dg[data-c]').forEach(x=>{const c=chById(x.dataset.c);x.setAttribute('style',c?dgStyle(c):'');
+// 빈 줄이 저장될 때 사라져서(아래 dlgify), 작가가 다시 넣기를 되풀이한 흔적이 쌓여 있다.
+// 아무것도 안 든 칸은 화면에서 높이가 0이라 보이지 않는다. 이어진 것은 하나로 모아 보이는 빈 줄로 만든다
+const BLANK=x=>!!x&&x.nodeType===1&&BLKS.test(x.tagName||'')&&!x.textContent.replace(/[\s\u200b]/g,'')&&!x.querySelector('img,hr');
+const EMPTY=x=>BLANK(x)&&!x.querySelector('br');
+function blkFix(root){[...root.querySelectorAll('p,div,li,blockquote')].forEach(x=>{
+  if(!EMPTY(x)||!x.parentNode)return;
+  let n=x.nextElementSibling;const run=[];
+  while(EMPTY(n)){run.push(n);n=n.nextElementSibling}
+  const near=BLANK(x.previousElementSibling)||BLANK(n);
+  run.forEach(y=>y.remove());
+  if(near)x.remove();else x.appendChild(document.createElement('br'))})}
+function styleDlg(root){if(!root)return;nlFix(root);blkFix(root);root.querySelectorAll('.dg[data-c]').forEach(x=>{const c=chById(x.dataset.c);x.setAttribute('style',c?dgStyle(c):'');
  x.querySelectorAll('[style]').forEach(y=>{y.style.color='';y.style.fontFamily='';if(!y.getAttribute('style'))y.removeAttribute('style')})})}
 function dlgify(h){const d=document.createElement('div');d.innerHTML=h;styleDlg(d);
- d.querySelectorAll('.dg').forEach(x=>{if(/^[\s\u200b“”"'‘’]*$/.test(x.textContent))x.remove()});
+ d.querySelectorAll('.dg').forEach(x=>{if(!/^[\s\u200b“”"'‘’]*$/.test(x.textContent))return;
+  const bl=x.parentElement;x.remove();
+  // 대사 칸만 비었을 뿐 작가가 띄워 둔 빈 줄이므로, 그 줄은 남겨 둔다
+  if(bl&&BLKS.test(bl.tagName||'')&&!bl.textContent.replace(/[\s\u200b]/g,'')&&!bl.querySelector('br,img,hr'))bl.appendChild(document.createElement('br'))});
  d.querySelectorAll('.nt[data-c]').forEach(x=>{let n=x.nextSibling;if(n&&n.nodeType===3&&/^\u200b/.test(n.nodeValue))n.nodeValue=n.nodeValue.replace(/^\u200b+/,'');
   n=x.nextSibling;if(!n||n.nodeType!==3)return;const m=/^\s*:\s*(["\u201c\u2018'])/.exec(n.nodeValue);if(!m)return;
   const open=m[1],close={'\u201c':'\u201d','\u2018':'\u2019','"':'"',"'":"'"}[open],rest=n.nodeValue.slice(m[0].length),end=rest.indexOf(close);if(end<0)return;
