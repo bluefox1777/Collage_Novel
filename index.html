@@ -1718,14 +1718,26 @@ function cAdj(c,dark){const o=hex2hsl(c);if(!o)return c;const q=Object.assign({}
  return hsl(q)}
 const cvar=c=>c?`--c-l:${cAdj(c,0)};--c-d:${cAdj(c,1)};color:var(--c-l);`:'';
 const dgStyle=c=>`${c.font?`font-family:'${esc(c.font)}',serif;${fsCss(c.font)}`:''}${cvar(c.tcolor)}`;
-// 예전에 여러 줄을 한꺼번에 대사로 씌우면 줄이 하나로 붙어 버렸다. 이미 그렇게 저장된 글의 줄을 되살린다
-function dgFix(x){const w=document.createTreeWalker(x,NodeFilter.SHOW_TEXT),T=[];while(w.nextNode())T.push(w.currentNode);
- T.forEach(n=>{if(n.nodeValue.indexOf('\n')<0)return;
-  const ps=n.nodeValue.split(/[ \t]*\n[ \t\n]*/),f=document.createDocumentFragment();
-  ps.forEach((s,i)=>{if(i)f.appendChild(document.createElement('br'));if(s)f.appendChild(document.createTextNode(s))});
-  n.replaceWith(f)})}
-function styleDlg(root){if(!root)return;root.querySelectorAll('.dg[data-c]').forEach(x=>{const c=chById(x.dataset.c);x.setAttribute('style',c?dgStyle(c):'');
- dgFix(x);
+// 예전에 여러 줄을 한꺼번에 대사로 씌우면 줄이 하나로 붙어 버렸다. 그때 남은 줄바꿈 글자로 원래 문단을 되살린다
+//   줄바꿈 1개 = 한 문단 안의 줄바꿈,  2개 = 문단이 바뀜,  4개 = 문단 사이에 빈 줄 하나, 6개면 빈 줄 둘…
+const BLKS=/^(P|DIV|LI|BLOCKQUOTE|H[1-6])$/;
+function nlFix(root){
+ for(let guard=0;guard<600;guard++){
+  let tn=null;const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
+  while(w.nextNode()){const n=w.currentNode;
+   if(n.nodeValue.indexOf('\n')>=0&&n.parentElement&&n.parentElement.closest('.dg')){tn=n;break}}
+  if(!tn)break;
+  const m=/\n[ \t\n]*/.exec(tn.nodeValue),cnt=(m[0].match(/\n/g)||[]).length;
+  let bl=tn.parentElement;while(bl&&bl!==root&&!BLKS.test(bl.tagName||''))bl=bl.parentElement;
+  const rest=tn.splitText(m.index);rest.nodeValue=rest.nodeValue.slice(m[0].length);
+  if(cnt<2||!bl||bl===root||!root.contains(bl)){rest.parentNode.insertBefore(document.createElement('br'),rest);continue}
+  const rg=document.createRange();rg.setStartBefore(rest);rg.setEnd(bl,bl.childNodes.length);
+  const nb=bl.cloneNode(false);nb.removeAttribute('id');nb.appendChild(rg.extractContents());
+  let at=bl;
+  for(let k=1;k<Math.floor(cnt/2);k++){const em=bl.cloneNode(false);em.removeAttribute('id');em.appendChild(document.createElement('br'));at.after(em);at=em}
+  at.after(nb);
+  [bl,nb].forEach(x=>x.querySelectorAll('.dg').forEach(y=>{if(!y.textContent.replace(/[\s​]/g,''))y.remove()}))}}
+function styleDlg(root){if(!root)return;nlFix(root);root.querySelectorAll('.dg[data-c]').forEach(x=>{const c=chById(x.dataset.c);x.setAttribute('style',c?dgStyle(c):'');
  x.querySelectorAll('[style]').forEach(y=>{y.style.color='';y.style.fontFamily='';if(!y.getAttribute('style'))y.removeAttribute('style')})})}
 function dlgify(h){const d=document.createElement('div');d.innerHTML=h;styleDlg(d);
  d.querySelectorAll('.dg').forEach(x=>{if(/^[\s\u200b“”"'‘’]*$/.test(x.textContent))x.remove()});
